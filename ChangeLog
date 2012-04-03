@@ -1,0 +1,11 @@
+TODO
+* add libcfile_codepage.h and codepage functions
+* merge with bfio file functions
+* update include header
+* update man page
+* add tests
+* add msvscpp, borlandc5 and codegear files
+
+20120403
+* Worked on stand-alone version
+
