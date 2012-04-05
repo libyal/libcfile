@@ -43,6 +43,59 @@ LIBCFILE_EXTERN \
 const char *libcfile_get_version(
              void );
 
+/* -------------------------------------------------------------------------
+ * File functions
+ * ------------------------------------------------------------------------- */
+
+LIBCFILE_EXTERN \
+int libcfile_file_initialize(
+     libcfile_file_t **file,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_free(
+     libcfile_file_t **file,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_open(
+     libcfile_file_t *file,
+     const libcstring_system_character_t *filename,
+     int access_flags,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_close(
+     libcfile_file_t *file,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_read(
+         libcfile_file_t *file,
+         uint8_t *buffer,
+         size_t size,
+         libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_write(
+         libcfile_file_t *file,
+         uint8_t *buffer,
+         size_t size,
+         libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+off64_t libcfile_file_seek_offset(
+         libcfile_file_t *file,
+         off64_t offset,
+         int whence,
+         libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_resize(
+     libcfile_file_t *file,
+     size64_t size,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

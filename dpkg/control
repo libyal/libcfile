@@ -1,0 +1,22 @@
+Source: libcfile
+Section: unknown
+Priority: extra
+Maintainer: Joachim Metz <jbmetz@users.sourceforge.net>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.8.3
+Homepage: https://sourceforge.net/projects/libctype/
+
+Package: libcfile
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Library to support cross-platform C file functions
+ libcfile is a library to support cross-platform C file functions.
+
+Package: libcfile-dev
+Section: libdevel
+Architecture: any
+Depends: libcfile (= ${Source-Version})
+Description: Header files and libraries for developing applications for libcfile
+ Header files and libraries for developing applications for libcfile.
+

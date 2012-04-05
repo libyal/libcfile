@@ -27,10 +27,6 @@
 #include <errno.h>
 #endif
 
-#if defined( HAVE_SYS_STAT_H ) || defined( WINAPI )
-#include <sys/stat.h>
-#endif
-
 #if defined( HAVE_FCNTL_H ) || defined( WINAPI )
 #include <fcntl.h>
 #endif

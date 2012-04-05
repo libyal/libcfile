@@ -1,6 +1,6 @@
 dnl Functions for libcstring
 dnl
-dnl Version: 20120325
+dnl Version: 20120405
 
 dnl Function to detect if libcstring is available
 dnl ac_libcstring_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -17,7 +17,8 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LIB],
   ])
 
  AS_IF(
-  [test "x$ac_cv_with_libcstring" != xno],
+  [test "x$ac_cv_with_libcstring" = xno],
+  [ac_cv_libcstring=no],
   [dnl Check for headers
   AC_CHECK_HEADERS([libcstring.h])
  
@@ -26,7 +27,7 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LIB],
    [ac_cv_libcstring=no],
    [ac_cv_libcstring=yes
    AC_CHECK_LIB(
-    fdatetime,
+    cstring,
     libcstring_get_version,
     [ac_cv_libcstring_dummy=yes],
     [ac_cv_libcstring=no])
@@ -41,7 +42,8 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LIB],
    [HAVE_LIBCSTRING],
    [1],
    [Define to 1 if you have the `cstring' library (-lcstring).])
-  LIBS="-lcstring $LIBS"
+
+  ac_cv_libcstring_LIBADD="-lcstring"
   ])
 
  AS_IF(
@@ -275,6 +277,11 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LOCAL],
     [1])
    ])
   ])
+
+ ac_cv_libcstring_CPPFLAGS="-I../libcstring";
+ ac_cv_libcstring_LIBADD="../libcstring/libcstring.la";
+
+ ac_cv_libcstring=local
  ])
 
 dnl Function to detect how to enable libcstring
@@ -286,8 +293,25 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_ENABLE],
   [auto-detect],
   [DIR])
 
- AX_LIBCSTRING_CHECK_LIB
+ dnl Check for a pkg-config file
+ AS_IF(
+  [test "x$PKGCONFIG" != "x"],
+  [PKG_CHECK_MODULES(
+   [libcstring],
+   [libcstring >= 20120405],
+   [ac_cv_libcstring=yes],
+   [ac_cv_libcstring=no])
 
+  ac_cv_libcstring_CPPFLAGS="$pkg_cv_libcstring_CFLAGS"
+  ac_cv_libcstring_LIBADD="$pkg_cv_libcstring_LIBS"
+ ])
+
+ dnl Check for a shared library version
+ AS_IF(
+  [test "x$ac_cv_libcstring" != xyes],
+  [AX_LIBCSTRING_CHECK_LIB])
+
+ dnl Check if the dependencies for the local library version
  AS_IF(
   [test "x$ac_cv_libcstring" != xyes],
   [AX_LIBCSTRING_CHECK_LOCAL
@@ -299,19 +323,23 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_ENABLE],
   AC_SUBST(
    [HAVE_LOCAL_LIBCSTRING],
    [1])
-  AC_SUBST(
-   [LIBCSTRING_CPPFLAGS],
-   [-I../libcstring])
-  AC_SUBST(
-   [LIBCSTRING_LIBADD],
-   [../libcstring/libcstring.la])
-
-  ac_cv_libcstring=local
   ])
 
  AM_CONDITIONAL(
   [HAVE_LOCAL_LIBCSTRING],
   [test "x$ac_cv_libcstring" = xlocal])
+ AS_IF(
+  [test "x$ac_cv_libcstring_CPPFLAGS" != "x"],
+  [AC_SUBST(
+   [LIBCSTRING_CPPFLAGS],
+   [$ac_cv_libcstring_CPPFLAGS])
+  ])
+ AS_IF(
+  [test "x$ac_cv_libcstring_LIBADD" != "x"],
+  [AC_SUBST(
+   [LIBCSTRING_LIBADD],
+   [$ac_cv_libcstring_LIBADD])
+  ])
 
  AS_IF(
   [test "x$ac_cv_libcstring" = xyes],

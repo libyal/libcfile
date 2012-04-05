@@ -1,0 +1,61 @@
+#!/usr/bin/make -f
+# debian/rules that uses debhelper >= 7.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+
+%:
+	dh  $@
+
+install_libcfile:
+	# Set up libcfile package directories and files
+	mkdir -p debian/libcfile/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.so.*.*.* debian/libcfile/usr/lib
+
+install_libcfile_dev:
+	# Set up libcfile-dev package directories and files
+	mkdir -p debian/libcfile-dev/usr/include
+	mkdir -p debian/libcfile-dev/usr/include/libcfile
+	mkdir -p debian/libcfile-dev/usr/lib
+	mkdir -p debian/libcfile-dev/usr/lib/pkgconfig
+	mkdir -p debian/libcfile-dev/usr/share/man/man3
+	install -p -m755 debian/tmp/usr/include/*.h debian/libcfile-dev/usr/include
+	install -p -m755 debian/tmp/usr/include/libcfile/*.h debian/libcfile-dev/usr/include/libcfile
+	install -p -m755 debian/tmp/usr/lib/*.la debian/libcfile-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.a debian/libcfile-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.so debian/libcfile-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/pkgconfig/* debian/libcfile-dev/usr/lib/pkgconfig
+	install -p -m755 debian/tmp/usr/share/man/man3/* debian/libcfile-dev/usr/share/man/man3
+
+override_dh_installinit: install_libcfile install_libcfile_dev
+
+override_dh_installmenu:
+
+override_dh_installmime:
+
+override_dh_installmodules:
+
+override_dh_installlogcheck:
+
+override_dh_installlogrotate:
+
+override_dh_installpam:
+
+override_dh_installppp:
+
+override_dh_installudev:
+
+override_dh_installwm:
+
+override_dh_installxfonts:
+
+override_dh_gconf:
+
+override_dh_icons:
+
+override_dh_perl:
+

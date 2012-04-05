@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libcfile],
- [20120403],
+ [20120404],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -18,8 +18,6 @@ AC_CANONICAL_HOST
 dnl Check for large file support
 AC_SYS_LARGEFILE
 
-dnl Check for configure arguments
-
 dnl Check for libtool DLL support
 AC_LIBTOOL_WIN32_DLL
 
@@ -28,8 +26,13 @@ AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+
+dnl Check for libtool
 AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
+
+dnl Check for pkg-config
+AC_PATH_PROG(PKGCONFIG,[pkg-config])
 
 dnl Support of internationalization (i18n)
 AM_GNU_GETTEXT([external])
@@ -63,16 +66,8 @@ AX_LIBUNA_CHECK_ENABLE
 dnl Check for library function support
 AX_LIBCFILE_CHECK_LOCAL
 
-dnl Check if requires and build requires should be set in spec file
-AS_IF(
- [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libuna" = xyes],
- [AC_SUBST(
-  [libcfile_spec_requires],
-  [Requires:])
- AC_SUBST(
-  [libcfile_spec_build_requires],
-  [BuildRequires:])
- ])
+dnl Set additional compiler flags
+CFLAGS="$CFLAGS -Wall";
 
 dnl Set memwatch support
 ac_cv_enable_memwatch=no
@@ -90,8 +85,21 @@ AM_CONDITIONAL(
  [HAVE_MEMWATCH],
  [test "x$ac_cv_enable_memwatch" != xno])
 
-dnl Set additional compiler flags
-CFLAGS="$CFLAGS -Wall";
+dnl Check if requires and build requires should be set in spec file
+AS_IF(
+ [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libuna" = xyes],
+ [AC_SUBST(
+  [libcfile_spec_requires],
+  [Requires:])
+ AC_SUBST(
+  [libcfile_spec_build_requires],
+  [BuildRequires:])
+ ])
+
+dnl Set the date for dpkg files
+AC_SUBST(
+ [DATE],
+ [`date -R 2> /dev/null`])
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
@@ -113,6 +121,8 @@ AC_CONFIG_FILES([include/libcfile/types.h])
 AC_CONFIG_FILES([libcfile/libcfile_definitions.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([common/types.h])
+AC_CONFIG_FILES([dpkg/changelog])
+AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([libcfile/libcfile.rc])
 AC_CONFIG_FILES([libcfile.pc])
 AC_CONFIG_FILES([libcfile.spec])

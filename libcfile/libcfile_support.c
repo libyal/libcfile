@@ -22,6 +22,14 @@
 #include <common.h>
 #include <types.h>
 
+#if defined( HAVE_SYS_STAT_H ) || defined( WINAPI )
+#include <sys/stat.h>
+#endif
+
+#if defined( HAVE_ERRNO_H ) || defined( WINAPI )
+#include <errno.h>
+#endif
+
 #include "libcfile_definitions.h"
 #include "libcfile_libcerror.h"
 #include "libcfile_libcstring.h"
