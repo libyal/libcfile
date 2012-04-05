@@ -33,13 +33,19 @@
 
 #if defined( WINAPI )
 #include <io.h>
-
-#elif defined( HAVE_UNISTD_H )
-#include <unistd.h>
 #endif
 
 #if defined( WINAPI ) && !defined( __CYGWIN__ )
 #include <share.h>
+#endif
+
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
+#if defined( HAVE_GLIB_H )
+#include <glib.h>
+#include <glib/gstdio.h>
 #endif
 
 #include "libcfile_definitions.h"
@@ -186,7 +192,7 @@ int libcfile_file_free(
  */
 int libcfile_file_open(
      libcfile_file_t *file,
-     const libcstring_system_character_t *filename,
+     const char *filename,
      int access_flags,
      libcerror_error_t **error )
 {
@@ -246,8 +252,9 @@ int libcfile_file_open(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported access flags.",
-		 function );
+		 "%s: unsupported access flags: 0x%02x.",
+		 function,
+		 access_flags );
 
 		return( -1 );
 	}
@@ -256,8 +263,8 @@ int libcfile_file_open(
 	{
 		file_io_creation_flags = CREATE_ALWAYS;
 	}
-	internal_file->handle = CreateFile(
-	                         (LPCTSTR) filename,
+	internal_file->handle = CreateFileA(
+	                         (LPCSTR) filename,
 	                         file_io_access_flags,
 	                         file_io_shared_flags,
 	                         NULL,
@@ -324,7 +331,7 @@ int libcfile_file_open(
  */
 int libcfile_file_open(
      libcfile_file_t *file,
-     const libcstring_system_character_t *filename,
+     const char *filename,
      int access_flags,
      libcerror_error_t **error )
 {
@@ -371,8 +378,9 @@ int libcfile_file_open(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported access flags.",
-		 function );
+		 "%s: unsupported access flags: 0x%02x.",
+		 function,
+		 access_flags );
 
 		return( -1 );
 	}
@@ -381,21 +389,12 @@ int libcfile_file_open(
 	{
 		file_io_flags |= _O_TRUNC;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( _wsopen_s(
-	     &( internal_file->descriptor ),
-	     (wchar_t *) filename,
-	     file_io_flags | _O_BINARY,
-	     file_io_shared_flags,
-	     file_io_permission_flags ) != 0 )
-#else
 	if( _sopen_s(
 	     &( internal_file->descriptor ),
 	     (char *) filename,
 	     file_io_flags | _O_BINARY,
 	     file_io_shared_flags,
 	     file_io_permission_flags ) != 0 )
-#endif
 	{
 		switch( errno )
 		{
@@ -458,7 +457,7 @@ int libcfile_file_open(
  */
 int libcfile_file_open(
      libcfile_file_t *file,
-     const libcstring_system_character_t *filename,
+     const char *filename,
      int access_flags,
      libcerror_error_t **error )
 {
@@ -517,8 +516,9 @@ int libcfile_file_open(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported access flags.",
-		 function );
+		 "%s: unsupported access flags: 0x%02x.",
+		 function,
+		 access_flags );
 
 		return( -1 );
 	}
@@ -532,30 +532,21 @@ int libcfile_file_open(
 #endif
 	}
 #if defined( WINAPI )
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	internal_file->descriptor = _wsopen(
-	                             (wchar_t *) filename,
-	                             file_io_flags | _O_BINARY,
-	                             file_io_permission_flags );
-#else
 	internal_file->descriptor = _sopen(
-	                             (char *) filename,
+	                             filename,
 	                             file_io_flags | _O_BINARY,
 	                             file_io_permission_flags );
-#endif
-
-#else
-/* Sanity check
- */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-#error Missing wide character open function
-#endif
-	internal_file->descriptor = open(
-	                             (char *) filename,
+#elif defined( HAVE_GLIB_H )
+	internal_file->descriptor = g_open(
+	                             filename,
 	                             file_io_flags,
 	                             0644 );
-
-#endif /* defined( WINAPI ) */
+#else
+	internal_file->descriptor = open(
+	                             filename,
+	                             file_io_flags,
+	                             0644 );
+#endif /* HAVE_GLIB_H */
 
 	if( internal_file->descriptor == -1 )
 	{
@@ -603,6 +594,553 @@ int libcfile_file_open(
 #else
 #error Missing file open function
 #endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( WINAPI ) && ( WINVER >= 0x0501 ) && !defined( USE_CRT_FUNCTIONS )
+
+/* Opens a file
+ * This function uses the WINAPI function for Windows XP or later
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_open_wide(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_open_wide";
+	DWORD error_code                        = 0;
+	DWORD file_io_access_flags              = 0;
+	DWORD file_io_creation_flags            = 0;
+	DWORD file_io_shared_flags              = 0;
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+	if( internal_file->handle != INVALID_HANDLE_VALUE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 ) )
+	{
+		file_io_access_flags   = GENERIC_WRITE | GENERIC_READ;
+		file_io_creation_flags = OPEN_ALWAYS;
+		file_io_shared_flags   = FILE_SHARE_READ;
+	}
+	else if( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_READ ) != 0 )
+	{
+		file_io_access_flags   = GENERIC_READ;
+		file_io_creation_flags = OPEN_EXISTING;
+		file_io_shared_flags   = FILE_SHARE_READ;
+	}
+	else if( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 )
+	{
+		file_io_access_flags   = GENERIC_WRITE;
+		file_io_creation_flags = OPEN_ALWAYS;
+		file_io_shared_flags   = 0;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported access flags: 0x%02x.",
+		 function,
+		 access_flags );
+
+		return( -1 );
+	}
+	if( ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 )
+	 && ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_TRUNCATE ) != 0 ) )
+	{
+		file_io_creation_flags = CREATE_ALWAYS;
+	}
+	internal_file->handle = CreateFileW(
+	                         (LPCWSTR) filename,
+	                         file_io_access_flags,
+	                         file_io_shared_flags,
+	                         NULL,
+	                         file_io_creation_flags,
+	                         FILE_ATTRIBUTE_NORMAL,
+	                         NULL );
+
+	if( internal_file->handle == INVALID_HANDLE_VALUE )
+	{
+		error_code = GetLastError();
+
+		switch( error_code )
+		{
+			case ERROR_ACCESS_DENIED:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
+				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+
+			case ERROR_FILE_NOT_FOUND:
+			case ERROR_PATH_NOT_FOUND:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
+				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+
+			default:
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_OPEN_FAILED,
+				 error_code,
+				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+		}
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+
+/* TODO */
+#error WINAPI file open function for Windows 2000 or earlier NOT implemented yet
+
+#elif defined( WINAPI ) && defined( USE_CRT_FUNCTIONS ) && defined( _MSC_VER )
+
+/* Opens a file
+ * This function uses the Visual Studio C runtime library function
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_open_wide(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_open_wide";
+	int file_io_permission_flags            = 0;
+	int file_io_flags                       = 0;
+	int file_io_shared_flags                = 0;
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+	if( ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 ) )
+	{
+		file_io_flags            = _O_RDWR | _O_CREAT;
+		file_io_permission_flags = _S_IREAD | _S_IWRITE;
+		file_io_shared_flags     = _SH_DENYWR;
+	}
+	else if( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_READ ) != 0 )
+	{
+		file_io_flags        = _O_RDONLY;
+		file_io_shared_flags = _SH_DENYWR;
+	}
+	else if( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 )
+	{
+		file_io_flags            = _O_WRONLY | _O_CREAT;
+		file_io_permission_flags = _S_IREAD | _S_IWRITE;
+		file_io_shared_flags     = _SH_DENYRW;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported access flags: 0x%02x.",
+		 function,
+		 access_flags );
+
+		return( -1 );
+	}
+	if( ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 )
+	 && ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_TRUNCATE ) != 0 ) )
+	{
+		file_io_flags |= _O_TRUNC;
+	}
+	if( _wsopen_s(
+	     &( internal_file->descriptor ),
+	     (wchar_t *) filename,
+	     file_io_flags | _O_BINARY,
+	     file_io_shared_flags,
+	     file_io_permission_flags ) != 0 )
+	{
+		switch( errno )
+		{
+			case EACCES:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
+				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+
+			case ENOENT:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
+				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+
+			default:
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_OPEN_FAILED,
+				 errno,
+				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+		}
+		return( -1 );
+	}
+	if( internal_file->descriptor == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: invalid descriptor: %d returned.",
+		 function,
+		 internal_file->descriptor );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#elif defined( HAVE_OPEN ) || defined( WINAPI )
+
+/* Opens a file
+ * This function uses the POSIX open function or equivalent
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_open_wide(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_open_wide";
+	int file_io_flags                       = 0;
+
+#if defined( WINAPI )
+	int file_io_permission_flags            = 0;
+	int file_io_flags                       = 0;
+#else
+	char *narrow_filename                   = NULL;
+	size_t filename_size                    = 0;
+	size_t narrow_filename_size             = 0;
+#endif
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+	if( ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 ) )
+	{
+#if defined( WINAPI )
+		file_io_flags            = _O_RDWR | _O_CREAT;
+		file_io_permission_flags = _S_IREAD | _S_IWRITE;
+#else
+		file_io_flags            = O_RDWR | O_CREAT;
+#endif
+	}
+	else if( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_READ ) != 0 )
+	{
+#if defined( WINAPI )
+		file_io_flags = _O_RDONLY;
+#else
+		file_io_flags = O_RDONLY;
+#endif
+	}
+	else if( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 )
+	{
+#if defined( WINAPI )
+		file_io_flags            = _O_WRONLY | _O_CREAT;
+		file_io_permission_flags = _S_IREAD | _S_IWRITE;
+#else
+		file_io_flags            = O_WRONLY | O_CREAT;
+#endif
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported access flags: 0x%02x.",
+		 function,
+		 access_flags );
+
+		return( -1 );
+	}
+	if( ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_WRITE ) != 0 )
+	 && ( ( access_flags & LIBCFILE_FILE_ACCESS_FLAG_TRUNCATE ) != 0 ) )
+	{
+#if defined( WINAPI )
+		file_io_flags |= _O_TRUNC;
+#else
+		file_io_flags |= O_TRUNC;
+#endif
+	}
+#if defined( WINAPI )
+	internal_file->descriptor = _wsopen(
+	                             (wchar_t *) filename,
+	                             file_io_flags | _O_BINARY,
+	                             file_io_permission_flags );
+#else
+	filename_size = 1 + libcstring_wide_string_length(
+	                     filename );
+
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_size_from_utf32(
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          &narrow_filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_size_from_utf16(
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          &narrow_filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_size_from_utf32(
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          &narrow_filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_size_from_utf16(
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          &narrow_filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine narrow character filename size.",
+		 function );
+
+		return( -1 );
+	}
+	narrow_filename = libcstring_narrow_string_allocate(
+	                   narrow_filename_size );
+
+	if( narrow_filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create narrow character filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_copy_from_utf32(
+		          (libuna_utf8_character_t *) narrow_filename,
+		          narrow_filename_size,
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_copy_from_utf16(
+		          (libuna_utf8_character_t *) narrow_filename,
+		          narrow_filename_size,
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_copy_from_utf32(
+		          (uint8_t *) narrow_filename,
+		          narrow_filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_copy_from_utf16(
+		          (uint8_t *) narrow_filename,
+		          narrow_filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set narrow character filename.",
+		 function );
+
+		memory_free(
+		 narrow_filename );
+
+		return( -1 );
+	}
+#if defined( HAVE_GLIB_H )
+	internal_file->descriptor = g_open(
+	                             narrow_filename,
+	                             file_io_flags,
+	                             0644 );
+#else
+	internal_file->descriptor = open(
+	                             narrow_filename,
+	                             file_io_flags,
+	                             0644 );
+#endif /* HAVE_GLIB_H */
+
+	memory_free(
+	 narrow_filename );
+
+#endif /* defined( WINAPI ) */
+
+	if( internal_file->descriptor == -1 )
+	{
+		switch( errno )
+		{
+			case EACCES:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
+				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+
+			case ENOENT:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
+				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+
+			default:
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_OPEN_FAILED,
+				 errno,
+				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 filename );
+
+				break;
+		}
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#else
+#error Missing file open wide function
+#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( WINAPI ) && ( WINVER >= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
 
@@ -834,6 +1372,8 @@ ssize_t libcfile_file_read(
 		 "%s: invalid read count: %" PRIzd " returned.",
 		 function,
 		 read_count );
+
+		return( -1 );
 	}
 	return( read_count );
 }
@@ -1035,6 +1575,8 @@ ssize_t libcfile_file_write(
 		 "%s: invalid write count: %" PRIzd " returned.",
 		 function,
 		 write_count );
+
+		return( -1 );
 	}
 	return( write_count );
 }
@@ -1141,10 +1683,110 @@ ssize_t libcfile_file_write(
 #error Missing file write function
 #endif
 
-#if defined( WINAPI ) && ( WINVER >= 0x0501 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+
+#if !defined( INVALID_SET_FILE_POINTER )
+#define INVALID_SET_FILE_POINTER	((LONG) -1)
+#endif
+
+/* Cross Windows safe version of SetFilePointerEx
+ * Returns TRUE if successful or FALSE on error
+ */
+BOOL libcfile_SetFilePointerEx(
+      HANDLE file_handle,
+      LARGE_INTEGER distance_to_move_large_integer,
+      LARGE_INTEGER *new_file_pointer_large_integer,
+      DWORD move_method )
+{
+	FARPROC function                 = NULL;
+	HMODULE library_handle           = NULL;
+	LONG distance_to_move_lower_long = 0;
+	LONG distance_to_move_upper_long = 0;
+	DWORD error_number               = 0;
+	BOOL result                      = FALSE;
+
+	if( file_handle == NULL )
+	{
+		return( FALSE );
+	}
+	if( new_file_pointer_large_integer == NULL )
+	{
+		return( FALSE );
+	}
+	library_handle = LoadLibrary(
+	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+
+	if( library_handle == NULL )
+	{
+		return( FALSE );
+	}
+	function = GetProcAddress(
+		    library_handle,
+		    (LPCSTR) "SetFilePointerEx" );
+
+	if( function != NULL )
+	{
+		result = function(
+			  file_handle,
+			  distance_to_move_large_integer,
+			  new_file_pointer_large_integer,
+			  move_method );
+	}
+	else
+	{
+#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x520
+		distance_to_move_lower_long = distance_to_move_large_integer.QuadPart & 0xffffffffUL;
+		distance_to_move_upper_long = distance_to_move_large_integer.QuadPart >> 32;
+#else
+		distance_to_move_lower_long = distance_to_move_large_integer.LowPart;
+		distance_to_move_upper_long = distance_to_move_large_integer.HighPart;
+#endif
+
+/* TODO make sure SetFilePointer is WINAPI version safe ? Officially first supported in Windows XP */
+		distance_to_move_lower_long = SetFilePointer(
+					       file_handle,
+					       distance_to_move_lower_long,
+					       &distance_to_move_upper_long,
+					       move_method );
+
+		error_number = GetLastError();
+
+		if( ( distance_to_move_lower_long == (LONG) INVALID_SET_FILE_POINTER )
+		 && ( error_number != NO_ERROR ) )
+		{
+		}
+		else
+		{
+#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x520
+			new_file_pointer_large_integer->QuadPart   = distance_to_move_upper_long;
+			new_file_pointer_large_integer->QuadPart <<= 32;
+			new_file_pointer_large_integer->QuadPart  += distance_to_move_lower_long;
+#else
+			new_file_pointer_large_integer->HighPart = distance_to_move_upper_long;
+			new_file_pointer_large_integer->LowPart  = distance_to_move_lower_long;
+#endif
+
+			result = TRUE;
+		}
+	}
+	/* This call should be after using the function
+	 * in most cases kernel32.dll will still be available after free
+	 */
+	if( FreeLibrary(
+	     library_handle ) != TRUE )
+	{
+		result = FALSE;
+	}
+	return( result );
+}
+
+#endif
+
+#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 
 /* Seeks a certain offset within the file
- * This function uses the WINAPI function for Windows XP or later
+ * This function uses the WINAPI function for Windows XP (0x0501) or later
+ * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
  * Returns the offset if the seek is successful or -1 on error
  */
 off64_t libcfile_file_seek_offset(
@@ -1222,15 +1864,23 @@ off64_t libcfile_file_seek_offset(
 #if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
 	large_integer_offset.QuadPart = (LONGLONG) offset;
 #else
-	large_integer_offset.LowPart  = (DWORD) ( 0x0ffffffff & offset );
+	large_integer_offset.LowPart  = (DWORD) ( 0x0ffffffffUL & offset );
 	large_integer_offset.HighPart = (LONG) ( offset >> 32 );
 #endif
 
+#if ( WINVER <= 0x0500 )
+	if( libcfile_SetFilePointerEx(
+	     internal_file->handle,
+	     large_integer_offset,
+	     &large_integer_offset,
+	     move_method ) == 0 )
+#else
 	if( SetFilePointerEx(
 	     internal_file->handle,
 	     large_integer_offset,
 	     &large_integer_offset,
 	     move_method ) == 0 )
+#endif
 	{
 		error_code = GetLastError();
 
@@ -1264,11 +1914,6 @@ off64_t libcfile_file_seek_offset(
 	}
 	return( offset );
 }
-
-#elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
-
-/* TODO */
-#error WINAPI file seek function for Windows 2000 or earlier NOT implemented yet
 
 #elif defined( HAVE_LSEEK ) || defined( WINAPI )
 
@@ -1418,15 +2063,23 @@ int libcfile_file_resize(
 #if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
 	large_integer_offset.QuadPart = (LONGLONG) size;
 #else
-	large_integer_offset.LowPart  = (DWORD) ( 0x0ffffffff & size );
+	large_integer_offset.LowPart  = (DWORD) ( 0x0ffffffffUL & size );
 	large_integer_offset.HighPart = (LONG) ( size >> 32 );
 #endif
 
+#if ( WINVER <= 0x0500 )
+	if( libcfile_SetFilePointerEx(
+	     internal_file->handle,
+	     large_integer_offset,
+	     &large_integer_offset,
+	     FILE_BEGIN ) == 0 )
+#else
 	if( SetFilePointerEx(
 	     internal_file->handle,
 	     large_integer_offset,
 	     &large_integer_offset,
 	     FILE_BEGIN ) == 0 )
+#endif
 	{
 		error_code = GetLastError();
 
@@ -1556,4 +2209,38 @@ int libcfile_file_resize(
 #else
 #error Missing file truncate function
 #endif
+
+/* Check if the file is open
+ * Returns 1 if open, 0 if not or -1 on error
+ */
+int libcfile_file_is_open(
+     libcfile_file_t *file,
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_is_open";
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+	if( internal_file->handle == INVALID_HANDLE_VALUE )
+#else
+	if( internal_file->descriptor == -1 )
+#endif
+	{
+		return( 0 );
+	}
+	return( 1 );
+}
 

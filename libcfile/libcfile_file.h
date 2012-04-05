@@ -58,14 +58,33 @@ int libcfile_file_free(
 LIBCFILE_EXTERN \
 int libcfile_file_open(
      libcfile_file_t *file,
-     const libcstring_system_character_t *filename,
+     const char *filename,
      int access_flags,
      libcerror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+LIBCFILE_EXTERN \
+int libcfile_file_open_wide(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     libcerror_error_t **error );
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_close(
      libcfile_file_t *file,
      libcerror_error_t **error );
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+/* TODO implement */
+BOOL libcfile_ReadFile(
+      HANDLE file_handle,
+      LPVOID buffer,
+      DWORD read_size,
+      DWORD *read_count,
+      LPOVERLAPPED overlapped );
+#endif
 
 LIBCFILE_EXTERN \
 ssize_t libcfile_file_read(
@@ -74,12 +93,30 @@ ssize_t libcfile_file_read(
          size_t size,
          libcerror_error_t **error );
 
+#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+/* TODO implement */
+BOOL libcfile_WriteFile(
+      HANDLE file_handle,
+      LPVOID buffer,
+      DWORD write_size,
+      DWORD *write_count,
+      LPOVERLAPPED overlapped );
+#endif
+
 LIBCFILE_EXTERN \
 ssize_t libcfile_file_write(
          libcfile_file_t *file,
          uint8_t *buffer,
          size_t size,
          libcerror_error_t **error );
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+BOOL libcfile_SetFilePointerEx(
+      HANDLE file_handle,
+      LARGE_INTEGER distance_to_move_large_integer,
+      LARGE_INTEGER *new_file_pointer_large_integer,
+      DWORD move_method );
+#endif
 
 LIBCFILE_EXTERN \
 off64_t libcfile_file_seek_offset(
@@ -92,6 +129,11 @@ LIBCFILE_EXTERN \
 int libcfile_file_resize(
      libcfile_file_t *file,
      size64_t size,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_is_open(
+     libcfile_file_t *file,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
