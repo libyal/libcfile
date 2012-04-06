@@ -87,7 +87,7 @@ BOOL libcfile_ReadFile(
 #endif
 
 LIBCFILE_EXTERN \
-ssize_t libcfile_file_read(
+ssize_t libcfile_file_read_buffer(
          libcfile_file_t *file,
          uint8_t *buffer,
          size_t size,
@@ -104,9 +104,9 @@ BOOL libcfile_WriteFile(
 #endif
 
 LIBCFILE_EXTERN \
-ssize_t libcfile_file_write(
+ssize_t libcfile_file_write_buffer(
          libcfile_file_t *file,
-         uint8_t *buffer,
+         const uint8_t *buffer,
          size_t size,
          libcerror_error_t **error );
 
@@ -125,6 +125,11 @@ off64_t libcfile_file_seek_offset(
          int whence,
          libcerror_error_t **error );
 
+#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+BOOL libcfile_SetEndOfFile(
+      HANDLE file_handle );
+#endif
+
 LIBCFILE_EXTERN \
 int libcfile_file_resize(
      libcfile_file_t *file,
@@ -134,6 +139,24 @@ int libcfile_file_resize(
 LIBCFILE_EXTERN \
 int libcfile_file_is_open(
      libcfile_file_t *file,
+     libcerror_error_t **error );
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+BOOL libcfile_GetFileSizeEx(
+      HANDLE file_handle,
+      LARGE_INTEGER *file_size_large_integer );
+#endif
+
+LIBCFILE_EXTERN \
+int libcfile_file_get_offset(
+     libcfile_file_t *file,
+     off64_t *offset,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_get_size(
+     libcfile_file_t *file,
+     size64_t *size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

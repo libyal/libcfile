@@ -1,5 +1,5 @@
 /*
- * The internal libcpath header
+ * The internal libcfile header
  *
  * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,19 +19,19 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _CPATH_TEST_LIBCPATH_H )
-#define _CPATH_TEST_LIBCPATH_H
+#if !defined( _CFILE_TEST_LIBCFILE_H )
+#define _CFILE_TEST_LIBCFILE_H
 
 #include <common.h>
 
-/* If Cygwin libtool DLL support is enabled set LIBCPATH_DLL_IMPORT
- * before including libcpath.h
+/* If Cygwin libtool DLL support is enabled set LIBCFILE_DLL_IMPORT
+ * before including libcfile.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBCPATH_DLL_IMPORT
+#define LIBCFILE_DLL_IMPORT
 #endif
 
-#include <libcpath.h>
+#include <libcfile.h>
 
 #endif
 

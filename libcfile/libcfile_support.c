@@ -33,6 +33,7 @@
 #include "libcfile_definitions.h"
 #include "libcfile_libcerror.h"
 #include "libcfile_libcstring.h"
+#include "libcfile_libuna.h"
 #include "libcfile_support.h"
 
 #if !defined( HAVE_LOCAL_LIBCFILE )
@@ -47,14 +48,14 @@ const char *libcfile_get_version(
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
-#if defined( WINAPI ) && ( WINVER >= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
 
-/* Determines if a file exists
- * This function uses the WINAPI functions for Windows 2000 or later
+/* Determines if a file exists using get file attibutes
+ * This function uses the WINAPI functions for Windows XP or later
  * Returns 1 if the file exists, 0 if not or -1 on error
  */
 int libcfile_file_exists(
-     const libcstring_system_character_t *filename,
+     const char *filename,
      libcerror_error_t **error )
 {
 	static char *function = "libcfile_file_exists";
@@ -73,21 +74,9 @@ int libcfile_file_exists(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	/* Must use GetFileAttributesW here because filename is a 
-	 * wide character string and GetFileAttributes is dependent
-	 * on UNICODE directives
-	 */
-	file_attributes = GetFileAttributesW(
-	                   (LPCWSTR) filename );
-#else
-	/* Must use GetFileAttributesA here because filename is a 
-	 * narrow character string and GetFileAttributes is dependent
-	 * on UNICODE directives
-	 */
 	file_attributes = GetFileAttributesA(
 	                   (LPCSTR) filename );
-#endif
+
 	if( file_attributes == INVALID_FILE_ATTRIBUTES )
 	{
 		error_code = GetLastError();
@@ -111,7 +100,7 @@ int libcfile_file_exists(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_GENERIC,
 				 error_code,
-				 "%s: unable to determine attributes of file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to determine attributes of file: %s.",
 				 function,
 				 filename );
 
@@ -123,106 +112,8 @@ int libcfile_file_exists(
 
 #elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 
-/* Determines if a file exists
- * This function uses the WINAPI functions for Windows NT4 or earlier
- * Returns 1 if the file exists, 0 if not or -1 on error
- */
-int libcfile_file_exists(
-     const libcstring_system_character_t *filename,
-     libcerror_error_t **error )
-{
-	HANDLE file_handle    = INVALID_HANDLE_VALUE;
-	static char *function = "libcfile_file_exists";
-	int result            = 1;
-	DWORD error_code      = 0;
-
-	if( filename == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	/* Must use CreateFileW here because filename is a 
-	 * wide character string and CreateFile is dependent
-	 * on UNICODE directives
-	 */
-	file_handle = CreateFileW(
-	               (LPCWSTR) filename,
-	               GENERIC_READ,
-	               FILE_SHARE_READ,
-	               NULL,
-	               OPEN_EXISTING,
-	               FILE_ATTRIBUTE_NORMAL,
-	               NULL );
-#else
-	/* Must use CreateFileA here because filename is a 
-	 * narrow character string and CreateFile is dependent
-	 * on UNICODE directives
-	 */
-	file_handle = CreateFileA(
-	               (LPCSTR) filename,
-	               GENERIC_READ,
-	               FILE_SHARE_READ,
-	               NULL,
-	               OPEN_EXISTING,
-	               FILE_ATTRIBUTE_NORMAL,
-	               NULL );
-#endif
-	if( file_handle == INVALID_HANDLE_VALUE )
-	{
-		error_code = GetLastError();
-
-		switch( error_code )
-		{
-			case ERROR_ACCESS_DENIED:
-				result = 1;
-
-				break;
-
-			case ERROR_FILE_NOT_FOUND:
-			case ERROR_PATH_NOT_FOUND:
-				result = 0;
-
-				break;
-
-			default:
-				libcerror_system_set_error(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 error_code,
-				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
-				 function,
-				 filename );
-
-				return( -1 );
-		}
-	}
-	else
-	{
-		if( CloseHandle(
-		     file_handle ) == 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file: %s.",
-			 function,
-			 filename );
-
-			return( -1 );
-		}
-		file_handle = INVALID_HANDLE_VALUE;
-	}
-	return( result );
-}
+/* TODO */
+#error WINAPI file stat function for Windows 2000 or earlier NOT implemented yet
 
 #elif defined( HAVE_STAT ) && !defined( WINAPI )
 
@@ -231,7 +122,7 @@ int libcfile_file_exists(
  * Returns 1 if the file exists, 0 if not or -1 on error
  */
 int libcfile_file_exists(
-     const libcstring_system_character_t *filename,
+     const char *filename,
      libcerror_error_t **error )
 {
 	struct stat file_statistics;
@@ -250,11 +141,8 @@ int libcfile_file_exists(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-#error Missing wide character stat function
-#endif
 	result = stat(
-	          (char *) filename,
+	          filename,
 	          &file_statistics );
 
 	if( result != 0 )
@@ -291,19 +179,26 @@ int libcfile_file_exists(
 	return( result );
 }
 
-#elif ( defined( HAVE_OPEN ) && defined( HAVE_CLOSE ) ) || defined( WINAPI )
+#else
+#error Missing file exists function
+#endif
 
-/* Determines if a file exists
- * This function uses the file open and close functions
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+
+/* Determines if a file exists using get file attibutes
+ * This function uses the WINAPI functions for Windows XP or later
  * Returns 1 if the file exists, 0 if not or -1 on error
  */
-int libcfile_file_exists(
-     const libcstring_system_character_t *filename,
+int libcfile_file_exists_wide(
+     const wchar_t *filename,
      libcerror_error_t **error )
 {
-	static char *function = "libcfile_file_exists";
-	int file_descriptor   = -1;
+	static char *function = "libcfile_file_exists_wide";
 	int result            = 1;
+	DWORD error_code      = 0;
+	DWORD file_attributes = 0;
 
 	if( filename == NULL )
 	{
@@ -316,50 +211,209 @@ int libcfile_file_exists(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-#if defined( _MSC_VER )
-	if( _wsopen_s(
-	     &file_descriptor,
-	     (wchar_t *) filename,
-	     _O_RDONLY | _O_BINARY,
-	     _SH_DENYWR,
-	     0 ) != 0 )
-	{
-		file_descriptor = -1;
-	}
-#elif defined( WINAPI )
-	file_descriptor = _wsopen(
-	                   (wchar_t *) filename,
-	                   _O_RDONLY | _O_BINARY,
-	                   0 );
-#else
-#error Missing wide character open function
-#endif
+	file_attributes = GetFileAttributesW(
+	                   (LPCWSTR) filename );
 
-#else
-#if defined( _MSC_VER )
-	if( _sopen_s(
-	     &file_descriptor,
-	     (char *) filename,
-	     _O_RDONLY | _O_BINARY,
-	     _SH_DENYWR,
-	     0 ) != 0 )
+	if( file_attributes == INVALID_FILE_ATTRIBUTES )
 	{
-		file_descriptor = -1;
+		error_code = GetLastError();
+
+		switch( error_code )
+		{
+			case ERROR_ACCESS_DENIED:
+				result = 1;
+
+				break;
+
+			case ERROR_FILE_NOT_FOUND:
+			case ERROR_PATH_NOT_FOUND:
+				result = 0;
+
+				break;
+
+			default:
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_GENERIC,
+				 error_code,
+				 "%s: unable to determine attributes of file: %ls.",
+				 function,
+				 filename );
+
+				return( -1 );
+		}
 	}
-#elif defined( WINAPI )
-	file_descriptor = _sopen(
-	                   (char *) filename,
-	                   _O_RDONLY | _O_BINARY,
-	                   0 );
+	return( result );
+}
+
+#elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+
+/* TODO */
+#error WINAPI file stat function for Windows 2000 or earlier NOT implemented yet
+
+#elif defined( HAVE_STAT ) && !defined( WINAPI )
+
+/* Determines if a file exists
+ * This function uses the POSIX stat function or equivalent
+ * Returns 1 if the file exists, 0 if not or -1 on error
+ */
+int libcfile_file_exists_wide(
+     const wchar_t *filename,
+     libcerror_error_t **error )
+{
+	struct stat file_statistics;
+
+	char *narrow_filename       = NULL;
+	static char *function       = "libcfile_file_exists_wide";
+	size_t narrow_filename_size = 0;
+	size_t filename_size        = 0;
+	int result                  = 0;
+
+	if( filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	filename_size = 1 + libcstring_wide_string_length(
+	                     filename );
+
+	/* Convert the filename to a narrow string
+	 * if the platform has no wide character open function
+	 */
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_size_from_utf32(
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          &narrow_filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_size_from_utf16(
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          &narrow_filename_size,
+		          error );
 #else
-	file_descriptor = open(
-	                   (char *) filename,
-	                   O_RDONLY,
-	                   0644 );
-#endif
-#endif
-	if( file_descriptor == -1 )
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_size_from_utf32(
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          &narrow_filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_size_from_utf16(
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          &narrow_filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine narrow character filename size.",
+		 function );
+
+		return( -1 );
+	}
+	narrow_filename = libcstring_narrow_string_allocate(
+	                   narrow_filename_size );
+
+	if( narrow_filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create narrow character filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_copy_from_utf32(
+		          (libuna_utf8_character_t *) narrow_filename,
+		          narrow_filename_size,
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_copy_from_utf16(
+		          (libuna_utf8_character_t *) narrow_filename,
+		          narrow_filename_size,
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_copy_from_utf32(
+		          (uint8_t *) narrow_filename,
+		          narrow_filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_copy_from_utf16(
+		          (uint8_t *) narrow_filename,
+		          narrow_filename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set narrow character filename.",
+		 function );
+
+		memory_free(
+		 narrow_filename );
+
+		return( -1 );
+	}
+	result = stat(
+	          narrow_filename,
+	          &file_statistics );
+
+	memory_free(
+	 narrow_filename );
+
+	if( result != 0 )
 	{
 		switch( errno )
 		{
@@ -377,9 +431,9 @@ int libcfile_file_exists(
 				libcerror_system_set_error(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_OPEN_FAILED,
+				 LIBCERROR_IO_ERROR_GENERIC,
 				 errno,
-				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to stat file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -388,30 +442,14 @@ int libcfile_file_exists(
 	}
 	else
 	{
-#if defined( WINAPI )
-		if( _close(
-		     file_descriptor ) != 0 )
-#else
-		if( close(
-		     file_descriptor ) != 0 )
-#endif
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file: %s.",
-			 function,
-			 filename );
-
-			return( -1 );
-		}
-		file_descriptor = -1;
+		result = 1;
 	}
 	return( result );
 }
 
 #else
-#error Missing file exists function
+#error Missing file exists wide function
 #endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 

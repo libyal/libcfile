@@ -1,5 +1,5 @@
 /*
- * Support functions
+ * Error functions
  *
  * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,14 +19,19 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCFILE_SUPPORT_H )
-#define _LIBCFILE_SUPPORT_H
+#if !defined( _LIBCFILE_INTERNAL_ERROR_H )
+#define _LIBCFILE_INTERNAL_ERROR_H
 
 #include <common.h>
 #include <types.h>
 
+#include <stdio.h>
+
+#if !defined( HAVE_LOCAL_LIBCFILE )
+#include <libcfile/error.h>
+#endif
+
 #include "libcfile_extern.h"
-#include "libcfile_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -35,24 +40,32 @@ extern "C" {
 #if !defined( HAVE_LOCAL_LIBCFILE )
 
 LIBCFILE_EXTERN \
-const char *libcfile_get_version(
-             void );
+void libcfile_error_free(
+      libcfile_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_error_fprint(
+     libcfile_error_t *error,
+     FILE *stream );
+
+LIBCFILE_EXTERN \
+int libcfile_error_sprint(
+     libcfile_error_t *error,
+     char *string,
+     size_t size );
+
+LIBCFILE_EXTERN \
+int libcfile_error_backtrace_fprint(
+     libcfile_error_t *error,
+     FILE *stream );
+
+LIBCFILE_EXTERN \
+int libcfile_error_backtrace_sprint(
+     libcfile_error_t *error,
+     char *string,
+     size_t size );
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
-
-LIBCFILE_EXTERN \
-int libcfile_file_exists(
-     const char *filename,
-     libcerror_error_t **error );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-LIBCFILE_EXTERN \
-int libcfile_file_exists_wide(
-     const wchar_t *filename,
-     libcerror_error_t **error );
-
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( __cplusplus )
 }

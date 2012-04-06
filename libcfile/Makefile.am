@@ -11,6 +11,7 @@ lib_LTLIBRARIES = libcfile.la
 libcfile_la_SOURCES = \
 	libcfile.c \
 	libcfile_definitions.h \
+	libcfile_error.c libcfile_error.h \
 	libcfile_extern.h \
 	libcfile_file.c libcfile_file.h \
 	libcfile_libcerror.h \

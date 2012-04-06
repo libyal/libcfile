@@ -6,26 +6,61 @@ AM_CPPFLAGS = \
 	@MEMWATCH_CPPFLAGS@
 
 TESTS = \
-	test_path.sh
+	test_seek.sh \
+	test_read.sh \
+	test_write.sh
 
 check_SCRIPTS = \
-	test_path.sh
+	test_seek.sh \
+	test_read.sh \
+	test_write.sh
+
+input_FILES = \
+	input/test.raw
 
 EXTRA_DIST = \
-	$(check_SCRIPTS)
+	$(check_SCRIPTS) \
+	$(input_FILES)
 
 check_PROGRAMS = \
-	cpath_test_path
+	cfile_test_read \
+	cfile_test_seek \
+	cfile_test_write
 
-cpath_test_path_SOURCES = \
-	cpath_test_libcerror.h \
-	cpath_test_libcpath.h \
-	cpath_test_libcstring.h \
-	cpath_test_path.c
+cfile_test_read_SOURCES = \
+	cfile_test_libcerror.h \
+	cfile_test_libcfile.h \
+	cfile_test_libcstring.h \
+	cfile_test_read.c
 
-cpath_test_path_LDADD = \
+cfile_test_read_LDADD = \
 	@LIBCSTRING_LIBADD@ \
-	../libcpath/libcpath.la \
+	@LIBCERROR_LIBADD@ \
+	../libcfile/libcfile.la \
+        @MEMWATCH_LIBADD@
+
+cfile_test_seek_SOURCES = \
+	cfile_test_libcerror.h \
+	cfile_test_libcfile.h \
+	cfile_test_libcstring.h \
+	cfile_test_seek.c
+
+cfile_test_seek_LDADD = \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	../libcfile/libcfile.la \
+        @MEMWATCH_LIBADD@
+
+cfile_test_write_SOURCES = \
+	cfile_test_libcerror.h \
+	cfile_test_libcfile.h \
+	cfile_test_libcstring.h \
+	cfile_test_write.c
+
+cfile_test_write_LDADD = \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	../libcfile/libcfile.la \
         @MEMWATCH_LIBADD@
 
 MAINTAINERCLEANFILES = \
