@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <memory.h>
 #include <types.h>
 
 #if defined( HAVE_SYS_STAT_H ) || defined( WINAPI )
@@ -32,6 +33,7 @@
 
 #include "libcfile_definitions.h"
 #include "libcfile_libcerror.h"
+#include "libcfile_libclocale.h"
 #include "libcfile_libcstring.h"
 #include "libcfile_libuna.h"
 #include "libcfile_support.h"
@@ -137,6 +139,20 @@ int libcfile_file_exists(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     &file_statistics,
+	     0,
+	     sizeof( struct stat ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear file statistics.",
 		 function );
 
 		return( -1 );
@@ -287,7 +303,7 @@ int libcfile_file_exists_wide(
 	/* Convert the filename to a narrow string
 	 * if the platform has no wide character open function
 	 */
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_size_from_utf32(
@@ -311,14 +327,14 @@ int libcfile_file_exists_wide(
 		result = libuna_byte_stream_size_from_utf32(
 		          (libuna_utf32_character_t *) filename,
 		          filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &narrow_filename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_byte_stream_size_from_utf16(
 		          (libuna_utf16_character_t *) filename,
 		          filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &narrow_filename_size,
 		          error );
 #else
@@ -350,7 +366,7 @@ int libcfile_file_exists_wide(
 
 		return( -1 );
 	}
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_copy_from_utf32(
@@ -376,7 +392,7 @@ int libcfile_file_exists_wide(
 		result = libuna_byte_stream_copy_from_utf32(
 		          (uint8_t *) narrow_filename,
 		          narrow_filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf32_character_t *) filename,
 		          filename_size,
 		          error );
@@ -384,7 +400,7 @@ int libcfile_file_exists_wide(
 		result = libuna_byte_stream_copy_from_utf16(
 		          (uint8_t *) narrow_filename,
 		          narrow_filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf16_character_t *) filename,
 		          filename_size,
 		          error );

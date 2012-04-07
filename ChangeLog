@@ -22,6 +22,9 @@ Notes:
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
 
+20120407
+* updated dependencies
+
 20120406
 * merged with libbfio file code
 * worked on tests

@@ -55,6 +55,7 @@
 #include "libcfile_definitions.h"
 #include "libcfile_file.h"
 #include "libcfile_libcerror.h"
+#include "libcfile_libclocale.h"
 #include "libcfile_libcstring.h"
 #include "libcfile_libuna.h"
 #include "libcfile_types.h"
@@ -121,6 +122,8 @@ int libcfile_file_initialize(
 	}
 #if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 	internal_file->handle = INVALID_HANDLE_VALUE;
+#else
+	internal_file->descriptor = -1;
 #endif
 	*file = (libcfile_file_t *) internal_file;
 
@@ -963,7 +966,7 @@ int libcfile_file_open_wide(
 	filename_size = 1 + libcstring_wide_string_length(
 	                     filename );
 
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_size_from_utf32(
@@ -987,14 +990,14 @@ int libcfile_file_open_wide(
 		result = libuna_byte_stream_size_from_utf32(
 		          (libuna_utf32_character_t *) filename,
 		          filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &narrow_filename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_byte_stream_size_from_utf16(
 		          (libuna_utf16_character_t *) filename,
 		          filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &narrow_filename_size,
 		          error );
 #else
@@ -1026,7 +1029,7 @@ int libcfile_file_open_wide(
 
 		return( -1 );
 	}
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_copy_from_utf32(
@@ -1052,7 +1055,7 @@ int libcfile_file_open_wide(
 		result = libuna_byte_stream_copy_from_utf32(
 		          (uint8_t *) narrow_filename,
 		          narrow_filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf32_character_t *) filename,
 		          filename_size,
 		          error );
@@ -1060,7 +1063,7 @@ int libcfile_file_open_wide(
 		result = libuna_byte_stream_copy_from_utf16(
 		          (uint8_t *) narrow_filename,
 		          narrow_filename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf16_character_t *) filename,
 		          filename_size,
 		          error );
@@ -2646,16 +2649,17 @@ int libcfile_file_get_size(
      libcerror_error_t **error )
 {
 #if defined( _MSC_VER )
-	struct __stat64 file_stat;
+	struct __stat64 file_statistics;
 #elif defined( __BORLANDC__ )
-	struct stati64 file_stat;
+	struct stati64 file_statistics;
 #else
-	struct stat file_stat;
+	struct stat file_statistics;
 #endif
 
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function = "libcfile_file_get_size";
-	off64_t offset        = 0;
+	static char *function                   = "libcfile_file_get_size";
+	off64_t offset                          = 0;
+	size_t file_statistics_size             = 0;
 
 	if( file == NULL )
 	{
@@ -2693,31 +2697,53 @@ int libcfile_file_get_size(
 		return( -1 );
 	}
 #if defined( _MSC_VER )
+	file_statistics_size = sizeof( struct __stat64 );
+#elif defined( __BORLANDC__ )
+	file_statistics_size = sizeof( struct stati64 );
+#else
+	file_statistics_size = sizeof( struct stat );
+#endif
+
+	if( memory_set(
+	     &file_statistics,
+	     0,
+	     file_statistics_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear file statistics.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( _MSC_VER )
 	if( _fstat64(
 	     internal_file->descriptor,
-	     &file_stat ) != 0 )
+	     &file_statistics ) != 0 )
 #elif defined( __BORLANDC__ )
 	if( _fstati64(
 	     internal_file->descriptor,
-	     &file_stat ) != 0 )
+	     &file_statistics ) != 0 )
 #else
 	if( fstat(
 	     internal_file->descriptor,
-	     &file_stat ) != 0 )
+	     &file_statistics ) != 0 )
 #endif
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: file stat failed.",
+		 "%s: unable to retrieve file statistics.",
 		 function );
 
 		return( -1 );
 	}
 /* TODO implement device support ? */
-	if( S_ISBLK( file_stat.st_mode )
-	 || S_ISCHR( file_stat.st_mode ) )
+	if( S_ISBLK( file_statistics.st_mode )
+	 || S_ISCHR( file_statistics.st_mode ) )
 	{
 		/* If the file is a device try to seek the end of the file
 		 */
@@ -2761,7 +2787,7 @@ int libcfile_file_get_size(
 	}
 	else
 	{
-		*size = (size64_t) file_stat.st_size;
+		*size = (size64_t) file_statistics.st_size;
 	}
 	return( 1 );
 }

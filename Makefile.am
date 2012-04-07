@@ -5,6 +5,7 @@ SUBDIRS = \
 	common \
 	libcstring \
 	libcerror \
+	libclocale \
 	libuna \
 	libcfile \
 	po \
@@ -60,6 +61,7 @@ library:
 	cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libcstring && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libcerror && $(MAKE) $(AM_MAKEFLAGS)
+	cd $(srcdir)/libclocale && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libcfile && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS)
@@ -79,6 +81,7 @@ distclean: clean
 splint:
 	(cd $(srcdir)/libcstring && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcerror && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libclocale && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libuna && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcfile && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) splint $(AM_MAKEFLAGS))
