@@ -291,6 +291,9 @@
 /* Define to 1 if you have the `wcstombs' function. */
 #undef HAVE_WCSTOMBS
 
+/* Define to 1 if you have the <wctype.h> header file. */
+#undef HAVE_WCTYPE_H
+
 /* Define to 1 if wide character type should be used. */
 #undef HAVE_WIDE_CHARACTER_TYPE
 
