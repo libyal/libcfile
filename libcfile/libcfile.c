@@ -1,7 +1,7 @@
 /*
  * Library to support cross-platform C error functions
  *
- * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
