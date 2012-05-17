@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _CPATH_TEST_LIBCERROR_H )
-#define _CPATH_TEST_LIBCERROR_H
+#if !defined( _CFILE_TEST_LIBCERROR_H )
+#define _CFILE_TEST_LIBCERROR_H
 
 #include <common.h>
 
