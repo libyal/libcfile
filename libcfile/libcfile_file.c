@@ -554,8 +554,7 @@ int libcfile_file_open(
 	                             filename,
 	                             file_io_flags,
 	                             0644 );
-#endif /* HAVE_GLIB_H */
-
+#endif
 	if( internal_file->descriptor == -1 )
 	{
 		switch( errno )
@@ -1095,7 +1094,7 @@ int libcfile_file_open_wide(
 	                             narrow_filename,
 	                             file_io_flags,
 	                             0644 );
-#endif /* HAVE_GLIB_H */
+#endif
 
 	memory_free(
 	 narrow_filename );
@@ -1363,7 +1362,7 @@ ssize_t libcfile_file_read_buffer(
 				libcerror_system_set_error(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_OPEN_FAILED,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 error_code,
 				 "%s: unable to read from file.",
 				 function );
@@ -1475,7 +1474,7 @@ ssize_t libcfile_file_read_buffer(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 errno,
 		 "%s: unable to read from file.",
 		 function );
@@ -1568,7 +1567,7 @@ ssize_t libcfile_file_write_buffer(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 error_code,
 		 "%s: unable to write to file.",
 		 function );
@@ -1678,7 +1677,7 @@ ssize_t libcfile_file_write_buffer(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 errno,
 		 "%s: unable to write to file.",
 		 function );
@@ -1896,9 +1895,9 @@ off64_t libcfile_file_seek_offset(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 error_code,
-		 "%s: unable to find offset in file.",
+		 "%s: unable to seek offset in file.",
 		 function );
 
 		return( -1 );
@@ -2003,9 +2002,9 @@ off64_t libcfile_file_seek_offset(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 errno,
-		 "%s: unable to find offset in file.",
+		 "%s: unable to seek offset in file.",
 		 function );
 
 		return( -1 );
@@ -2141,9 +2140,9 @@ int libcfile_file_resize(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 error_code,
-		 "%s: unable to find offset in file.",
+		 "%s: unable to seek offset in file.",
 		 function );
 
 		return( -1 );
@@ -2179,7 +2178,7 @@ int libcfile_file_resize(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 error_code,
 		 "%s: unable to resize file.",
 		 function );
@@ -2251,7 +2250,7 @@ int libcfile_file_resize(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_GENERIC,
 		 errno,
 		 "%s: unable to resize file.",
 		 function );
@@ -2451,9 +2450,9 @@ int libcfile_file_get_offset(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 error_code,
-		 "%s: unable to find offset in file.",
+		 "%s: unable to seek offset in file.",
 		 function );
 
 		return( -1 );
@@ -2544,9 +2543,9 @@ int libcfile_file_get_offset(
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 errno,
-		 "%s: unable to find offset in file.",
+		 "%s: unable to seek offset in file.",
 		 function );
 
 		return( -1 );
@@ -2760,7 +2759,7 @@ int libcfile_file_get_size(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to find end of file.",
+			 "%s: unable to seek end of file.",
 			 function );
 
 			return( -1 );
@@ -2779,7 +2778,7 @@ int libcfile_file_get_size(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to find start of file.",
+			 "%s: unable to seek start of file.",
 			 function );
 
 			return( -1 );

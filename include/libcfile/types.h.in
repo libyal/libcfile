@@ -198,6 +198,7 @@ typedef int64_t off64_t;
 /* The following type definitions hide internal data structures
  */
 typedef intptr_t libcfile_file_t;
+typedef intptr_t libcfile_stream_t;
 
 #ifdef __cplusplus
 }

@@ -61,6 +61,65 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [1])
   ])
 
+ dnl File stream functions used in libcfile/libcfile_stream.h
+ AC_CHECK_FUNCS([fclose feof fopen fread fseeko fseeko64 ftello ftello64 fwrite])
+
+ AS_IF(
+  [test "x$ac_cv_func_fclose" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: fclose],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_feof" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: feof],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_fgets" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: fgets],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_fopen" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: fopen],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_fread" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: fread],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_fseeko" != xyes && test "x$ac_cv_func_fseeko64" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: fseeko and fseeko64],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_ftello" != xyes && test "x$ac_cv_func_ftello64" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: ftello and ftello64],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_fwrite" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: fwrite],
+   [1])
+  ])
+ 
  dnl File input/output functions used in libcfile/libcfile_support.h
  AC_CHECK_FUNCS([stat])
 

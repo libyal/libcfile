@@ -19,6 +19,7 @@ libcfile_la_SOURCES = \
 	libcfile_libclocale.h \
 	libcfile_libcstring.h \
 	libcfile_libuna.h \
+	libcfile_stream.c libcfile_stream.h \
 	libcfile_support.c libcfile_support.h \
 	libcfile_types.h \
 	libcfile_unused.h

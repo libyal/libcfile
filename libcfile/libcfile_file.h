@@ -27,7 +27,6 @@
 
 #include "libcfile_extern.h"
 #include "libcfile_libcerror.h"
-#include "libcfile_libcstring.h"
 #include "libcfile_types.h"
 
 #if defined( __cplusplus )
