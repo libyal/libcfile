@@ -44,11 +44,14 @@ typedef struct libcfile_internal_stream libcfile_internal_stream_t;
 
 struct libcfile_internal_stream
 {
+/* TODO
 #if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 	HANDLE handle;
 #else
 	FILE *stream;
 #endif
+*/
+	FILE *stream;
 };
 
 LIBCFILE_EXTERN \
