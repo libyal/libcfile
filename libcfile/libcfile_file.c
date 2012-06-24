@@ -2592,7 +2592,7 @@ int libcfile_file_get_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - misisng handle.",
+		 "%s: invalid file - missing handle.",
 		 function );
 
 		return( -1 );
