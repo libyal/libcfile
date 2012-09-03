@@ -31,6 +31,10 @@
 #include <errno.h>
 #endif
 
+#if defined( WINAPI )
+#include <io.h>
+#endif
+
 #if defined( HAVE_GLIB_H )
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -850,7 +854,13 @@ int libcfile_stream_get_size(
 
 		return( -1 );
 	}
-	file_descriptor = fileno( internal_stream->stream );
+#if defined( WINAPI )
+	file_descriptor = _fileno(
+	                   internal_stream->stream );
+#else
+	file_descriptor = fileno(
+	                   internal_stream->stream );
+#endif
 
 	if( file_descriptor == -1 )
 	{
