@@ -31,10 +31,6 @@
 #include <errno.h>
 #endif
 
-#if defined( WINAPI )
-#include <io.h>
-#endif
-
 #if defined( HAVE_GLIB_H )
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -792,10 +788,13 @@ int libcfile_stream_get_size(
 
 	libcfile_internal_stream_t *internal_stream = NULL;
 	static char *function                       = "libcfile_stream_get_size";
-	off64_t current_offset                      = 0;
-	off64_t offset                              = 0;
 	size_t file_statistics_size                 = 0;
 	int file_descriptor                         = 0;
+
+#if defined( S_ISBLK ) && defined( S_ISCHR )
+	off64_t current_offset                      = 0;
+	off64_t offset                              = 0;
+#endif
 
 	if( stream == NULL )
 	{
@@ -897,6 +896,8 @@ int libcfile_stream_get_size(
 		return( -1 );
 	}
 /* TODO implement device support ? */
+/* TODO does not work on Mac OS X or WINAPI */
+#if defined( S_ISBLK ) && defined( S_ISCHR )
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
 	{
@@ -916,7 +917,6 @@ int libcfile_stream_get_size(
 		}
 		/* If the file is a device try to seek the end of the file
 		 */
-/* TODO does not work on Mac OS X or WINAPI */
 		offset = libcfile_stream_seek_offset(
 		          stream,
 		          0,
@@ -956,6 +956,7 @@ int libcfile_stream_get_size(
 		}
 	}
 	else
+#endif
 	{
 		*size = (size64_t) file_statistics.st_size;
 	}

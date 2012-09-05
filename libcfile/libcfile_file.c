@@ -2657,9 +2657,12 @@ int libcfile_file_get_size(
 
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_get_size";
+	size_t file_statistics_size             = 0;
+
+#if defined( S_ISBLK ) && defined( S_ISCHR )
 	off64_t current_offset                  = 0;
 	off64_t offset                          = 0;
-	size_t file_statistics_size             = 0;
+#endif
 
 	if( file == NULL )
 	{
@@ -2742,6 +2745,8 @@ int libcfile_file_get_size(
 		return( -1 );
 	}
 /* TODO implement device support ? */
+/* TODO does not work on Mac OS X or WINAPI */
+#if defined( S_ISBLK ) && defined( S_ISCHR )
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
 	{
@@ -2761,7 +2766,6 @@ int libcfile_file_get_size(
 		}
 		/* If the file is a device try to seek the end of the file
 		 */
-/* TODO does not work on Mac OS X or WINAPI */
 		offset = libcfile_file_seek_offset(
 		          file,
 		          0,
@@ -2801,6 +2805,7 @@ int libcfile_file_get_size(
 		}
 	}
 	else
+#endif
 	{
 		*size = (size64_t) file_statistics.st_size;
 	}
