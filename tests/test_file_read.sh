@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Cross-platform C file functions library file read offset testing script
+# Cross-platform C file functions library file read testing script
 #
 # Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -29,7 +29,7 @@ TMP="tmp";
 
 test_file_read()
 { 
-	echo "Testing read offset of input:" $*;
+	echo "Testing read of input:" $*;
 
 	./${CFILE_TEST_FILE_READ} $*;
 

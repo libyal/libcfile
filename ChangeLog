@@ -24,6 +24,10 @@ Notes:
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
 
+20121103
+* code clean up
+* bug fixes in error handling
+
 20120919
 * applied updates
 

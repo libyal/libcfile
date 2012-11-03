@@ -79,7 +79,7 @@ int libcfile_file_initialize(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *file != NULL )
 	{
@@ -158,7 +158,7 @@ int libcfile_file_free(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *file != NULL )
 	{
@@ -1303,7 +1303,7 @@ ssize_t libcfile_file_read_buffer(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -1416,7 +1416,7 @@ ssize_t libcfile_file_read_buffer(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -1514,7 +1514,7 @@ ssize_t libcfile_file_write_buffer(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -1619,7 +1619,7 @@ ssize_t libcfile_file_write_buffer(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -1818,7 +1818,7 @@ off64_t libcfile_file_seek_offset(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -1947,7 +1947,7 @@ off64_t libcfile_file_seek_offset(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -2088,7 +2088,7 @@ int libcfile_file_resize(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -2211,7 +2211,7 @@ int libcfile_file_resize(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -2405,7 +2405,7 @@ int libcfile_file_get_offset(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -2429,7 +2429,7 @@ int libcfile_file_get_offset(
 		 "%s: invalid offset.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 #if ( WINVER <= 0x0500 )
 	if( libcfile_SetFilePointerEx(
@@ -2501,7 +2501,7 @@ int libcfile_file_get_offset(
 		 "%s: invalid file.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
@@ -2525,7 +2525,7 @@ int libcfile_file_get_offset(
 		 "%s: invalid offset.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 #if defined( WINAPI )
 	*offset = _lseeki64(

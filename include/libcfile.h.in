@@ -81,7 +81,7 @@ int libcfile_error_fprint(
 LIBCFILE_EXTERN \
 int libcfile_error_sprint(
      libcfile_error_t *error,
-     char *string, 
+     char *string,
      size_t size );
 
 /* Prints a backtrace of the error to the stream

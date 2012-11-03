@@ -64,7 +64,7 @@ int libcfile_stream_initialize(
 		 "%s: invalid stream.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *stream != NULL )
 	{
@@ -143,7 +143,7 @@ int libcfile_stream_free(
 		 "%s: invalid stream.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *stream != NULL )
 	{
@@ -396,7 +396,7 @@ ssize_t libcfile_stream_read_buffer(
 		 "%s: invalid stream.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_stream = (libcfile_internal_stream_t *) stream;
 
@@ -493,7 +493,7 @@ ssize_t libcfile_stream_write_buffer(
 		 "%s: invalid stream.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_stream = (libcfile_internal_stream_t *) stream;
 
@@ -589,7 +589,7 @@ off64_t libcfile_stream_seek_offset(
 		 "%s: invalid stream.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_stream = (libcfile_internal_stream_t *) stream;
 
@@ -712,7 +712,7 @@ int libcfile_stream_get_offset(
 		 "%s: invalid stream.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_stream = (libcfile_internal_stream_t *) stream;
 
@@ -736,7 +736,7 @@ int libcfile_stream_get_offset(
 		 "%s: invalid offset.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 #if defined( WINAPI )
 	*offset = (off64_t) ftell(
