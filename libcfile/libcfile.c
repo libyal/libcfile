@@ -1,5 +1,5 @@
 /*
- * Library to support cross-platform C error functions
+ * Library to support cross-platform C file functions
  *
  * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *

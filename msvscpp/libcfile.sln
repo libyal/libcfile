@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcfile_dll", "libcfile_dll\libcfile_dll.vcproj", "{B5225323-AC67-411D-8FBA-199E9467FAB5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89} = {CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89}
+		{BC27FF34-C859-4A1A-95D6-FC89952E1910} = {BC27FF34-C859-4A1A-95D6-FC89952E1910}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcstring", "libcstring\libcstring.vcproj", "{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcerror", "libcerror\libcerror.vcproj", "{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclocale", "libclocale\libclocale.vcproj", "{CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libuna", "libuna\libuna.vcproj", "{BC27FF34-C859-4A1A-95D6-FC89952E1910}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Win32 = Release|Win32
+		VSDebug|Win32 = VSDebug|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.Release|Win32.ActiveCfg = Release|Win32
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.Release|Win32.Build.0 = Release|Win32
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.Release|Win32.ActiveCfg = Release|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.Release|Win32.Build.0 = Release|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.ActiveCfg = Release|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.Build.0 = Release|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89}.Release|Win32.ActiveCfg = Release|Win32
+		{CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89}.Release|Win32.Build.0 = Release|Win32
+		{CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{CEDF8919-00B2-4D8A-88CC-84ADB2D2FF89}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{BC27FF34-C859-4A1A-95D6-FC89952E1910}.Release|Win32.ActiveCfg = Release|Win32
+		{BC27FF34-C859-4A1A-95D6-FC89952E1910}.Release|Win32.Build.0 = Release|Win32
+		{BC27FF34-C859-4A1A-95D6-FC89952E1910}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{BC27FF34-C859-4A1A-95D6-FC89952E1910}.VSDebug|Win32.Build.0 = VSDebug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

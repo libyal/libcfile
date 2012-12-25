@@ -13,7 +13,7 @@ TODO
   - GetFileAttributesW
   - GetLastError
 * add libcfile_codepage.h and codepage functions
-* add msvscpp, borlandc5 and codegear files
+* add borlandc5 and codegear files
 * improve tests ?
   - add write when opened with read ?
 * what about disk full on write errno = ENOSPC
@@ -23,6 +23,10 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20121225
+* added .gitignore
+* added msvscpp files
 
 20121103
 * code clean up

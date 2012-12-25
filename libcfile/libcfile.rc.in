@@ -21,14 +21,14 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "FileDescription",		"Library to support cross-platform C error functions\0"
+      VALUE "FileDescription",		"Library to support cross-platform C file functions\0"
       VALUE "FileVersion",		"@VERSION@" "\0"
       VALUE "InternalName",		"libcfile.dll\0"
       VALUE "LegalCopyright",		"(c) 2008-2012 Joachim Metz <joachim.metz@gmail.com>\0"
       VALUE "OriginalFilename",		"libcfile.dll\0"
       VALUE "ProductName",		"libcfile\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"
-      VALUE "Comments",			"For more information visit http://code.google.com/p/libclibs/\0"
+      VALUE "Comments",			"For more information visit http://code.google.com/p/libcfile/\0"
     END
   END
   BLOCK "VarFileInfo"
