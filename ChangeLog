@@ -24,6 +24,10 @@ Notes:
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
 
+20130103
+* changes to .gitignore
+* 2013 update
+
 20121225
 * added .gitignore
 * added msvscpp files

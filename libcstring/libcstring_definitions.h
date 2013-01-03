@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -40,11 +40,11 @@
 #define LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER           1
 #endif
 
-#define LIBCSTRING_VERSION				20120919
+#define LIBCSTRING_VERSION				20130103
 
 /* The libcstring version string
  */
-#define LIBCSTRING_VERSION_STRING			"20120919"
+#define LIBCSTRING_VERSION_STRING			"20130103"
 
 #if defined( WINAPI ) && ( defined( _UNICODE ) || defined( UNICODE ) )
 #define PRIc_LIBCSTRING_SYSTEM				"lc"

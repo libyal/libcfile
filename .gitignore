@@ -1,3 +1,7 @@
+# Files to ignore by git
+#
+# Version: 20130103
+
 # Generic auto-generated build files
 *~
 *.a
@@ -10,10 +14,12 @@
 *.so
 *.so.[0-9][0-9]*
 *.so.[0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*
-.debs
+*.Tpo
+.deps
 .libs
 Makefile
 Makefile.in
+
 # Specific auto-generated build files
 /ABOUT-NLS
 /aclocal.m4
@@ -77,6 +83,7 @@ Makefile.in
 /po/quot.sed
 /po/remove-potcdate.sed
 /po/remove-potcdate.sin
+
 # Project specific files
 /libcfile.pc
 /libcfile.spec
@@ -91,6 +98,13 @@ Makefile.in
 /include/libcfile/types.h
 /libcfile/libcfile.rc
 /libcfile/libcfile_definitions.h
+/tests/cfile_test_file_read
+/tests/cfile_test_file_seek
+/tests/cfile_test_file_write
+/tests/cfile_test_stream_read
+/tests/cfile_test_stream_seek
+/tests/cfile_test_stream_write
+
 # Local library dependencies specific files
 /libcerror
 /libclocale
