@@ -246,7 +246,11 @@ int libcfile_file_open(
 	{
 		file_io_access_flags   = GENERIC_READ;
 		file_io_creation_flags = OPEN_EXISTING;
-		file_io_shared_flags   = FILE_SHARE_READ;
+
+		/* FILE_SHARE_WRITE is set to allow reading files that are
+		 * currently being written FILE_SHARE_READ alone does not suffice
+		 */
+		file_io_shared_flags = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
 	else if( ( access_flags & LIBCFILE_ACCESS_FLAG_WRITE ) != 0 )
 	{
@@ -658,7 +662,11 @@ int libcfile_file_open_wide(
 	{
 		file_io_access_flags   = GENERIC_READ;
 		file_io_creation_flags = OPEN_EXISTING;
-		file_io_shared_flags   = FILE_SHARE_READ;
+
+		/* FILE_SHARE_WRITE is set to allow reading files that are
+		 * currently being written FILE_SHARE_READ alone does not suffice
+		 */
+		file_io_shared_flags = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
 	else if( ( access_flags & LIBCFILE_ACCESS_FLAG_WRITE ) != 0 )
 	{
