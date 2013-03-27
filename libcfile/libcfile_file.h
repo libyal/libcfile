@@ -200,6 +200,15 @@ int libcfile_file_io_control_read(
      size_t data_size,
      libcerror_error_t **error );
 
+LIBCFILE_EXTERN \
+int libcfile_file_io_control_read_with_error_code(
+     libcfile_file_t *file,
+     uint32_t control_code,
+     uint8_t *data,
+     size_t data_size,
+     uint32_t *error_code,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

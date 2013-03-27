@@ -56,6 +56,8 @@ File functions
 .Fn libcfile_file_get_size "libcfile_file_t *file, size64_t *size, libcfile_error_t **error"
 .Ft int
 .Ft libcfile_file_io_control_read "libcfile_file_t *file, uint32_t control_code, uint8_t *data, size_t data_size, libcfile_error_t **error"
+.Ft int
+.Ft libcfile_file_io_control_read_with_error_code "libcfile_file_t *file, uint32_t control_code, uint8_t *data, size_t data_size, uint32_t *error_code, libcfile_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
@@ -102,7 +104,7 @@ http://code.google.com/p/libcfile/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
-Copyright 2008-2013 Joachim Metz <joachim.metz@gmail.com>.
+Copyright 2008-2013, Joachim Metz <joachim.metz@gmail.com>.
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 the libcfile.h include file

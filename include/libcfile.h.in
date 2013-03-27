@@ -273,6 +273,18 @@ int libcfile_file_io_control_read(
      size_t data_size,
      libcfile_error_t **error );
 
+/* Read data from a device file using IO control
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_file_io_control_read_with_error_code(
+     libcfile_file_t *file,
+     uint32_t control_code,
+     uint8_t *data,
+     size_t data_size,
+     uint32_t *error_code,
+     libcfile_error_t **error );
+
 /* -------------------------------------------------------------------------
  * File stream functions
  * ------------------------------------------------------------------------- */

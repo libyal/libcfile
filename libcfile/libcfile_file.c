@@ -3249,10 +3249,7 @@ int libcfile_file_get_size(
 #error Missing file get size function
 #endif
 
-#if defined( HAVE_IOCTL ) || defined( WINAPI )
-
 /* Read data from a device file using IO control
- * This function uses the POSIX ioctl function or WINAPI DeviceIoControl
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_io_control_read(
@@ -3262,8 +3259,45 @@ int libcfile_file_io_control_read(
      size_t data_size, 
      libcerror_error_t **error )
 {
+	static char *function = "libcfile_file_io_control_read";
+	uint32_t error_code   = 0;
+
+	if( libcfile_file_io_control_read_with_error_code(
+	     file,
+	     control_code,
+	     data,
+	     data_size,
+	     &error_code,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 "%s: unable to to IO control device.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#if defined( HAVE_IOCTL ) || defined( WINAPI )
+
+/* Read data from a device file using IO control
+ * This function uses the POSIX ioctl function or WINAPI DeviceIoControl
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_io_control_read_with_error_code(
+     libcfile_file_t *file,
+     uint32_t control_code,
+     uint8_t *data,
+     size_t data_size, 
+     uint32_t *error_code, 
+     libcerror_error_t **error )
+{
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_io_control_read";
+	static char *function                   = "libcfile_file_io_control_read_with_error_code";
 
 #if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 	DWORD response_count                    = 0;
@@ -3322,6 +3356,17 @@ int libcfile_file_io_control_read(
 
 		return( -1 );
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 	if( DeviceIoControl(
 	     internal_file->handle,
@@ -3333,10 +3378,13 @@ int libcfile_file_io_control_read(
 	     &response_count,
 	     NULL ) == 0 )
 	{
-		libcerror_error_set(
+		*error_code = (uint32_t) GetLastError();
+
+		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 *error_code,
 		 "%s: unable to IO control device.",
 		 function );
 
@@ -3348,10 +3396,13 @@ int libcfile_file_io_control_read(
 	     (int) control_code,
 	     data ) == -1 )
 	{
-		libcerror_error_set(
+		*error_code = (uint32_t) errno;
+
+		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 *error_code,
 		 "%s: unable to IO control device.",
 		 function );
 
