@@ -43,6 +43,38 @@
 #include <share.h>
 #endif
 
+#if defined( HAVE_SYS_IOCTL_H )
+#include <sys/ioctl.h>
+#endif
+
+#if defined( WINAPI )
+#include <winioctl.h>
+
+#elif defined( HAVE_CYGWIN_FS_H )
+#include <cygwin/fs.h>
+
+#elif defined( HAVE_LINUX_FS_H )
+/* Required for Linux platforms that use a sizeof( u64 )
+ * in linux/fs.h but have no typedef of it
+ */
+#if !defined( HAVE_U64 )
+typedef size_t u64;
+#endif
+
+#include <linux/fs.h>
+
+#else
+
+#if defined( HAVE_SYS_DISK_H )
+#include <sys/disk.h>
+#endif
+
+#if defined( HAVE_SYS_DISKLABEL_H )
+#include <sys/disklabel.h>
+#endif
+
+#endif
+
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
@@ -192,10 +224,7 @@ int libcfile_file_free(
 	return( result );
 }
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
-
 /* Opens a file
- * This function uses the WINAPI function for Windows XP or later
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_open(
@@ -204,9 +233,43 @@ int libcfile_file_open(
      int access_flags,
      libcerror_error_t **error )
 {
+	static char *function = "libcfile_file_open";
+	uint32_t error_code   = 0;
+
+	if( libcfile_file_open_with_error_code(
+	     file,
+	     filename,
+	     access_flags,
+	     &error_code,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+
+/* Opens a file
+ * This function uses the WINAPI function for Windows XP or later
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_open_with_error_code(
+     libcfile_file_t *file,
+     const char *filename,
+     int access_flags,
+     uint32_t *error_code,
+     libcerror_error_t **error )
+{
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_open";
-	DWORD error_code                        = 0;
+	static char *function                   = "libcfile_file_open_with_error_code";
 	DWORD file_io_access_flags              = 0;
 	DWORD file_io_creation_flags            = 0;
 	DWORD file_io_shared_flags              = 0;
@@ -256,7 +319,7 @@ int libcfile_file_open(
 	{
 		file_io_access_flags   = GENERIC_WRITE;
 		file_io_creation_flags = OPEN_ALWAYS;
-		file_io_shared_flags   = 0;
+		file_io_shared_flags   = FILE_SHARE_READ;
 	}
 	else
 	{
@@ -275,6 +338,17 @@ int libcfile_file_open(
 	{
 		file_io_creation_flags = CREATE_ALWAYS;
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 	internal_file->handle = CreateFileA(
 	                         (LPCSTR) filename,
 	                         file_io_access_flags,
@@ -286,9 +360,9 @@ int libcfile_file_open(
 
 	if( internal_file->handle == INVALID_HANDLE_VALUE )
 	{
-		error_code = GetLastError();
+		*error_code = (uint32_t) GetLastError();
 
-		switch( error_code )
+		switch( *error_code )
 		{
 			case ERROR_ACCESS_DENIED:
 				libcerror_error_set(
@@ -318,7 +392,7 @@ int libcfile_file_open(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 error_code,
+				 *error_code,
 				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
@@ -341,14 +415,15 @@ int libcfile_file_open(
  * This function uses the Visual Studio C runtime library function
  * Returns 1 if successful or -1 on error
  */
-int libcfile_file_open(
+int libcfile_file_open_with_error_code(
      libcfile_file_t *file,
      const char *filename,
      int access_flags,
+     uint32_t *error_code,
      libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_open";
+	static char *function                   = "libcfile_file_open_with_error_code";
 	int file_io_permission_flags            = 0;
 	int file_io_flags                       = 0;
 	int file_io_shared_flags                = 0;
@@ -401,6 +476,17 @@ int libcfile_file_open(
 	{
 		file_io_flags |= _O_TRUNC;
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 	if( _sopen_s(
 	     &( internal_file->descriptor ),
 	     (char *) filename,
@@ -408,7 +494,9 @@ int libcfile_file_open(
 	     file_io_shared_flags,
 	     file_io_permission_flags ) != 0 )
 	{
-		switch( errno )
+		*error_code = (uint32_t) errno;
+
+		switch( *error_code )
 		{
 			case EACCES:
 				libcerror_error_set(
@@ -437,7 +525,7 @@ int libcfile_file_open(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 errno,
+				 *error_code,
 				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
@@ -467,14 +555,15 @@ int libcfile_file_open(
  * This function uses the POSIX open function or equivalent
  * Returns 1 if successful or -1 on error
  */
-int libcfile_file_open(
+int libcfile_file_open_with_error_code(
      libcfile_file_t *file,
      const char *filename,
      int access_flags,
+     uint32_t *error_code,
      libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_open";
+	static char *function                   = "libcfile_file_open_with_error_code";
 	int file_io_flags                       = 0;
 
 #if defined( WINAPI )
@@ -543,6 +632,17 @@ int libcfile_file_open(
 		file_io_flags |= O_TRUNC;
 #endif
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( WINAPI )
 	internal_file->descriptor = _sopen(
 	                             filename,
@@ -561,7 +661,9 @@ int libcfile_file_open(
 #endif
 	if( internal_file->descriptor == -1 )
 	{
-		switch( errno )
+		*error_code = (uint32_t) errno;
+
+		switch( *error_code )
 		{
 			case EACCES:
 				libcerror_error_set(
@@ -590,7 +692,7 @@ int libcfile_file_open(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 errno,
+				 *error_code,
 				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
@@ -608,10 +710,7 @@ int libcfile_file_open(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
-
 /* Opens a file
- * This function uses the WINAPI function for Windows XP or later
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_open_wide(
@@ -620,9 +719,43 @@ int libcfile_file_open_wide(
      int access_flags,
      libcerror_error_t **error )
 {
+	static char *function = "libcfile_file_open_wide";
+	uint32_t error_code   = 0;
+
+	if( libcfile_file_open_wide_with_error_code(
+	     file,
+	     filename,
+	     access_flags,
+	     &error_code,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+
+/* Opens a file
+ * This function uses the WINAPI function for Windows XP or later
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_open_wide_with_error_code(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     uint32_t *error_code,
+     libcerror_error_t **error )
+{
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_open_wide";
-	DWORD error_code                        = 0;
+	static char *function                   = "libcfile_file_open_wide_with_error_code";
 	DWORD file_io_access_flags              = 0;
 	DWORD file_io_creation_flags            = 0;
 	DWORD file_io_shared_flags              = 0;
@@ -672,7 +805,7 @@ int libcfile_file_open_wide(
 	{
 		file_io_access_flags   = GENERIC_WRITE;
 		file_io_creation_flags = OPEN_ALWAYS;
-		file_io_shared_flags   = 0;
+		file_io_shared_flags   = FILE_SHARE_READ;
 	}
 	else
 	{
@@ -691,6 +824,17 @@ int libcfile_file_open_wide(
 	{
 		file_io_creation_flags = CREATE_ALWAYS;
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 	internal_file->handle = CreateFileW(
 	                         (LPCWSTR) filename,
 	                         file_io_access_flags,
@@ -702,9 +846,9 @@ int libcfile_file_open_wide(
 
 	if( internal_file->handle == INVALID_HANDLE_VALUE )
 	{
-		error_code = GetLastError();
+		*error_code = (uint32_t) GetLastError();
 
-		switch( error_code )
+		switch( *error_code )
 		{
 			case ERROR_ACCESS_DENIED:
 				libcerror_error_set(
@@ -734,7 +878,7 @@ int libcfile_file_open_wide(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 error_code,
+				 *error_code,
 				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
@@ -757,14 +901,15 @@ int libcfile_file_open_wide(
  * This function uses the Visual Studio C runtime library function
  * Returns 1 if successful or -1 on error
  */
-int libcfile_file_open_wide(
+int libcfile_file_open_wide_with_error_code(
      libcfile_file_t *file,
      const wchar_t *filename,
      int access_flags,
+     uint32_t *error_code,
      libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_open_wide";
+	static char *function                   = "libcfile_file_open_wide_with_error_code";
 	int file_io_permission_flags            = 0;
 	int file_io_flags                       = 0;
 	int file_io_shared_flags                = 0;
@@ -817,6 +962,17 @@ int libcfile_file_open_wide(
 	{
 		file_io_flags |= _O_TRUNC;
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 	if( _wsopen_s(
 	     &( internal_file->descriptor ),
 	     (wchar_t *) filename,
@@ -824,7 +980,9 @@ int libcfile_file_open_wide(
 	     file_io_shared_flags,
 	     file_io_permission_flags ) != 0 )
 	{
-		switch( errno )
+		*error_code = (uint32_t) errno;
+
+		switch( *error_code )
 		{
 			case EACCES:
 				libcerror_error_set(
@@ -853,7 +1011,7 @@ int libcfile_file_open_wide(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 errno,
+				 *error_code,
 				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
@@ -883,14 +1041,15 @@ int libcfile_file_open_wide(
  * This function uses the POSIX open function or equivalent
  * Returns 1 if successful or -1 on error
  */
-int libcfile_file_open_wide(
+int libcfile_file_open_wide_with_error_code(
      libcfile_file_t *file,
      const wchar_t *filename,
      int access_flags,
+     uint32_t *error_code,
      libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_open_wide";
+	static char *function                   = "libcfile_file_open_wide_with_error_code";
 	int file_io_flags                       = 0;
 	int result                              = 0;
 
@@ -963,6 +1122,17 @@ int libcfile_file_open_wide(
 #else
 		file_io_flags |= O_TRUNC;
 #endif
+	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
 	}
 #if defined( WINAPI )
 	internal_file->descriptor = _wsopen(
@@ -1111,7 +1281,9 @@ int libcfile_file_open_wide(
 
 	if( internal_file->descriptor == -1 )
 	{
-		switch( errno )
+		*error_code = (uint32_t) errno;
+
+		switch( *error_code )
 		{
 			case EACCES:
 				libcerror_error_set(
@@ -1140,7 +1312,7 @@ int libcfile_file_open_wide(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 errno,
+				 *error_code,
 				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
 				 filename );
@@ -1285,10 +1457,7 @@ int libcfile_file_close(
 #error Missing file close function
 #endif
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
-
 /* Reads a buffer from the file
- * This function uses the WINAPI function for Windows XP or later
  * Returns the number of bytes read if successful, or -1 on error
  */
 ssize_t libcfile_file_read_buffer(
@@ -1297,10 +1466,47 @@ ssize_t libcfile_file_read_buffer(
          size_t size,
          libcerror_error_t **error )
 {
+	static char *function = "libcfile_file_read_buffer";
+	ssize_t read_count    = 0;
+	uint32_t error_code   = 0;
+
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              size,
+	              &error_code,
+	              error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read from file.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
+#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+
+/* Reads a buffer from the file
+ * This function uses the WINAPI function for Windows XP or later
+ * Returns the number of bytes read if successful, or -1 on error
+ */
+ssize_t libcfile_file_read_buffer_with_error_code(
+         libcfile_file_t *file,
+         uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
+         libcerror_error_t **error )
+{
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_read_buffer";
+	static char *function                   = "libcfile_file_read_buffer_with_error_code";
 	ssize_t read_count                      = 0;
-	DWORD error_code                        = 0;
 
 	if( file == NULL )
 	{
@@ -1352,6 +1558,17 @@ ssize_t libcfile_file_read_buffer(
 
 		return( -1 );
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 	if( ReadFile(
 	     internal_file->handle,
 	     buffer,
@@ -1359,9 +1576,9 @@ ssize_t libcfile_file_read_buffer(
 	     (LPDWORD) &read_count,
 	     NULL ) == 0 )
 	{
-		error_code = GetLastError();
+		*error_code = (uint32_t) GetLastError();
 
-		switch( error_code )
+		switch( *error_code )
 		{
 			case ERROR_HANDLE_EOF:
 				break;
@@ -1371,13 +1588,12 @@ ssize_t libcfile_file_read_buffer(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 error_code,
+				 *error_code,
 				 "%s: unable to read from file.",
 				 function );
 
-				break;
+				return( -1 );
 		}
-		return( -1 );
 	}
 	if( read_count < 0 )
 	{
@@ -1405,14 +1621,15 @@ ssize_t libcfile_file_read_buffer(
  * This function uses the POSIX read function or equivalent
  * Returns the number of bytes read if successful, or -1 on error
  */
-ssize_t libcfile_file_read_buffer(
+ssize_t libcfile_file_read_buffer_with_error_code(
          libcfile_file_t *file,
          uint8_t *buffer,
          size_t size,
+         uint32_t *error_code,
          libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_read_buffer";
+	static char *function                   = "libcfile_file_read_buffer_with_error_code";
 	ssize_t read_count                      = 0;
 
 	if( file == NULL )
@@ -1465,6 +1682,17 @@ ssize_t libcfile_file_read_buffer(
 
 		return( -1 );
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( WINAPI )
 	read_count = _read(
 	              internal_file->descriptor,
@@ -1476,14 +1704,15 @@ ssize_t libcfile_file_read_buffer(
 	              (void *) buffer,
 	              size );
 #endif
-
 	if( read_count < 0 )
 	{
+		*error_code = (uint32_t) errno;
+
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 errno,
+		 *error_code,
 		 "%s: unable to read from file.",
 		 function );
 
@@ -1496,10 +1725,7 @@ ssize_t libcfile_file_read_buffer(
 #error Missing file read function
 #endif
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
-
 /* Writes a buffer to the file
- * This function uses the WINAPI function for Windows XP or later
  * Returns the number of bytes written if successful, or -1 on error
  */
 ssize_t libcfile_file_write_buffer(
@@ -1508,10 +1734,47 @@ ssize_t libcfile_file_write_buffer(
          size_t size,
          libcerror_error_t **error )
 {
+	static char *function = "libcfile_file_write_buffer";
+	ssize_t write_count   = 0;
+	uint32_t error_code   = 0;
+
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               file,
+	               buffer,
+	               size,
+	               &error_code,
+	               error );
+
+	if( write_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write to file.",
+		 function );
+
+		return( -1 );
+	}
+	return( write_count );
+}
+
+#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+
+/* Writes a buffer to the file
+ * This function uses the WINAPI function for Windows XP or later
+ * Returns the number of bytes written if successful, or -1 on error
+ */
+ssize_t libcfile_file_write_buffer_with_error_code(
+         libcfile_file_t *file,
+         const uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
+         libcerror_error_t **error )
+{
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_write_buffer";
+	static char *function                   = "libcfile_file_write_buffer_with_error_code";
 	ssize_t write_count                     = 0;
-	DWORD error_code                        = 0;
 
 	if( file == NULL )
 	{
@@ -1563,6 +1826,17 @@ ssize_t libcfile_file_write_buffer(
 
 		return( -1 );
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 	if( WriteFile(
 	     internal_file->handle,
 	     buffer,
@@ -1570,13 +1844,13 @@ ssize_t libcfile_file_write_buffer(
 	     (LPDWORD) &write_count,
 	     NULL ) == 0 )
 	{
-		error_code = GetLastError();
+		*error_code = (uint32_t) GetLastError();
 
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 error_code,
+		 *error_code,
 		 "%s: unable to write to file.",
 		 function );
 
@@ -1608,14 +1882,15 @@ ssize_t libcfile_file_write_buffer(
  * This function uses the POSIX write function or equivalent
  * Returns the number of bytes written if successful, or -1 on error
  */
-ssize_t libcfile_file_write_buffer(
+ssize_t libcfile_file_write_buffer_with_error_code(
          libcfile_file_t *file,
          const uint8_t *buffer,
          size_t size,
+         uint32_t *error_code,
          libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_write_buffer";
+	static char *function                   = "libcfile_file_write_buffer_with_error_code";
 	ssize_t write_count                     = 0;
 
 	if( file == NULL )
@@ -1668,6 +1943,17 @@ ssize_t libcfile_file_write_buffer(
 
 		return( -1 );
 	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( WINAPI )
 	write_count = _write(
 	               internal_file->descriptor,
@@ -1679,14 +1965,15 @@ ssize_t libcfile_file_write_buffer(
 	               (void *) buffer,
 	               size );
 #endif
-
 	if( write_count < 0 )
 	{
+		*error_code = (uint32_t) errno;
+
 		libcerror_system_set_error(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 errno,
+		 *error_code,
 		 "%s: unable to write to file.",
 		 function );
 
@@ -2567,6 +2854,18 @@ int libcfile_file_get_offset(
 
 #if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
 
+#if !defined( IOCTL_DISK_GET_LENGTH_INFO )
+#define IOCTL_DISK_GET_LENGTH_INFO \
+	CTL_CODE( IOCTL_DISK_BASE, 0x0017, METHOD_BUFFERED, FILE_READ_ACCESS )
+
+typedef struct
+{
+	LARGE_INTEGER Length;
+}
+GET_LENGTH_INFORMATION;
+
+#endif /* !defined( IOCTL_DISK_GET_LENGTH_INFO ) */
+
 /* Retrieves the size of the file
  * This function uses the WINAPI function for Windows XP (0x0501) or later
  * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
@@ -2577,9 +2876,15 @@ int libcfile_file_get_size(
      size64_t *size,
      libcerror_error_t **error )
 {
+	DISK_GEOMETRY disk_geometry;
+	GET_LENGTH_INFORMATION length_information;
+
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_get_size";
 	LARGE_INTEGER large_integer_size        = LIBCFILE_LARGE_INTEGER_ZERO;
+	DWORD error_code                        = 0;
+	DWORD response_count                    = 0;
+	int result                              = 0;
 
 	if( file == NULL )
 	{
@@ -2617,30 +2922,71 @@ int libcfile_file_get_size(
 		return( -1 );
 	}
 /* TODO implement device support ? */
-#if ( WINVER <= 0x0500 )
-	if( libcfile_GetFileSizeEx(
-	     internal_file->handle,
-	     &large_integer_size ) == 0 )
-#else
-	if( GetFileSizeEx(
-	     internal_file->handle,
-	     &large_integer_size ) == 0 )
-#endif
+	if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file size.",
-		 function );
+		result = libcfile_file_io_control_read(
+		          file,
+		          IOCTL_DISK_GET_LENGTH_INFO,
+		          (uint8_t *) &length_information,
+		          sizeof( GET_LENGTH_INFORMATION ),
+		          NULL );
 
-		return( -1 );
+		if( result == 1 )
+		{
+			*size  = (size64_t) length_information.Length.HighPart << 32;
+			*size += length_information.Length.LowPart;
+		}
+		else
+		{
+			error_code = GetLastError();
+
+			if( error_code == ERROR_NOT_SUPPORTED )
+			{
+				/* A floppy device does not support IOCTL_DISK_GET_LENGTH_INFO
+				 */
+				result = libcfile_file_io_control_read(
+				          file,
+				          IOCTL_DISK_GET_DRIVE_GEOMETRY,
+				          (uint8_t *) &disk_geometry,
+				          sizeof( DISK_GEOMETRY ),
+				          NULL );
+
+				if( result != 0 )
+				{
+					*size  = disk_geometry.Cylinders.QuadPart;
+					*size *= disk_geometry.TracksPerCylinder;
+					*size *= disk_geometry.SectorsPerTrack;
+					*size *= disk_geometry.BytesPerSector;
+				}
+		}
 	}
-#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x520
-	*size = (size64_t) large_integer_size.QuadPart;
+	else
+	{
+#if ( WINVER <= 0x0500 )
+		if( libcfile_GetFileSizeEx(
+		     internal_file->handle,
+		     &large_integer_size ) == 0 )
 #else
-	*size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
+		if( GetFileSizeEx(
+		     internal_file->handle,
+		     &large_integer_size ) == 0 )
 #endif
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file size.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x520
+		*size = (size64_t) large_integer_size.QuadPart;
+#else
+		*size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
+#endif
+	}
 	return( 1 );
 }
 
@@ -2670,6 +3016,14 @@ int libcfile_file_get_size(
 #if defined( S_ISBLK ) && defined( S_ISCHR )
 	off64_t current_offset                  = 0;
 	off64_t offset                          = 0;
+	int result                              = 0;
+#endif
+#if !defined( DIOCGMEDIASIZE ) && defined( DIOCGDINFO )
+	struct disklabel disk_label;
+#endif
+#if defined( DKIOCGETBLOCKCOUNT )
+	uint64_t block_count                    = 0;
+	uint32_t bytes_per_sector               = 0;
 #endif
 
 	if( file == NULL )
@@ -2752,65 +3106,136 @@ int libcfile_file_get_size(
 
 		return( -1 );
 	}
-/* TODO implement device support ? */
-/* TODO does not work on Mac OS X or WINAPI */
 #if defined( S_ISBLK ) && defined( S_ISCHR )
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
 	{
-		if( libcfile_file_get_offset(
-		     file,
-		     &current_offset,
-		     error ) != 1  )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve current offset.",
-			 function );
-
-			return( -1 );
-		}
-		/* If the file is a device try to seek the end of the file
-		 */
-		offset = libcfile_file_seek_offset(
+#if defined( BLKGETSIZE64 )
+		result = libcfile_file_io_control_read(
 		          file,
-		          0,
-		          SEEK_END,
-		          error );
+		          (uint32_t) BLKGETSIZE64,
+		          (uint8_t *) size,
+		          8,
+		          NULL );
 
-		if( offset == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek end of file.",
-			 function );
-
-			return( -1 );
-		}
-		*size = (size64_t) offset;
-
-		offset = libcfile_file_seek_offset(
+#elif defined( DIOCGMEDIASIZE )
+		result = libcfile_file_io_control_read(
 		          file,
-		          current_offset,
-		          SEEK_SET,
-		          error );
+		          (uint32_t) DIOCGMEDIASIZE,
+		          (uint8_t *) size,
+		          8,
+		          NULL );
 
-		if( offset == -1 )
+#elif defined( DIOCGDINFO )
+		result = libcfile_file_io_control_read(
+		          file,
+		          (uint32_t) DIOCGDINFO,
+		          (uint8_t *) &disk_label,
+		          sizeof( struct disklabel ),
+		          NULL );
+
+		if( result == 1 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset: %" PRIi64 ".",
+			*size = disk_label.d_secperunit * disk_label.d_secsize;
+		}
+#elif defined( DKIOCGETBLOCKCOUNT )
+		result = libcfile_file_io_control_read(
+		          file,
+		          (uint32_t) DKIOCGETBLOCKSIZE,
+		          (uint8_t *) &bytes_per_sector,
+		          4,
+			  NULL );
+
+		if( result == 1 )
+		{
+			result = libcfile_file_io_control_read(
+			          file,
+			          (uint32_t) DKIOCGETBLOCKCOUNT,
+			          (uint8_t *) &block_count,
+			          4,
+			          NULL );
+
+			if( result == 1 )
+			{
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: block size: %" PRIu32 " block count: %" PRIu64 " ",
+					 function,
+					 bytes_per_sector,
+					 block_count );
+				}
+#endif
+				*size = (size64_t) ( block_count * bytes_per_sector );
+			}
+		}
+#endif
+		if( result != 1 )
+		{
+			/* Try to seek the end of the file and determine the size based on the offset
+			 */
+			if( libcfile_file_get_offset(
+			     file,
+			     &current_offset,
+			     error ) != 1  )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve current offset.",
+				 function );
+
+				return( -1 );
+			}
+			offset = libcfile_file_seek_offset(
+				  file,
+				  0,
+				  SEEK_END,
+				  error );
+
+			if( offset == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to seek end of file.",
+				 function );
+
+				return( -1 );
+			}
+			*size = (size64_t) offset;
+
+			offset = libcfile_file_seek_offset(
+				  file,
+				  current_offset,
+				  SEEK_SET,
+				  error );
+
+			if( offset == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to seek offset: %" PRIi64 ".",
+				 function,
+				 current_offset );
+
+				return( -1 );
+			}
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: device media size: %" PRIu64 "\n",
 			 function,
-			 current_offset );
-
-			return( -1 );
+			 *size );
 		}
+#endif
 	}
 	else
 #endif
@@ -2822,5 +3247,120 @@ int libcfile_file_get_size(
 
 #else
 #error Missing file get size function
+#endif
+
+#if defined( HAVE_IOCTL ) || defined( WINAPI )
+
+/* Read data from a device file using IO control
+ * This function uses the POSIX ioctl function or WINAPI DeviceIoControl
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_io_control_read(
+     libcfile_file_t *file,
+     uint32_t control_code,
+     uint8_t *data,
+     size_t data_size, 
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_io_control_read";
+
+#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+	DWORD response_count                    = 0;
+#endif
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+	if( internal_file->handle == INVALID_HANDLE_VALUE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing handle.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( internal_file->descriptor == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing descriptor.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+#if UINT32_MAX < SSIZE_MAX
+	if( data_size > (size_t) UINT32_MAX )
+#else
+	if( data_size > (size_t) SSIZE_MAX )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+	if( DeviceIoControl(
+	     internal_file->handle,
+	     (DWORD) control_code,
+	     NULL,
+	     0,
+	     data,
+	     (DWORD) data_size,
+	     &response_count,
+	     NULL ) == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 "%s: unable to IO control device.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( ioctl(
+	     internal_file->descriptor,
+	     (int) control_code,
+	     data ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 "%s: unable to IO control device.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+#else
+#error Missing file IO control function
 #endif
 

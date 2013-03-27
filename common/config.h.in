@@ -15,6 +15,9 @@
 /* Define to 1 if you have the `close' function. */
 #undef HAVE_CLOSE
 
+/* Define to 1 if you have the <cygwin/fs.h> header file. */
+#undef HAVE_CYGWIN_FS_H
+
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
 #undef HAVE_DCGETTEXT
@@ -93,6 +96,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the `ioctl' function. */
+#undef HAVE_IOCTL
+
 /* Define if nl_langinfo has CODESET support. */
 #undef HAVE_LANGINFO_CODESET
 
@@ -128,6 +134,9 @@
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <linux/fs.h> header file. */
+#undef HAVE_LINUX_FS_H
 
 /* Define to 1 if you have the `localeconv' function. */
 #undef HAVE_LOCALECONV
@@ -251,6 +260,15 @@
 
 /* Define to 1 if you have the `swprintf' function. */
 #undef HAVE_SWPRINTF
+
+/* Define to 1 if you have the <sys/disklabel.h> header file. */
+#undef HAVE_SYS_DISKLABEL_H
+
+/* Define to 1 if you have the <sys/disk.h> header file. */
+#undef HAVE_SYS_DISK_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H

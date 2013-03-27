@@ -61,13 +61,31 @@ int libcfile_file_open(
      int access_flags,
      libcerror_error_t **error );
 
+LIBCFILE_EXTERN \
+int libcfile_file_open_with_error_code(
+     libcfile_file_t *file,
+     const char *filename,
+     int access_flags,
+     uint32_t *error_code,
+     libcerror_error_t **error );
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBCFILE_EXTERN \
 int libcfile_file_open_wide(
      libcfile_file_t *file,
      const wchar_t *filename,
      int access_flags,
      libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_open_wide_with_error_code(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     uint32_t *error_code,
+     libcerror_error_t **error );
+
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBCFILE_EXTERN \
@@ -92,6 +110,14 @@ ssize_t libcfile_file_read_buffer(
          size_t size,
          libcerror_error_t **error );
 
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_read_buffer_with_error_code(
+         libcfile_file_t *file,
+         uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
+         libcerror_error_t **error );
+
 #if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
 /* TODO implement */
 BOOL libcfile_WriteFile(
@@ -107,6 +133,14 @@ ssize_t libcfile_file_write_buffer(
          libcfile_file_t *file,
          const uint8_t *buffer,
          size_t size,
+         libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_write_buffer_with_error_code(
+         libcfile_file_t *file,
+         const uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
          libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
@@ -156,6 +190,14 @@ LIBCFILE_EXTERN \
 int libcfile_file_get_size(
      libcfile_file_t *file,
      size64_t *size,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_io_control_read(
+     libcfile_file_t *file,
+     uint32_t control_code,
+     uint8_t *data,
+     size_t data_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

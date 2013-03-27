@@ -1,4 +1,6 @@
 TODO
+* add IO control function
+* fix logic of definition of WINAPI CRT stat exists function
 * add file stream support
   - what about non-CRT WINAPI version ?
   - implement libcfile_stream_open_wide
@@ -13,9 +15,10 @@ TODO
   - GetFileAttributesW
   - GetLastError
 * add libcfile_codepage.h and codepage functions
-* add borlandc5 and codegear files
 * improve tests ?
   - add write when opened with read ?
+  - add IO control tests ?
+  - add test to retrieve size from device ?
 * what about disk full on write errno = ENOSPC
 
 Notes:
@@ -23,6 +26,11 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20130327
+* added file open, read and write _with_error_code functions
+* improved size detection for device files
+* added IO control read function
 
 20130210
 * added FILE_SHARE_WRITE to open read CreateFile calls

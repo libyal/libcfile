@@ -1,4 +1,4 @@
-.Dd January 3, 2013
+.Dd March 27, 2013
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -33,11 +33,17 @@ File functions
 .Ft int
 .Fn libcfile_file_open "libcfile_file_t *file, const char *filename, int access_flags, libcfile_error_t **error"
 .Ft int
+.Fn libcfile_file_open_with_error_code "libcfile_file_t *file, const char *filename, int access_flags, uint32_t *error_code, libcfile_error_t **error"
+.Ft int
 .Fn libcfile_file_close "libcfile_file_t *file, libcfile_error_t **error"
 .Ft ssize_t
 .Fn libcfile_file_read_buffer "libcfile_file_t *file, uint8_t *buffer, size_t size, libcfile_error_t **error"
 .Ft ssize_t
+.Fn libcfile_file_read_buffer_with_error_code "libcfile_file_t *file, uint8_t *buffer, size_t size, uint32_t *error_code, libcfile_error_t **error"
+.Ft ssize_t
 .Fn libcfile_file_write_buffer "libcfile_file_t *file, const uint8_t *buffer, size_t size, libcfile_error_t **error"
+.Ft ssize_t
+.Fn libcfile_file_write_buffer_with_error_code "libcfile_file_t *file, const uint8_t *buffer, size_t size, uint32_t *error_code, libcfile_error_t **error"
 .Ft off64_t
 .Fn libcfile_file_seek_offset "libcfile_file_t *file, off64_t offset, int whence, libcfile_error_t **error"
 .Ft int
@@ -48,10 +54,14 @@ File functions
 .Fn libcfile_file_get_offset "libcfile_file_t *file, off64_t *offset, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_get_size "libcfile_file_t *file, size64_t *size, libcfile_error_t **error"
+.Ft int
+.Ft libcfile_file_io_control_read "libcfile_file_t *file, uint32_t control_code, uint8_t *data, size_t data_size, libcfile_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
 .Fn libcfile_file_open_wide "libcfile_file_t *file, const wchar_t *filename, int access_flags, libcfile_error_t **error"
+.Ft int
+.Fn libcfile_file_open_wide_with_error_code "libcfile_file_t *file, const wchar_t *filename, int access_flags, uint32_t *error_code, libcfile_error_t **error"
 .Pp
 File stream functions
 .Ft int

@@ -1,6 +1,6 @@
 dnl Functions for libcfile
 dnl
-dnl Version: 20120825
+dnl Version: 20130327
 
 dnl Function to detect if libcfile dependencies are available
 AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
@@ -8,10 +8,10 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
  AC_CHECK_HEADERS([errno.h stdio.h sys/stat.h])
 
  dnl Headers included in libcfile/libcfile_file.h
- AC_CHECK_HEADERS([fcntl.h unistd.h])
+ AC_CHECK_HEADERS([cygwin/fs.h fcntl.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h unistd.h])
 
- dnl File input/output functions used in libcfile/libcfile_file.h
- AC_CHECK_FUNCS([close fstat ftruncate lseek open read write])
+ dnl File input/output functions used in libcfile/libcfile_file.c
+ AC_CHECK_FUNCS([close fstat ftruncate ioctl lseek open read write])
 
  AS_IF(
   [test "x$ac_cv_func_close" != xyes],
@@ -30,6 +30,13 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
   [test "x$ac_cv_func_ftruncate" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftruncate],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_ioctl" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: ioctl],
    [1])
   ])
  

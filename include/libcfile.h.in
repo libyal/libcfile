@@ -131,6 +131,17 @@ int libcfile_file_open(
      int access_flags,
      libcfile_error_t **error );
 
+/* Opens a file
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_file_open_with_error_code(
+     libcfile_file_t *file,
+     const char *filename,
+     int access_flags,
+     uint32_t *error_code,
+     libcfile_error_t **error );
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Opens a file
@@ -141,6 +152,17 @@ int libcfile_file_open_wide(
      libcfile_file_t *file,
      const wchar_t *filename,
      int access_flags,
+     libcfile_error_t **error );
+
+/* Opens a file
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_file_open_wide_with_error_code(
+     libcfile_file_t *file,
+     const wchar_t *filename,
+     int access_flags,
+     uint32_t *error_code,
      libcfile_error_t **error );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
@@ -163,6 +185,17 @@ ssize_t libcfile_file_read_buffer(
          size_t size,
          libcfile_error_t **error );
 
+/* Reads a buffer from the file
+ * Returns the number of bytes read if successful, or -1 on error
+ */
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_read_buffer_with_error_code(
+         libcfile_file_t *file,
+         uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
+         libcfile_error_t **error );
+
 /* Writes a buffer to the file
  * Returns the number of bytes written if successful, or -1 on error
  */
@@ -171,6 +204,17 @@ ssize_t libcfile_file_write_buffer(
          libcfile_file_t *file,
          const uint8_t *buffer,
          size_t size,
+         libcfile_error_t **error );
+
+/* Writes a buffer to the file
+ * Returns the number of bytes written if successful, or -1 on error
+ */
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_write_buffer_with_error_code(
+         libcfile_file_t *file,
+         const uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
          libcfile_error_t **error );
 
 /* Seeks a certain offset within the file
@@ -216,6 +260,17 @@ LIBCFILE_EXTERN \
 int libcfile_file_get_size(
      libcfile_file_t *file,
      size64_t *size,
+     libcfile_error_t **error );
+
+/* Read data from a device file using IO control
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_file_io_control_read(
+     libcfile_file_t *file,
+     uint32_t control_code,
+     uint8_t *data,
+     size_t data_size,
      libcfile_error_t **error );
 
 /* -------------------------------------------------------------------------
