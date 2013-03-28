@@ -88,6 +88,7 @@ typedef size_t u64;
 #include "libcfile_file.h"
 #include "libcfile_libcerror.h"
 #include "libcfile_libclocale.h"
+#include "libcfile_libcnotify.h"
 #include "libcfile_libcstring.h"
 #include "libcfile_libuna.h"
 #include "libcfile_types.h"
@@ -1357,34 +1358,25 @@ int libcfile_file_close(
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
-	if( internal_file->handle == INVALID_HANDLE_VALUE )
+	if( internal_file->handle != INVALID_HANDLE_VALUE )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing handle.",
-		 function );
+		if( CloseHandle(
+		     internal_file->handle ) == 0 )
+		{
+			error_code = GetLastError();
 
-		return( -1 );
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+			 error_code,
+			 "%s: unable to close file.",
+			 function );
+
+			return( -1 );
+		}
+		internal_file->handle = INVALID_HANDLE_VALUE;
 	}
-	if( CloseHandle(
-	     internal_file->handle ) == 0 )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 error_code,
-		 "%s: unable to close file.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file->handle = INVALID_HANDLE_VALUE;
-
 	return( 0 );
 }
 
@@ -1419,37 +1411,28 @@ int libcfile_file_close(
 	}
 	internal_file = (libcfile_internal_file_t *) file;
 
-	if( internal_file->descriptor == -1 )
+	if( internal_file->descriptor != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing descriptor.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( WINAPI )
-	if( _close(
-	     internal_file->descriptor ) != 0 )
+		if( _close(
+		     internal_file->descriptor ) != 0 )
 #else
-	if( close(
-	     internal_file->descriptor ) != 0 )
+		if( close(
+		     internal_file->descriptor ) != 0 )
 #endif
-	{
-		libcerror_system_set_error(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 errno,
-		 "%s: unable to close file.",
-		 function );
+		{
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+			 errno,
+			 "%s: unable to close file.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		internal_file->descriptor = -1;
 	}
-	internal_file->descriptor = -1;
-
 	return( 0 );
 }
 
@@ -2882,8 +2865,7 @@ int libcfile_file_get_size(
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_get_size";
 	LARGE_INTEGER large_integer_size        = LIBCFILE_LARGE_INTEGER_ZERO;
-	DWORD error_code                        = 0;
-	DWORD response_count                    = 0;
+	uint32_t error_code                     = 0;
 	int result                              = 0;
 
 	if( file == NULL )
@@ -2924,11 +2906,12 @@ int libcfile_file_get_size(
 /* TODO implement device support ? */
 	if( result != 0 )
 	{
-		result = libcfile_file_io_control_read(
+		result = libcfile_file_io_control_read_with_error_code(
 		          file,
 		          IOCTL_DISK_GET_LENGTH_INFO,
 		          (uint8_t *) &length_information,
 		          sizeof( GET_LENGTH_INFORMATION ),
+		          &error_code,
 		          NULL );
 
 		if( result == 1 )
@@ -2936,28 +2919,24 @@ int libcfile_file_get_size(
 			*size  = (size64_t) length_information.Length.HighPart << 32;
 			*size += length_information.Length.LowPart;
 		}
-		else
+		else if( error_code == ERROR_NOT_SUPPORTED )
 		{
-			error_code = GetLastError();
+			/* A floppy device does not support IOCTL_DISK_GET_LENGTH_INFO
+			 */
+			result = libcfile_file_io_control_read(
+				  file,
+				  IOCTL_DISK_GET_DRIVE_GEOMETRY,
+				  (uint8_t *) &disk_geometry,
+				  sizeof( DISK_GEOMETRY ),
+				  NULL );
 
-			if( error_code == ERROR_NOT_SUPPORTED )
+			if( result != 0 )
 			{
-				/* A floppy device does not support IOCTL_DISK_GET_LENGTH_INFO
-				 */
-				result = libcfile_file_io_control_read(
-				          file,
-				          IOCTL_DISK_GET_DRIVE_GEOMETRY,
-				          (uint8_t *) &disk_geometry,
-				          sizeof( DISK_GEOMETRY ),
-				          NULL );
-
-				if( result != 0 )
-				{
-					*size  = disk_geometry.Cylinders.QuadPart;
-					*size *= disk_geometry.TracksPerCylinder;
-					*size *= disk_geometry.SectorsPerTrack;
-					*size *= disk_geometry.BytesPerSector;
-				}
+				*size  = disk_geometry.Cylinders.QuadPart;
+				*size *= disk_geometry.TracksPerCylinder;
+				*size *= disk_geometry.SectorsPerTrack;
+				*size *= disk_geometry.BytesPerSector;
+			}
 		}
 	}
 	else
@@ -3341,6 +3320,17 @@ int libcfile_file_io_control_read_with_error_code(
 		return( -1 );
 	}
 #endif
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
 #if UINT32_MAX < SSIZE_MAX
 	if( data_size > (size_t) UINT32_MAX )
 #else

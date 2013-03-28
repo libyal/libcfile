@@ -1,4 +1,4 @@
-.Dd March 27, 2013
+.Dd March 28, 2013
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -12,6 +12,16 @@
 Support functions
 .Ft const char *
 .Fn libcfile_get_version "void"
+.Pp
+Notify functions
+.Ft void
+.Fn libcfile_notify_set_verbose "int verbose"
+.Ft int
+.Fn libcfile_notify_set_stream "FILE *stream, libcfile_error_t **error"
+.Ft int
+.Fn libcfile_notify_stream_open "const char *filename, libcfile_error_t **error"
+.Ft int
+.Fn libcfile_notify_stream_close "libcfile_error_t **error"
 .Pp
 Error functions
 .Ft void

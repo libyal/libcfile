@@ -1,5 +1,5 @@
 TODO
-* add IO control function
+* get size determine if file is device
 * fix logic of definition of WINAPI CRT stat exists function
 * add file stream support
   - what about non-CRT WINAPI version ?
@@ -26,6 +26,11 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20130328
+* worked on IO control read function
+* changed close to ignore a file that is already closed
+* added libcnotify
 
 20130327
 * added file open, read and write _with_error_code functions

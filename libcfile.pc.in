@@ -7,6 +7,6 @@ Name: libuna
 Description: Library to support cross-platform C path functions
 Version: @VERSION@
 Libs: -L${libdir} -lcfile
-Libs.private: @ax_libcerror_libs_private@ @ax_libclocale_libs_private@ @ax_libcstring_libs_private@ @ax_libuna_libs_private@
+Libs.private: @ax_libcerror_libs_private@ @ax_libclocale_libs_private@ @ax_libcnotify_libs_private@ @ax_libcstring_libs_private@ @ax_libuna_libs_private@
 Cflags: -I${includedir}
 

@@ -58,6 +58,40 @@ int libcfile_file_exists_wide(
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* -------------------------------------------------------------------------
+ * Notify functions
+ * ------------------------------------------------------------------------- */
+
+/* Sets the verbose notification
+ */
+LIBCFILE_EXTERN \
+void libcfile_notify_set_verbose(
+      int verbose );
+
+/* Sets the notification stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_notify_set_stream(
+     FILE *stream,
+     libcfile_error_t **error );
+
+/* Opens the notification stream using a filename
+ * The stream is opened in append mode
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_notify_stream_open(
+     const char *filename,
+     libcfile_error_t **error );
+
+/* Closes the notification stream if opened using a filename
+ * Returns 0 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_notify_stream_close(
+     libcfile_error_t **error );
+
+/* -------------------------------------------------------------------------
  * Error functions
  * ------------------------------------------------------------------------- */
 

@@ -4,7 +4,7 @@
 # Version: 20121224
 
 GIT_URL_PREFIX="https://code.google.com/p"
-LOCAL_LIBS="libcerror libclocale libuna";
+LOCAL_LIBS="libcerror libclocale libcnotify libuna";
 
 OLDIFS=$IFS;
 IFS=" ";

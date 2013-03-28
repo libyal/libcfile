@@ -2,6 +2,7 @@ MSVSCPP_FILES = \
 	libcerror/libcerror.vcproj \
 	libclocale/libclocale.vcproj \
 	libcfile_dll/libcfile_dll.vcproj \
+	libcnotify/libcnotify.vcproj \
 	libcstring/libcstring.vcproj \
 	libuna/libuna.vcproj \
 	libcfile.sln

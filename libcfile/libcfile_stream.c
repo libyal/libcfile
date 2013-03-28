@@ -338,32 +338,23 @@ int libcfile_stream_close(
 	}
 	internal_stream = (libcfile_internal_stream_t *) stream;
 
-	if( internal_stream->stream == NULL )
+	if( internal_stream->stream != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid stream - missing stream.",
-		 function );
+		if( fclose(
+		     internal_stream->stream ) != 0 )
+		{
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+			 errno,
+			 "%s: unable to close stream.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		internal_stream->stream = NULL;
 	}
-	if( fclose(
-	     internal_stream->stream ) != 0 )
-	{
-		libcerror_system_set_error(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 errno,
-		 "%s: unable to close stream.",
-		 function );
-
-		return( -1 );
-	}
-	internal_stream->stream = NULL;
-
 	return( 0 );
 }
 
