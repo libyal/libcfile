@@ -38,8 +38,16 @@ typedef struct libcfile_internal_file libcfile_internal_file_t;
 struct libcfile_internal_file
 {
 #if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+	/* The (file) handle
+	 */
 	HANDLE handle;
+
+	/* Value to indicate the filename indicate this is a device file
+	 */
+	uint8_t is_device_filename;
 #else
+	/* The (file) descriptor
+	 */
 	int descriptor;
 #endif
 };
@@ -193,21 +201,30 @@ int libcfile_file_get_size(
      libcerror_error_t **error );
 
 LIBCFILE_EXTERN \
-int libcfile_file_io_control_read(
+int libcfile_file_is_device(
      libcfile_file_t *file,
-     uint32_t control_code,
-     uint8_t *data,
-     size_t data_size,
      libcerror_error_t **error );
 
 LIBCFILE_EXTERN \
-int libcfile_file_io_control_read_with_error_code(
-     libcfile_file_t *file,
-     uint32_t control_code,
-     uint8_t *data,
-     size_t data_size,
-     uint32_t *error_code,
-     libcerror_error_t **error );
+ssize_t libcfile_file_io_control_read(
+         libcfile_file_t *file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+ssize_t libcfile_file_io_control_read_with_error_code(
+         libcfile_file_t *file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         uint32_t *error_code,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
