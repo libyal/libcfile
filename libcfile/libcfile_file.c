@@ -2645,7 +2645,13 @@ int libcfile_file_resize(
 
 		return( -1 );
 	}
+#if defined( WINAPI )
+	if( size > (size64_t) LONG_MAX )
+#elif SIZEOF_OFF_T >= 8
 	if( size > (size64_t) INT64_MAX )
+#else
+	if( size > (size64_t) INT32_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -2659,11 +2665,11 @@ int libcfile_file_resize(
 #if defined( WINAPI )
 	if( _chsize(
 	     internal_file->descriptor,
-	     size ) != 0 )
+	     (long) size ) != 0 )
 #else
 	if( ftruncate(
 	     internal_file->descriptor,
-	     size ) != 0 )
+	     (off_t) size ) != 0 )
 #endif
 	{
 		libcerror_system_set_error(
@@ -3292,7 +3298,7 @@ int libcfile_file_get_size(
 		return( -1 );
 	}
 #if defined( WINAPI )
-	if( _S_IFCHR( file_statistics.st_mode ) )
+	if( ( file_statistics.st_mode & _S_IFCHR ) != 0 )
 #else
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
@@ -3728,7 +3734,7 @@ int libcfile_file_is_device(
 		return( -1 );
 	}
 #if defined( WINAPI )
-	if( _S_IFCHR( file_statistics.st_mode ) )
+	if( ( file_statistics.st_mode & _S_IFCHR ) != 0 )
 #else
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
@@ -3956,7 +3962,8 @@ ssize_t libcfile_file_io_control_read_with_error_code(
 	}
 #endif
 	return( (ssize_t) response_count );
-#else
+
+#elif defined( HAVE_IOCTL )
 	if( control_data != NULL )
 	{
 		libcerror_error_set(
@@ -3992,4 +3999,121 @@ ssize_t libcfile_file_io_control_read_with_error_code(
 #else
 #error Missing file IO control with data function
 #endif
+
+/* On some versions of Linux the FADVISE definions seem to be missing from fcntl.h
+ */
+#if defined( HAVE_POSIX_FADVISE )
+
+#if !defined( POSIX_FADV_NORMAL ) 
+#define POSIX_FADV_NORMAL		0
+#endif
+
+#if !defined( POSIX_FADV_RANDOM ) 
+#define POSIX_FADV_RANDOM		1
+#endif
+
+#if !defined( POSIX_FADV_SEQUENTIAL ) 
+#define POSIX_FADV_SEQUENTIAL		2
+#endif
+
+#endif /* #if defined( HAVE_POSIX_FADVISE ) */
+
+/* Sets the expected access behavior so the system can optimize the access
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_set_access_behavior(
+     libcfile_file_t *file,
+     int access_behavior,
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_set_access_behavior";
+
+#if defined( HAVE_POSIX_FADVISE )
+	int advice                              = POSIX_FADV_NORMAL;
+#endif
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+	if( internal_file->handle == INVALID_HANDLE_VALUE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing handle.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( internal_file->descriptor == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing descriptor.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( ( access_behavior != LIBCFILE_ACCESS_BEHAVIOR_NORMAL )
+	 && ( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_RANDOM )
+	 && ( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_SEQUENTIAL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported access behavior: %d.",
+		 function,
+		 access_behavior );
+
+		return( -1 );
+	}
+#if defined( HAVE_POSIX_FADVISE )
+	if( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_NORMAL )
+	{
+		advice = POSIX_FADV_NORMAL;
+	}
+	else if( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_RANDOM )
+	{
+		advice = POSIX_FADV_RANDOM;
+	}
+	else if( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_SEQUENTIAL )
+	{
+		advice = POSIX_FADV_SEQUENTIAL;
+	}
+	if( posix_fadvise(
+	     internal_file->descriptor,
+	     0,
+	     0,
+	     advice ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_GENERIC,
+		 "%s: unable to advice file descriptor on access behavior.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
 

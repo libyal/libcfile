@@ -323,6 +323,15 @@ int libcfile_file_io_control_read_with_error_code(
      uint32_t *error_code,
      libcfile_error_t **error );
 
+/* Sets the expected access behavior so the system can optimize the access
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_file_set_access_behavior(
+     libcfile_file_t *file,
+     int access_behavior,
+     libcfile_error_t **error );
+
 /* -------------------------------------------------------------------------
  * File stream functions
  * ------------------------------------------------------------------------- */

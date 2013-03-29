@@ -1,5 +1,8 @@
 TODO
-* fix logic of definition of WINAPI CRT stat exists function
+* Windows CRT functions
+  - fix logic of definition of WINAPI CRT stat exists function
+  - ioctl equivalent?
+  - remove them all together?
 * add file stream support
   - what about non-CRT WINAPI version ?
   - implement libcfile_stream_open_wide
@@ -28,6 +31,8 @@ Notes:
 
 20130329
 * worked on IO control read function
+* changes for Windows CRT functions
+* added posix_fadvise support
 
 20130328
 * worked on IO control read function

@@ -226,6 +226,12 @@ ssize_t libcfile_file_io_control_read_with_error_code(
          uint32_t *error_code,
          libcerror_error_t **error );
 
+LIBCFILE_EXTERN \
+int libcfile_file_set_access_behavior(
+     libcfile_file_t *file,
+     int access_behavior,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
