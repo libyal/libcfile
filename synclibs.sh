@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script that synchronizes the local library dependencies
 #
-# Version: 20121224
+# Version: 20130330
 
 GIT_URL_PREFIX="https://code.google.com/p"
 LOCAL_LIBS="libcerror libclocale libcnotify libuna";
@@ -24,14 +24,59 @@ do
 		if [ -d ${LOCAL_LIB} ];
 		then
 			cp ${LOCAL_LIB}-$$/${LOCAL_LIB}/*.[ch] ${LOCAL_LIB};
-
 			cp ${LOCAL_LIB}-$$/${LOCAL_LIB}/Makefile.am ${LOCAL_LIB}/Makefile.am;
-			sed "1i if HAVE_LOCAL_${LOCAL_LIB_UPPER}" -i ${LOCAL_LIB}/Makefile.am;
-			sed "s/lib_LTLIBRARIES/noinst_LTLIBRARIES/" -i ${LOCAL_LIB}/Makefile.am;
-			sed "/${LOCAL_LIB}.c/ { d }" -i ${LOCAL_LIB}/Makefile.am;
-			sed "s/${LOCAL_LIB}_la_LDFLAGS = .*$/endif/" -i ${LOCAL_LIB}/Makefile.am;
-			sed "/EXTRA_DIST = / { N; N; N; N; d }" -i ${LOCAL_LIB}/Makefile.am;
-			sed "/distclean: clean/ { n; N; d }" -i ${LOCAL_LIB}/Makefile.am;
+
+SED_SCRIPT="
+1i if HAVE_LOCAL_${LOCAL_LIB_UPPER}
+
+/lib_LTLIBRARIES/ {
+	s/lib_LTLIBRARIES/noinst_LTLIBRARIES/
+}
+
+/${LOCAL_LIB}\.c/ {
+	d
+}
+
+/${LOCAL_LIB}_la_LIBADD/ {
+:loop1
+        /${LOCAL_LIB}_la_LDFLAGS/ {
+                N
+		i endif
+                d
+        }
+        /${LOCAL_LIB}_la_LDFLAGS/ !{
+                N
+                b loop1
+        }
+}
+
+/EXTRA_DIST = / {
+	N
+	N
+	N
+	N
+	d
+}
+
+/distclean: clean/ {
+	n
+	N
+	d
+}";
+			sed "${SED_SCRIPT}" -i ${LOCAL_LIB}/Makefile.am;
+
+SED_SCRIPT="
+/^$/ {
+        x
+        N
+        /endif$/ {
+                a \
+
+                D
+        }
+}";
+			sed "${SED_SCRIPT}" -i ${LOCAL_LIB}/Makefile.am;
+
 			rm -f ${LOCAL_LIB}/${LOCAL_LIB}.c;
 
 			cp ${LOCAL_LIB}-$$/${LOCAL_LIB}/${LOCAL_LIB}_definitions.h.in ${LOCAL_LIB}/${LOCAL_LIB}_definitions.h;
