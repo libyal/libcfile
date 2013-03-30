@@ -3756,9 +3756,9 @@ ssize_t libcfile_file_io_control_read(
          libcfile_file_t *file,
          uint32_t control_code,
          uint8_t *control_data,
-         size_t control_data_size, 
+         size_t control_data_size,
          uint8_t *data,
-         size_t data_size, 
+         size_t data_size,
          libcerror_error_t **error )
 {
 	static char *function = "libcfile_file_io_control_read";
@@ -3799,10 +3799,10 @@ ssize_t libcfile_file_io_control_read_with_error_code(
          libcfile_file_t *file,
          uint32_t control_code,
          uint8_t *control_data,
-         size_t control_data_size, 
+         size_t control_data_size,
          uint8_t *data,
-         size_t data_size, 
-         uint32_t *error_code, 
+         size_t data_size,
+         uint32_t *error_code,
          libcerror_error_t **error )
 {
 	libcfile_internal_file_t *internal_file = NULL;
@@ -4004,15 +4004,15 @@ ssize_t libcfile_file_io_control_read_with_error_code(
  */
 #if defined( HAVE_POSIX_FADVISE )
 
-#if !defined( POSIX_FADV_NORMAL ) 
+#if !defined( POSIX_FADV_NORMAL )
 #define POSIX_FADV_NORMAL		0
 #endif
 
-#if !defined( POSIX_FADV_RANDOM ) 
+#if !defined( POSIX_FADV_RANDOM )
 #define POSIX_FADV_RANDOM		1
 #endif
 
-#if !defined( POSIX_FADV_SEQUENTIAL ) 
+#if !defined( POSIX_FADV_SEQUENTIAL )
 #define POSIX_FADV_SEQUENTIAL		2
 #endif
 
