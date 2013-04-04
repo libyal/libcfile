@@ -95,7 +95,7 @@ int libcfile_notify_stream_close(
  * Error functions
  * ------------------------------------------------------------------------- */
 
-/* Frees the error including elements
+/* Frees an error
  */
 LIBCFILE_EXTERN \
 void libcfile_error_free(
@@ -139,7 +139,8 @@ int libcfile_error_backtrace_sprint(
  * File functions
  * ------------------------------------------------------------------------- */
 
-/* Initializes the file
+/* Creates a file
+ * Make sure the value file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 LIBCFILE_EXTERN \
@@ -147,7 +148,7 @@ int libcfile_file_initialize(
      libcfile_file_t **file,
      libcfile_error_t **error );
 
-/* Frees the file including elements
+/* Frees a file
  * Returns 1 if successful or -1 on error
  */
 LIBCFILE_EXTERN \
@@ -336,7 +337,8 @@ int libcfile_file_set_access_behavior(
  * File stream functions
  * ------------------------------------------------------------------------- */
 
-/* Initializes the file stream
+/* Creates a file stream
+ * Make sure the value stream is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 LIBCFILE_EXTERN \
@@ -344,7 +346,7 @@ int libcfile_stream_initialize(
      libcfile_stream_t **stream,
      libcfile_error_t **error );
 
-/* Frees the file stream including elements
+/* Frees a file stream
  * Returns 1 if successful or -1 on error
  */
 LIBCFILE_EXTERN \

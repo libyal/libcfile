@@ -93,7 +93,8 @@ typedef size_t u64;
 #include "libcfile_libuna.h"
 #include "libcfile_types.h"
 
-/* Initializes the file
+/* Creates a file
+ * Make sure the value file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_initialize(
@@ -171,7 +172,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the file including elements
+/* Frees a file
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_free(

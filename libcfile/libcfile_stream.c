@@ -45,7 +45,8 @@
 #include "libcfile_stream.h"
 #include "libcfile_types.h"
 
-/* Initializes the file stream
+/* Creates a file stream
+ * Make sure the value stream is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libcfile_stream_initialize(
@@ -123,7 +124,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the file stream including elements
+/* Frees a file stream
  * Returns 1 if successful or -1 on error
  */
 int libcfile_stream_free(
