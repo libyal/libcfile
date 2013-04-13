@@ -29,6 +29,9 @@ Notes:
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
 
+20130413
+* updated dependencies
+
 20130404
 * textual changes
 * updated dependencies

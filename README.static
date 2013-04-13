@@ -1,8 +1,0 @@
-Libcstring supports the following types of static compilation:
-* static library
-
-Creating a static library
-
-Use the following command to tell configure you want to make a static library:
-./configure --enable-shared=no
-
