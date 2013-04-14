@@ -1,6 +1,6 @@
 dnl Functions for libcfile
 dnl
-dnl Version: 20130329
+dnl Version: 20130414
 
 dnl Function to detect if posix_fadvise is available
 AC_DEFUN([AX_LIBCFILE_CHECK_FUNC_POSIX_FADVISE],
@@ -67,20 +67,24 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [Missing function: fstat],
    [1])
   ])
+
  AS_IF(
   [test "x$ac_cv_func_ftruncate" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftruncate],
    [1])
   ])
- 
+
  AS_IF(
-  [test "x$ac_cv_func_ioctl" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: ioctl],
-   [1])
+  [test x"$ac_cv_enable_winapi" = xno],
+  [AS_IF(
+   [test "x$ac_cv_func_ioctl" != xyes],
+   [AC_MSG_FAILURE(
+    [Missing function: ioctl],
+    [1])
+   ])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_lseek" != xyes],
   [AC_MSG_FAILURE(
