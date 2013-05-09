@@ -23,11 +23,11 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( HAVE_SYS_STAT_H ) || defined( WINAPI )
+#if defined( HAVE_SYS_STAT_H )
 #include <sys/stat.h>
 #endif
 
-#if defined( HAVE_ERRNO_H ) || defined( WINAPI )
+#if defined( HAVE_ERRNO_H )
 #include <errno.h>
 #endif
 
