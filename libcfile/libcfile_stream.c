@@ -106,11 +106,6 @@ int libcfile_stream_initialize(
 
 		goto on_error;
 	}
-/* TODO
-#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
-	internal_stream->handle = INVALID_HANDLE_VALUE;
-#endif
-*/
 	*stream = (libcfile_stream_t *) internal_stream;
 
 	return( 1 );
@@ -150,13 +145,6 @@ int libcfile_stream_free(
 	{
 		internal_stream = (libcfile_internal_stream_t *) *stream;
 
-/* TODO
-#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
-		if( internal_stream->handle != INVALID_HANDLE_VALUE )
-#else
-		if( internal_stream->stream != NULL )
-#endif
-*/
 		if( internal_stream->stream != NULL )
 		{
 			if( libcfile_stream_close(

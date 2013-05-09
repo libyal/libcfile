@@ -50,7 +50,7 @@ const char *libcfile_get_version(
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER > 0x0500 )
 
 /* Determines if a file exists using get file attibutes
  * This function uses the WINAPI functions for Windows XP or later
@@ -112,12 +112,12 @@ int libcfile_file_exists(
 	return( result );
 }
 
-#elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+#elif defined( WINAPI )
 
 /* TODO */
 #error WINAPI file stat function for Windows 2000 or earlier NOT implemented yet
 
-#elif defined( HAVE_STAT ) && !defined( WINAPI )
+#elif defined( HAVE_STAT )
 
 /* Determines if a file exists
  * This function uses the POSIX stat function or equivalent
@@ -201,7 +201,7 @@ int libcfile_file_exists(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER > 0x0500 )
 
 /* Determines if a file exists using get file attibutes
  * This function uses the WINAPI functions for Windows XP or later
@@ -263,12 +263,12 @@ int libcfile_file_exists_wide(
 	return( result );
 }
 
-#elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+#elif defined( WINAPI )
 
 /* TODO */
 #error WINAPI file stat function for Windows 2000 or earlier NOT implemented yet
 
-#elif defined( HAVE_STAT ) && !defined( WINAPI )
+#elif defined( HAVE_STAT )
 
 /* Determines if a file exists
  * This function uses the POSIX stat function or equivalent

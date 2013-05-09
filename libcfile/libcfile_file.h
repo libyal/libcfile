@@ -37,7 +37,7 @@ typedef struct libcfile_internal_file libcfile_internal_file_t;
 
 struct libcfile_internal_file
 {
-#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI )
 	/* The (file) handle
 	 */
 	HANDLE handle;
@@ -101,7 +101,7 @@ int libcfile_file_close(
      libcfile_file_t *file,
      libcerror_error_t **error );
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 /* TODO implement */
 BOOL libcfile_ReadFile(
       HANDLE file_handle,
@@ -126,7 +126,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
          uint32_t *error_code,
          libcerror_error_t **error );
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 /* TODO implement */
 BOOL libcfile_WriteFile(
       HANDLE file_handle,
@@ -151,7 +151,7 @@ ssize_t libcfile_file_write_buffer_with_error_code(
          uint32_t *error_code,
          libcerror_error_t **error );
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 BOOL libcfile_SetFilePointerEx(
       HANDLE file_handle,
       LARGE_INTEGER distance_to_move_large_integer,
@@ -166,7 +166,7 @@ off64_t libcfile_file_seek_offset(
          int whence,
          libcerror_error_t **error );
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 BOOL libcfile_SetEndOfFile(
       HANDLE file_handle );
 #endif
@@ -182,7 +182,7 @@ int libcfile_file_is_open(
      libcfile_file_t *file,
      libcerror_error_t **error );
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 BOOL libcfile_GetFileSizeEx(
       HANDLE file_handle,
       LARGE_INTEGER *file_size_large_integer );

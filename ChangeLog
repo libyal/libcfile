@@ -1,11 +1,8 @@
 TODO
+* add support for reading Windows devices make sure reads are sector aligned
 * Cygwin
-* Windows CRT functions
-  - fix logic of definition of WINAPI CRT stat exists function
-  - ioctl equivalent?
-  - remove them all together?
 * add file stream support
-  - what about non-CRT WINAPI version ?
+  - what about non-CRT WINAPI version ? use HANDLE functions or remove?
   - implement libcfile_stream_open_wide
 * validate WINAPI versions of fallback functions
 * add fallback versions of
@@ -29,6 +26,10 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20130509
+* updated dependencies
+* removed WINAPI CRT function fallbacks
 
 20130414
 * changes to ioctl detection in configure
