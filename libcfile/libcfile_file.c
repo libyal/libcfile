@@ -3590,8 +3590,8 @@ int libcfile_file_set_access_behavior(
 	}
 #endif
 	if( ( access_behavior != LIBCFILE_ACCESS_BEHAVIOR_NORMAL )
-	 && ( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_RANDOM )
-	 && ( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_SEQUENTIAL ) )
+	 && ( access_behavior != LIBCFILE_ACCESS_BEHAVIOR_RANDOM )
+	 && ( access_behavior != LIBCFILE_ACCESS_BEHAVIOR_SEQUENTIAL ) )
 	{
 		libcerror_error_set(
 		 error,
