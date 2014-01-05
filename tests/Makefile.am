@@ -42,7 +42,7 @@ cfile_test_file_read_SOURCES = \
 	cfile_test_file_read.c
 
 cfile_test_file_read_LDADD = \
-	../libcfile/libcfile.la
+	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
@@ -53,7 +53,7 @@ cfile_test_file_seek_SOURCES = \
 	cfile_test_file_seek.c
 
 cfile_test_file_seek_LDADD = \
-	../libcfile/libcfile.la
+	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
