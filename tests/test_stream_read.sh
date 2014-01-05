@@ -2,7 +2,7 @@
 #
 # Cross-platform C file functions library stream read offset testing script
 #
-# Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #

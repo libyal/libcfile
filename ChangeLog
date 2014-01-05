@@ -27,6 +27,10 @@ Notes:
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
 
+20140105
+* 2014 update
+* updated dependencies
+
 20130809
 * updated dependencies
 * bug fix for file access behavior

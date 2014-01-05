@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20130831
+# Version: 20130922
 
 # Generic auto-generated build files
 *~
@@ -107,6 +107,7 @@ stamp-h1
 /tests/cfile_test_stream_read
 /tests/cfile_test_stream_seek
 /tests/cfile_test_stream_write
+/tests/tmp
 
 # Local library dependencies specific files
 /libcerror
