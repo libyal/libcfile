@@ -2777,7 +2777,7 @@ int libcfile_file_get_size(
 #if !defined( DIOCGMEDIASIZE ) && defined( DIOCGDINFO )
 	struct disklabel disk_label;
 #endif
-#if defined( DKIOCGETBLOCKCOUNT )
+#if defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE )
 	uint64_t block_count                    = 0;
 	uint32_t bytes_per_sector               = 0;
 #endif
@@ -2952,7 +2952,7 @@ int libcfile_file_get_size(
 		{
 			*size = disk_label.d_secperunit * disk_label.d_secsize;
 		}
-#elif defined( DKIOCGETBLOCKCOUNT )
+#elif defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE )
 		read_count = libcfile_file_io_control_read(
 		              file,
 		              (uint32_t) DKIOCGETBLOCKSIZE,
