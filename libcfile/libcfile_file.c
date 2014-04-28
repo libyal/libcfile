@@ -3622,14 +3622,20 @@ int libcfile_file_set_access_behavior(
 	     0,
 	     advice ) != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_GENERIC,
-		 "%s: unable to advice file descriptor on access behavior.",
-		 function );
+		/* Safely ignore if the device does not support fadvise
+		 */
+		if( errno != ENODEV )
+		{
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_GENERIC,
+			 errno,
+			 "%s: unable to advice file descriptor on access behavior.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	return( 1 );
