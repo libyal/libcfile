@@ -92,7 +92,7 @@ int libcfile_file_free(
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
 HANDLE libcfile_CreateFileA(
-        CSTR *filename,
+        LPCSTR filename,
         DWORD desired_access,
         DWORD share_mode,
         SECURITY_ATTRIBUTES *security_attributes,
@@ -120,7 +120,7 @@ int libcfile_file_open_with_error_code(
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
 HANDLE libcfile_CreateFileW(
-        CWSTR *filename,
+        LPCWSTR filename,
         DWORD desired_access,
         DWORD share_mode,
         SECURITY_ATTRIBUTES *security_attributes,

@@ -237,7 +237,7 @@ int libcfile_file_free(
  * Returns a handle if successful or INVALID_HANDLE_VALUE on error
  */
 HANDLE libcfile_CreateFileA(
-        CSTR *filename,
+        LPCSTR filename,
         DWORD desired_access,
         DWORD share_mode,
         SECURITY_ATTRIBUTES *security_attributes,
@@ -262,7 +262,7 @@ HANDLE libcfile_CreateFileA(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "CreateFileA" );
+		    (LPCSTR) "CreateFileA" );
 
 	if( function != NULL )
 	{
@@ -431,7 +431,7 @@ int libcfile_file_open_with_error_code(
 	}
 #if ( WINVER <= 0x0500 )
 	internal_file->handle = libcfile_CreateFileA(
-	                         (CSTR *) filename,
+	                         (LPCSTR) filename,
 	                         file_io_access_flags,
 	                         file_io_shared_flags,
 	                         NULL,
@@ -440,7 +440,7 @@ int libcfile_file_open_with_error_code(
 	                         NULL );
 #else
 	internal_file->handle = CreateFileA(
-	                         (CSTR *) filename,
+	                         (LPCSTR) filename,
 	                         file_io_access_flags,
 	                         file_io_shared_flags,
 	                         NULL,
@@ -675,7 +675,7 @@ int libcfile_file_open_with_error_code(
  * Returns a handle if successful or INVALID_HANDLE_VALUE on error
  */
 HANDLE libcfile_CreateFileW(
-        CWSTR *filename,
+        LPCWSTR filename,
         DWORD desired_access,
         DWORD share_mode,
         SECURITY_ATTRIBUTES *security_attributes,
@@ -700,7 +700,7 @@ HANDLE libcfile_CreateFileW(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "CreateFileW" );
+		    (LPCSTR) "CreateFileW" );
 
 	if( function != NULL )
 	{
@@ -869,7 +869,7 @@ int libcfile_file_open_wide_with_error_code(
 	}
 #if ( WINVER <= 0x0500 )
 	internal_file->handle = libcfile_CreateFileW(
-	                         (CWSTR *) filename,
+	                         (LPCWSTR) filename,
 	                         file_io_access_flags,
 	                         file_io_shared_flags,
 	                         NULL,
@@ -878,7 +878,7 @@ int libcfile_file_open_wide_with_error_code(
 	                         NULL );
 #else
 	internal_file->handle = CreateFileW(
-	                         (CWSTR *) filename,
+	                         (LPCWSTR) filename,
 	                         file_io_access_flags,
 	                         file_io_shared_flags,
 	                         NULL,
@@ -1256,7 +1256,7 @@ BOOL libcfile_CloseHandle(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "CloseHandle" );
+		    (LPCSTR) "CloseHandle" );
 
 	if( function != NULL )
 	{
@@ -1493,7 +1493,7 @@ BOOL libcfile_ReadFile(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "ReadFile" );
+		    (LPCSTR) "ReadFile" );
 
 	if( function != NULL )
 	{
@@ -2179,7 +2179,7 @@ BOOL libcfile_WriteFile(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "WriteFile" );
+		    (LPCSTR) "WriteFile" );
 
 	if( function != NULL )
 	{
@@ -2466,7 +2466,7 @@ BOOL libcfile_SetFilePointerEx(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "SetFilePointerEx" );
+		    (LPCSTR) "SetFilePointerEx" );
 
 	if( function != NULL )
 	{
@@ -2480,7 +2480,7 @@ BOOL libcfile_SetFilePointerEx(
 	{
 		function = GetProcAddress(
 			    library_handle,
-			    (CSTR *) "SetFilePointer" );
+			    (LPCSTR) "SetFilePointer" );
 
 		if( function != NULL )
 		{
@@ -2820,7 +2820,7 @@ BOOL libcfile_SetEndOfFile(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "SetEndOfFile" );
+		    (LPCSTR) "SetEndOfFile" );
 
 	if( function != NULL )
 	{
@@ -3108,7 +3108,7 @@ BOOL libcfile_GetFileSizeEx(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "GetFileSizeEx" );
+		    (LPCSTR) "GetFileSizeEx" );
 
 	if( function != NULL )
 	{
@@ -3120,7 +3120,7 @@ BOOL libcfile_GetFileSizeEx(
 	{
 		function = GetProcAddress(
 			    library_handle,
-			    (CSTR *) "GetFileSize" );
+			    (LPCSTR) "GetFileSize" );
 
 		if( function != NULL )
 		{
@@ -3807,7 +3807,7 @@ DWORD libcfile_GetFileType(
 	}
 	function = GetProcAddress(
 		    library_handle,
-		    (CSTR *) "GetFileType" );
+		    (LPCSTR) "GetFileType" );
 
 	if( function != NULL )
 	{
