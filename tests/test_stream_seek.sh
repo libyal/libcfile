@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Cross-platform C file functions library file stream seek offset testing script
+# Library stream seek testing script
 #
 # Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,16 +24,34 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
-TMP="tmp";
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
+
+	for LINE in $LIST;
+	do
+		if test $LINE = $SEARCH;
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
+
+	return ${EXIT_FAILURE};
+}
 
 test_stream_seek()
 { 
-	echo "Testing seek offset of input:" $*;
+	echo "Testing stream seek offset of input:" $*;
 
-	./${CFILE_TEST_STREAM_SEEK} $*;
+	rm -rf tmp;
+	mkdir tmp;
+
+	${TEST_RUNNER} ./${CFILE_TEST_STREAM_SEEK} $*;
 
 	RESULT=$?;
+
+	rm -rf tmp;
 
 	echo "";
 
@@ -54,20 +72,74 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
 then
-	echo "No input directory found, to test seek create input directory and place test files in directory.";
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test -d "input";
+then
+	echo "No input directory found.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-for FILENAME in ${INPUT}/*;
-do
-	if ! test_stream_seek ${FILENAME};
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
+OLDIFS=${IFS};
+IFS="
+";
 
-exit ${EXIT_SUCCESS};
+RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+if test ${RESULT} -eq 0;
+then
+	echo "No files or directories found in the input directory.";
+
+	EXIT_RESULT=${EXIT_IGNORE};
+else
+	IGNORELIST="";
+
+	if test -f "input/.libcfile/ignore";
+	then
+		IGNORELIST=`cat input/.libcfile/ignore | sed '/^#/d'`;
+	fi
+	for TESTDIR in input/*;
+	do
+		if test -d "${TESTDIR}";
+		then
+			DIRNAME=`basename ${TESTDIR}`;
+
+			if ! list_contains "${IGNORELIST}" "${DIRNAME}";
+			then
+				if test -f "input/.libcfile/${DIRNAME}/files";
+				then
+					TESTFILES=`cat input/.libcfile/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+				else
+					TESTFILES=`ls ${TESTDIR}/*`;
+				fi
+				for TESTFILE in ${TESTFILES};
+				do
+					if ! test_stream_seek "${TESTFILE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			fi
+		fi
+	done
+
+	EXIT_RESULT=${EXIT_SUCCESS};
+fi
+
+IFS=${OLDIFS};
+
+exit ${EXIT_RESULT};
 

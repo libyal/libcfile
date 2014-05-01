@@ -1,4 +1,4 @@
-.Dd January 5, 2014
+.Dd May 1, 2014
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -70,6 +70,8 @@ File functions
 .Ft libcfile_file_io_control_read_with_error_code "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, uint32_t *error_code, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_set_access_behavior "libcfile_file_t *file, int access_behavior, libcfile_error_t **error"
+.Ft int
+.Fn libcfile_file_set_block_size "libcfile_file_t *file, size_t block_size, libcfile_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int

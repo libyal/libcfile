@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Cross-platform C file functions library file write offset testing script
+# Library file write testing script
 #
 # Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,23 +24,20 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TMP="tmp";
-
 test_file_write()
 { 
-	mkdir ${TMP};
-	cd ${TMP};
+	rm -rf tmp;
+	mkdir tmp;
 
 	echo "Testing write";
 
-	../${CFILE_TEST_FILE_WRITE};
+	${TEST_RUNNER} ./${CFILE_TEST_FILE_WRITE};
 
 	RESULT=$?;
 
 	echo "";
 
-	cd ..;
-	rm -rf ${TMP};
+	rm -rf tmp;
 
 	return ${RESULT};
 }
@@ -59,7 +56,21 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_file_write
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
+then
+        TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+        echo "Missing test runner: ${TEST_RUNNER}";
+
+        exit ${EXIT_FAILURE};
+fi
+
+if ! test_file_write;
 then
 	exit ${EXIT_FAILURE};
 fi

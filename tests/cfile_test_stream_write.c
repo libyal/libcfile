@@ -1,5 +1,5 @@
 /*
- * Cross-platform C file functions library file stream write testing program
+ * Library stream write testing program
  *
  * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -34,14 +34,15 @@
 
 #define CFILE_TEST_BUFFER_SIZE	4096
 
-int cfile_test_write(
-     const char *filename,
-     size_t file_size,
+int cfile_test_stream_write(
+     const libcstring_system_character_t *filename,
+     size_t data_size,
      libcerror_error_t **error )
 {
 	libcfile_stream_t *stream = NULL;
 	uint8_t *buffer           = NULL;
-	static char *function     = "cfile_test_write";
+	static char *function     = "cfile_test_stream_write";
+	size_t filename_length    = 0;
 	size_t write_size         = 0;
 	ssize_t write_count       = 0;
 	int result                = 1;
@@ -49,9 +50,14 @@ int cfile_test_write(
 
 	fprintf(
 	 stdout,
-	 "Testing writing file size: %" PRIzd "\t",
-	 file_size );
+	 "Testing writing stream size: %" PRIzd "\t",
+	 data_size );
 
+	filename_length = libcstring_system_string_length(
+	                   filename );
+
+	/* Initialization
+	 */
 	if( libcfile_stream_initialize(
 	     &stream,
 	     error ) != 1 )
@@ -60,7 +66,7 @@ int cfile_test_write(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create stream.",
+		 "%s: unable create stream.",
 		 function );
 
 		goto on_error;
@@ -130,7 +136,7 @@ int cfile_test_write(
 
 		if( write_count != (ssize_t) write_size )
 		{
-			if( write_count != (ssize_t) file_size )
+			if( write_count != (ssize_t) data_size )
 			{
 				libcerror_error_set(
 				 error,
@@ -143,9 +149,9 @@ int cfile_test_write(
 				goto on_error;
 			}
 		}
-		if( file_size > 0 )
+		if( data_size > 0 )
 		{
-			file_size -= write_count;
+			data_size -= write_count;
 		}
 	}
 	write_size = 3751;
@@ -176,7 +182,7 @@ int cfile_test_write(
 
 		if( write_count != (ssize_t) write_size )
 		{
-			if( write_count != (ssize_t) file_size )
+			if( write_count != (ssize_t) data_size )
 			{
 				libcerror_error_set(
 				 error,
@@ -189,9 +195,9 @@ int cfile_test_write(
 				goto on_error;
 			}
 		}
-		if( file_size > 0 )
+		if( data_size > 0 )
 		{
-			file_size -= write_count;
+			data_size -= write_count;
 		}
 	}
 	memory_free(
@@ -271,7 +277,9 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error = NULL;
+	libcstring_system_character_t *filename = NULL;
+	libcerror_error_t *error                = NULL;
+	size_t filename_size                    = 0;
 
 	if( argc != 1 )
 	{
@@ -281,8 +289,13 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( cfile_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test1" ),
+#if defined( HAVE_WINAPI )
+	filename = _LIBCSTRING_SYSTEM_STRING( "tmp\\test1" );
+#else
+	filename = _LIBCSTRING_SYSTEM_STRING( "tmp/test1" );
+#endif
+	if( cfile_test_stream_write(
+	     filename,
 	     0,
 	     &error ) != 1 )
 	{
@@ -292,8 +305,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( cfile_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test2" ),
+#if defined( HAVE_WINAPI )
+	filename = _LIBCSTRING_SYSTEM_STRING( "tmp\\test2" );
+#else
+	filename = _LIBCSTRING_SYSTEM_STRING( "tmp/test2" );
+#endif
+	if( cfile_test_stream_write(
+	     filename,
 	     100000,
 	     &error ) != 1 )
 	{

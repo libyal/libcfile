@@ -1,5 +1,5 @@
 /*
- * Cross-platform C file functions library file seek offset testing program
+ * Library file seek testing program
  *
  * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -34,7 +34,7 @@
 /* Tests libcfile_file_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_seek_offset(
+int cfile_file_test_seek_offset(
      libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
@@ -109,6 +109,278 @@ int cfile_test_seek_offset(
 	return( result );
 }
 
+/* Tests seeking in a file
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_file_test_seek_file(
+     libcfile_file_t *file,
+     size64_t file_size )
+{
+	int result = 0;
+
+	if( file == NULL )
+	{
+		return( -1 );
+	}
+	if( file_size > (size64_t) INT64_MAX )
+	{
+		fprintf(
+		 stderr,
+		 "File size exceeds maximum.\n" );
+
+		return( -1 );
+	}
+	/* Test: SEEK_SET offset: 0
+	 * Expected result: 0
+	 */
+	result = cfile_file_test_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          0 );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: <file_size>
+	 * Expected result: <file_size>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     (off64_t) file_size,
+	     SEEK_SET,
+	     (off64_t) file_size ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: <file_size / 5>
+	 * Expected result: <file_size / 5>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     (off64_t) ( file_size / 5 ),
+	     SEEK_SET,
+	     (off64_t) ( file_size / 5 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: <file_size + 987>
+	 * Expected result: <file_size + 987>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     (off64_t) ( file_size + 987 ),
+	     SEEK_SET,
+	     (off64_t) ( file_size + 987 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: -987
+	 * Expected result: -1
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     -987,
+	     SEEK_SET,
+	     -1 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_CUR offset: 0
+	 * Expected result: <file_size + 987>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     0,
+	     SEEK_CUR,
+	     (off64_t) ( file_size + 987 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_CUR offset: <-1 * (file_size + 987)>
+	 * Expected result: 0
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     -1 * (off64_t) ( file_size + 987 ),
+	     SEEK_CUR,
+	     0 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_CUR offset: <file_size / 3>
+	 * Expected result: <file_size / 3>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     (off64_t) ( file_size / 3 ),
+	     SEEK_CUR,
+	     (off64_t) ( file_size / 3 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	if( file_size == 0 )
+	{
+		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
+		 * Expected result: 0
+		 */
+		if( cfile_file_test_seek_offset(
+		     file,
+		     -2 * (off64_t) ( file_size / 3 ),
+		     SEEK_CUR,
+		     0 ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset.\n" );
+
+			return( result );
+		}
+	}
+	else
+	{
+		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
+		 * Expected result: -1
+		 */
+		if( cfile_file_test_seek_offset(
+		     file,
+		     -2 * (off64_t) ( file_size / 3 ),
+		     SEEK_CUR,
+		     -1 ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset.\n" );
+
+			return( result );
+		}
+	}
+	/* Test: SEEK_END offset: 0
+	 * Expected result: <file_size>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     0,
+	     SEEK_END,
+	     (off64_t) file_size ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: <-1 * file_size>
+	 * Expected result: 0
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     -1 * (off64_t) file_size,
+	     SEEK_END,
+	     0 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: <-1 * (file_size / 4)>
+	 * Expected result: <file_size - (file_size / 4)>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     -1 * (off64_t) ( file_size / 4 ),
+	     SEEK_END,
+	     (off64_t) file_size - (off64_t) ( file_size / 4 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: 542
+	 * Expected result: <file_size + 542>
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     542,
+	     SEEK_END,
+	     (off64_t) ( file_size + 542 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: <-1 * (file_size + 542)>
+	 * Expected result: -1
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     -1 * (off64_t) ( file_size + 542 ),
+	     SEEK_END,
+	     -1 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: UNKNOWN (88) offset: 0
+	 * Expected result: -1
+	 */
+	if( cfile_file_test_seek_offset(
+	     file,
+	     0,
+	     88,
+	     -1 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	return( result );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -129,7 +401,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* Initialization
+	/* Test file seek
 	 */
 	if( libcfile_file_initialize(
 	     &file,
@@ -172,262 +444,100 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( file_size > (size64_t) INT64_MAX )
-	{
-		fprintf(
-		 stderr,
-		 "File size exceeds maximum.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: 0
-	 * Expected result: 0
-	 */
-	if( cfile_test_seek_offset(
+	if( cfile_file_test_seek_file(
 	     file,
-	     0,
-	     SEEK_SET,
-	     0 ) != 1 )
+	     file_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to seek in file.\n" );
 
 		goto on_error;
 	}
-	/* Test: SEEK_SET offset: <file_size>
-	 * Expected result: <file_size>
-	 */
-	if( cfile_test_seek_offset(
+	if( libcfile_file_close(
 	     file,
-	     (off64_t) file_size,
-	     SEEK_SET,
-	     (off64_t) file_size ) != 1 )
+	     &error ) != 0 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to close file.\n" );
 
 		goto on_error;
 	}
-	/* Test: SEEK_SET offset: <file_size / 5>
-	 * Expected result: <file_size / 5>
+	if( libcfile_file_free(
+	     &file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
+	/* Test file seek with block size
 	 */
-	if( cfile_test_seek_offset(
+	if( libcfile_file_initialize(
+	     &file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_set_block_size(
 	     file,
-	     (off64_t) ( file_size / 5 ),
-	     SEEK_SET,
-	     (off64_t) ( file_size / 5 ) ) != 1 )
+	     512,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to set block size.\n" );
 
 		goto on_error;
 	}
-	/* Test: SEEK_SET offset: <file_size + 987>
-	 * Expected result: <file_size + 987>
-	 */
-	if( cfile_test_seek_offset(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
 	     file,
-	     (off64_t) ( file_size + 987 ),
-	     SEEK_SET,
-	     (off64_t) ( file_size + 987 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: -987
-	 * Expected result: -1
-	 */
-	if( cfile_test_seek_offset(
+	     argv[ 1 ],
+	     LIBCFILE_OPEN_READ,
+	     &error ) != 1 )
+#else
+	if( libcfile_file_open(
 	     file,
-	     -987,
-	     SEEK_SET,
-	     -1 ) != 1 )
+	     argv[ 1 ],
+	     LIBCFILE_OPEN_READ,
+	     &error ) != 1 )
+#endif
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to open file.\n" );
 
 		goto on_error;
 	}
-	/* Test: SEEK_CUR offset: 0
-	 * Expected result: <file_size + 987>
-	 */
-	if( cfile_test_seek_offset(
+	if( libcfile_file_get_size(
 	     file,
-	     0,
-	     SEEK_CUR,
-	     (off64_t) ( file_size + 987 ) ) != 1 )
+	     &file_size,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to retrieve file size.\n" );
 
 		goto on_error;
 	}
-	/* Test: SEEK_CUR offset: <-1 * (file_size + 987)>
-	 * Expected result: 0
-	 */
-	if( cfile_test_seek_offset(
+	if( cfile_file_test_seek_file(
 	     file,
-	     -1 * (off64_t) ( file_size + 987 ),
-	     SEEK_CUR,
-	     0 ) != 1 )
+	     file_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to seek in file.\n" );
 
 		goto on_error;
 	}
-	/* Test: SEEK_CUR offset: <file_size / 3>
-	 * Expected result: <file_size / 3>
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     (off64_t) ( file_size / 3 ),
-	     SEEK_CUR,
-	     (off64_t) ( file_size / 3 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	if( file_size == 0 )
-	{
-		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
-		 * Expected result: 0
-		 */
-		if( cfile_test_seek_offset(
-		     file,
-		     -2 * (off64_t) ( file_size / 3 ),
-		     SEEK_CUR,
-		     0 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test seek offset.\n" );
-
-			goto on_error;
-		}
-	}
-	else
-	{
-		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
-		 * Expected result: -1
-		 */
-		if( cfile_test_seek_offset(
-		     file,
-		     -2 * (off64_t) ( file_size / 3 ),
-		     SEEK_CUR,
-		     -1 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test seek offset.\n" );
-
-			goto on_error;
-		}
-	}
-	/* Test: SEEK_END offset: 0
-	 * Expected result: <file_size>
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     0,
-	     SEEK_END,
-	     (off64_t) file_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: <-1 * file_size>
-	 * Expected result: 0
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     -1 * (off64_t) file_size,
-	     SEEK_END,
-	     0 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: <-1 * (file_size / 4)>
-	 * Expected result: <file_size - (file_size / 4)>
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     -1 * (off64_t) ( file_size / 4 ),
-	     SEEK_END,
-	     (off64_t) file_size - (off64_t) ( file_size / 4 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: 542
-	 * Expected result: <file_size + 542>
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     542,
-	     SEEK_END,
-	     (off64_t) ( file_size + 542 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: <-1 * (file_size + 542)>
-	 * Expected result: -1
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     -1 * (off64_t) ( file_size + 542 ),
-	     SEEK_END,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: UNKNOWN (88) offset: 0
-	 * Expected result: -1
-	 */
-	if( cfile_test_seek_offset(
-	     file,
-	     0,
-	     88,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Clean up
-	 */
 	if( libcfile_file_close(
 	     file,
 	     &error ) != 0 )

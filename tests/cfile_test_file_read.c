@@ -1,5 +1,5 @@
 /*
- * Cross-platform C file functions library file read testing program
+ * Library read testing program
  *
  * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,65 +27,29 @@
 
 #include <stdio.h>
 
+#include "cfile_test_libcstring.h"
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
-#include "cfile_test_libcstring.h"
+#include "cfile_test_unused.h"
 
-#define CFILE_TEST_FILE_READ_BUFFER_SIZE	4096
-
-/* Tests libcfile_file_get_offset
- * Returns 1 if successful, 0 if not or -1 on error
+/* Define to make cfile_test_read generate verbose output
+#define CFILE_TEST_READ_VERBOSE
  */
-int cfile_test_get_offset(
-     libcfile_file_t *file,
-     off64_t expected_offset,
-     libcerror_error_t **error )
-{
-	static char *function = "cfile_test_get_offset";
-	off64_t result_offset = 0;
 
-	if( expected_offset != -1 )
-	{
-		if( libcfile_file_get_offset(
-		     file,
-		     &result_offset,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve offset.",
-			 function );
-
-			return( -1 );
-		}
-		if( result_offset != expected_offset )
-		{
-			fprintf(
-			 stderr,
-			 "%s: unexpected result offset: %" PRIi64 "\n",
-			 function,
-			 result_offset );
-
-			return( 0 );
-		}
-	}
-	return( 1 );
-}
+#define CFILE_TEST_READ_BUFFER_SIZE	4096
 
 /* Tests libcfile_file_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_seek_offset(
+int cfile_file_test_seek_offset(
      libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
      off64_t expected_offset )
 {
-	libcerror_error_t *error = NULL;
-	off64_t result_offset    = 0;
-	int result               = 0;
+	libcfile_error_t *error = NULL;
+	off64_t result_offset   = 0;
+	int result              = 0;
 
 	if( file == NULL )
 	{
@@ -97,25 +61,7 @@ int cfile_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset == -1 )
-	{
-		libcfile_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libcfile_error_free(
-		 &error );
-	}
-	if( result_offset == -1 )
-	{
-		libcfile_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libcfile_error_free(
-		 &error );
-	}
-	if( result_offset != expected_offset )
+	if( expected_offset != result_offset )
 	{
 		fprintf(
 		 stderr,
@@ -126,25 +72,36 @@ int cfile_test_seek_offset(
 	{
 		result = 1;
 	}
+	if( error != NULL )
+	{
+		if( result != 1 )
+		{
+			libcfile_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
+		libcfile_error_free(
+		 &error );
+	}
 	return( result );
 }
 
 /* Tests libcfile_file_read_buffer
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_read_buffer(
+int cfile_file_test_read_buffer(
      libcfile_file_t *file,
      size64_t input_size,
      size64_t expected_size )
 {
-	uint8_t buffer[ CFILE_TEST_FILE_READ_BUFFER_SIZE ];
+	uint8_t buffer[ CFILE_TEST_READ_BUFFER_SIZE ];
 
-	libcerror_error_t *error = NULL;
-	size64_t remaining_size  = 0;
-	size64_t result_size     = 0;
-	size_t read_size         = 0;
-	ssize_t read_count       = 0;
-	int result               = 0;
+	libcfile_error_t *error = NULL;
+	size64_t remaining_size = 0;
+	size64_t result_size    = 0;
+	size_t read_size        = 0;
+	ssize_t read_count      = 0;
+	int result              = 0;
 
 	if( file == NULL )
 	{
@@ -154,7 +111,7 @@ int cfile_test_read_buffer(
 
 	while( remaining_size > 0 )
 	{
-		read_size = CFILE_TEST_FILE_READ_BUFFER_SIZE;
+		read_size = CFILE_TEST_READ_BUFFER_SIZE;
 
 		if( remaining_size < (size64_t) read_size )
 		{
@@ -168,13 +125,6 @@ int cfile_test_read_buffer(
 
 		if( read_count < 0 )
 		{
-			libcfile_error_backtrace_fprint(
-			 error,
-			 stderr );
-
-			libcfile_error_free(
-			 &error );
-
 			break;
 		}
 		remaining_size -= (size64_t) read_count;
@@ -185,24 +135,154 @@ int cfile_test_read_buffer(
 			break;
 		}
 	}
-	if( expected_size == result_size )
-	{
-		result = 1;
-	}
-	else
+	if( expected_size != result_size )
 	{
 		fprintf(
 		 stderr,
 		 "Unexpected read count: %" PRIu64 "\n",
 		 result_size );
 	}
+	else
+	{
+		result = 1;
+	}
+	if( error != NULL )
+	{
+		if( result != 1 )
+		{
+			libcfile_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
+		libcfile_error_free(
+		 &error );
+	}
 	return( result );
 }
+
+#ifdef TODO
+
+/* Tests libcfile_file_read_buffer_at_offset
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_file_test_read_buffer_at_offset(
+     libcfile_file_t *file,
+     off64_t input_offset,
+     size64_t input_size,
+     off64_t expected_offset,
+     size64_t expected_size )
+{
+	uint8_t buffer[ CFILE_TEST_READ_BUFFER_SIZE ];
+
+	libcfile_error_t *error = NULL;
+	off64_t result_offset   = 0;
+	size64_t remaining_size = 0;
+	size64_t result_size    = 0;
+	size_t read_size        = 0;
+	ssize_t read_count      = 0;
+	int result              = 0;
+
+	if( file == NULL )
+	{
+		return( -1 );
+	}
+	remaining_size = input_size;
+
+	fprintf(
+	 stdout,
+	 "Testing reading buffer at offset: %" PRIi64 " and size: %" PRIu64 "\t",
+	 input_offset,
+	 input_size );
+
+	while( remaining_size > 0 )
+	{
+		read_size = CFILE_TEST_READ_BUFFER_SIZE;
+
+		if( remaining_size < (size64_t) read_size )
+		{
+			read_size = (size_t) remaining_size;
+		}
+		read_count = libcfile_file_read_buffer_at_offset(
+			      file,
+			      buffer,
+			      read_size,
+			      input_offset,
+			      &error );
+
+		if( read_count < 0 )
+		{
+			break;
+		}
+		input_offset   += (size64_t) read_count;
+		remaining_size -= (size64_t) read_count;
+		result_size    += (size64_t) read_count;
+
+		if( read_count != (ssize_t) read_size )
+		{
+			break;
+		}
+	}
+	if( libcfile_file_get_offset(
+	     file,
+	     &result_offset,
+	     &error ) != 1 )
+	{
+		result = -1;
+	}
+	if( expected_offset != result_offset )
+	{
+		fprintf(
+		 stderr,
+		 "Unexpected offset: %" PRIi64 "\n",
+		 result_offset );
+	}
+	else if( expected_size != result_size )
+	{
+		fprintf(
+		 stderr,
+		 "Unexpected read count: %" PRIu64 "\n",
+		 result_size );
+	}
+	else
+	{
+		result = 1;
+	}
+	if( result == 1 )
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	if( error != NULL )
+	{
+		if( result != 1 )
+		{
+			libcfile_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
+		libcfile_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif /* TODO */
 
 /* Tests reading data at a specific offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_read(
+int cfile_file_test_seek_offset_and_read_buffer(
      libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
@@ -210,7 +290,6 @@ int cfile_test_read(
      off64_t expected_offset,
      size64_t expected_size )
 {
-	libcerror_error_t *error  = NULL;
 	const char *whence_string = NULL;
 	int result                = 0;
 
@@ -236,12 +315,12 @@ int cfile_test_read(
 	}
 	fprintf(
 	 stdout,
-	 "Testing reading range with offset: %" PRIi64 ", whence: %s and size: %" PRIu64 "\t",
+	 "Testing reading buffer at offset: %" PRIi64 ", whence: %s and size: %" PRIu64 "\t",
 	 input_offset,
 	 whence_string,
 	 input_size );
 
-	result = cfile_test_seek_offset(
+	result = cfile_file_test_seek_offset(
 	          file,
 	          input_offset,
 	          input_whence,
@@ -251,23 +330,13 @@ int cfile_test_read(
 	{
 		if( input_offset >= 0 )
 		{
-			result = cfile_test_read_buffer(
+			result = cfile_file_test_read_buffer(
 				  file,
 				  input_size,
 				  expected_size );
 		}
 	}
 	if( result == 1 )
-	{
-		if( input_offset >= 0 )
-		{
-			result = cfile_test_get_offset(
-			          file,
-			          input_offset + expected_size,
-			          &error );
-		}
-	}
-	if( result != 0 )
 	{
 		fprintf(
 		 stdout,
@@ -283,16 +352,241 @@ int cfile_test_read(
 	 stdout,
 	 "\n" );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
-		libcerror_error_free(
-		 &error );
-	}
 	return( result );
+}
+
+/* Tests reading data from a file
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_file_test_read_from_file(
+     libcfile_file_t *file,
+     size64_t file_size )
+{
+	int result = 0;
+
+	if( file == NULL )
+	{
+		return( -1 );
+	}
+	if( file_size > (size64_t) INT64_MAX )
+	{
+		fprintf(
+		 stderr,
+		 "File size exceeds maximum.\n" );
+
+		return( -1 );
+	}
+	/* Case 0: test full read
+	 */
+
+	/* Test: offset: 0 size: <file_size>
+	 * Expected result: offset: 0 size: <file_size>
+	 */
+	result = cfile_file_test_seek_offset_and_read_buffer(
+	          file,
+	          0,
+	          SEEK_SET,
+	          file_size,
+	          0,
+	          file_size );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset and read buffer.\n" );
+
+		return( result );
+	}
+	/* Test: offset: 0 size: <file_size>
+	 * Expected result: offset: 0 size: <file_size>
+	 */
+	result = cfile_file_test_seek_offset_and_read_buffer(
+	          file,
+	          0,
+	          SEEK_SET,
+	          file_size,
+	          0,
+	          file_size );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset and read buffer.\n" );
+
+		return( result );
+	}
+
+	/* Case 1: test buffer at offset read
+	 */
+
+	/* Test: offset: <file_size / 7> size: <file_size / 2>
+	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
+	 */
+	result = cfile_file_test_seek_offset_and_read_buffer(
+	          file,
+	          (off64_t) ( file_size / 7 ),
+	          SEEK_SET,
+	          file_size / 2,
+	          (off64_t) ( file_size / 7 ),
+	          file_size / 2 );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset and read buffer.\n" );
+
+		return( result );
+	}
+	/* Test: offset: <file_size / 7> size: <file_size / 2>
+	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
+	 */
+	result = cfile_file_test_seek_offset_and_read_buffer(
+	          file,
+	          (off64_t) ( file_size / 7 ),
+	          SEEK_SET,
+	          file_size / 2,
+	          (off64_t) ( file_size / 7 ),
+	          file_size / 2 );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset and read buffer.\n" );
+
+		return( result );
+	}
+
+	/* Case 2: test read beyond file size
+	 */
+
+	if( file_size < 1024 )
+	{
+		/* Test: offset: <file_size - 1024> size: 4096
+		 * Expected result: offset: -1 size: <undetermined>
+		 */
+		result = cfile_file_test_seek_offset_and_read_buffer(
+		          file,
+		          (off64_t) ( file_size - 1024 ),
+		          SEEK_SET,
+		          4096,
+		          -1,
+		          (size64_t) -1 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset and read buffer.\n" );
+
+			return( result );
+		}
+		/* Test: offset: <file_size - 1024> size: 4096
+		 * Expected result: offset: -1 size: <undetermined>
+		 */
+		result = cfile_file_test_seek_offset_and_read_buffer(
+		          file,
+		          (off64_t) ( file_size - 1024 ),
+		          SEEK_SET,
+		          4096,
+		          -1,
+		          (size64_t) -1 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset and read buffer.\n" );
+
+			return( result );
+		}
+	}
+	else
+	{
+		/* Test: offset: <file_size - 1024> size: 4096
+		 * Expected result: offset: <file_size - 1024> size: 1024
+		 */
+		result = cfile_file_test_seek_offset_and_read_buffer(
+		          file,
+		          (off64_t) ( file_size - 1024 ),
+		          SEEK_SET,
+		          4096,
+		          (off64_t) ( file_size - 1024 ),
+		          1024 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read.\n" );
+
+			return( result );
+		}
+		/* Test: offset: <file_size - 1024> size: 4096
+		 * Expected result: offset: <file_size - 1024> size: 1024
+		 */
+		result = cfile_file_test_seek_offset_and_read_buffer(
+		          file,
+		          (off64_t) ( file_size - 1024 ),
+		          SEEK_SET,
+		          4096,
+		          (off64_t) ( file_size - 1024 ),
+		          1024 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset and read buffer.\n" );
+
+			return( result );
+		}
+	}
+#ifdef TODO
+	/* Case 3: test buffer at offset read
+	 */
+
+	/* Test: offset: <file_size / 7> size: <file_size / 2>
+	 * Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
+	 */
+	result = cfile_file_test_read_buffer_at_offset(
+	          file,
+	          (off64_t) ( file_size / 7 ),
+	          file_size / 2,
+	          (off64_t) ( file_size / 7 ) + ( file_size / 2 ),
+	          file_size / 2 );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test read buffer at offset.\n" );
+
+		return( result );
+	}
+	/* Test: offset: <file_size / 7> size: <file_size / 2>
+	 * Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
+	 */
+	result = cfile_file_test_read_buffer_at_offset(
+	          file,
+	          (off64_t) ( file_size / 7 ),
+	          file_size / 2,
+	          (off64_t) ( file_size / 7 ) + ( file_size / 2 ),
+	          file_size / 2 );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test read buffer at offset.\n" );
+
+		return( result );
+	}
+#endif /* TODO */
+	return( 1 );
 }
 
 /* The main program
@@ -303,19 +597,26 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error = NULL;
-	libcfile_file_t *file    = NULL;
-	size64_t file_size       = 0;
+	libcfile_error_t *error   = NULL;
+	libcfile_file_t *file = NULL;
+	size64_t file_size      = 0;
 
-	if( argc != 2 )
+	if( argc < 2 )
 	{
 		fprintf(
 		 stderr,
-		 "Unsupported number of arguments.\n" );
+		 "Missing filename.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	/* Initialization
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_TEST_READ_VERBOSE )
+	libcfile_notify_set_verbose(
+	 1 );
+	libcfile_notify_set_file(
+	 stderr,
+	 NULL );
+#endif
+	/* Test file read
 	 */
 	if( libcfile_file_initialize(
 	     &file,
@@ -358,11 +659,92 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( file_size > (size64_t) INT64_MAX )
+	fprintf(
+	 stdout,
+	 "File size: %" PRIu64 " bytes\n",
+	 file_size );
+
+	if( cfile_file_test_read_from_file(
+	     file,
+	     file_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "File size exceeds maximum.\n" );
+		 "Unable to read from file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_close(
+	     file,
+	     &error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to close file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
+	/* Test file read with block size
+	 */
+	if( libcfile_file_initialize(
+	     &file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_set_block_size(
+	     file,
+	     512,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set block size.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
+	     file,
+	     argv[ 1 ],
+	     LIBCFILE_OPEN_READ,
+	     &error ) != 1 )
+#else
+	if( libcfile_file_open(
+	     file,
+	     argv[ 1 ],
+	     LIBCFILE_OPEN_READ,
+	     &error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_get_size(
+	     file,
+	     &file_size,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve file size.\n" );
 
 		goto on_error;
 	}
@@ -371,161 +753,16 @@ int main( int argc, char * const argv[] )
 	 "File size: %" PRIu64 " bytes\n",
 	 file_size );
 
-	/* Case 0: test full read
-	 */
-
-	/* Test: offset: 0 size: <file_size>
-	 * Expected result: offset: 0 size: <file_size>
-	 */
-	if( cfile_test_read(
+	if( cfile_file_test_read_from_file(
 	     file,
-	     0,
-	     SEEK_SET,
-	     file_size,
-	     0,
 	     file_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read.\n" );
+		 "Unable to read from file.\n" );
 
 		goto on_error;
 	}
-	/* Test: offset: 0 size: <file_size>
-	 * Expected result: offset: 0 size: <file_size>
-	 */
-	if( cfile_test_read(
-	     file,
-	     0,
-	     SEEK_SET,
-	     file_size,
-	     0,
-	     file_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test read.\n" );
-
-		goto on_error;
-	}
-
-	/* Case 1: test random read
-	 */
-
-	/* Test: offset: <file_size / 7> size: <file_size / 2>
-	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
-	 */
-	if( cfile_test_read(
-	     file,
-	     (off64_t) ( file_size / 7 ),
-	     SEEK_SET,
-	     file_size / 2,
-	     (off64_t) ( file_size / 7 ),
-	     file_size / 2 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test read.\n" );
-
-		goto on_error;
-	}
-	/* Test: offset: <file_size / 7> size: <file_size / 2>
-	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
-	 */
-	if( cfile_test_read(
-	     file,
-	     (off64_t) ( file_size / 7 ),
-	     SEEK_SET,
-	     file_size / 2,
-	     (off64_t) ( file_size / 7 ),
-	     file_size / 2 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test read.\n" );
-
-		goto on_error;
-	}
-
-	/* Case 3: test read beyond file size
-	 */
-
-	if( file_size < 1024 )
-	{
-		/* Test: offset: <file_size - 1024> size: 4096
-		 * Expected result: offset: -1 size: <undetermined>
-		 */
-		if( cfile_test_read(
-		     file,
-		     (off64_t) ( file_size - 1024 ),
-		     SEEK_SET,
-		     4096,
-		     -1,
-		     (size64_t) -1 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read.\n" );
-
-			goto on_error;
-		}
-		/* Test: offset: <file_size - 1024> size: 4096
-		 * Expected result: offset: -1 size: <undetermined>
-		 */
-		if( cfile_test_read(
-		     file,
-		     (off64_t) ( file_size - 1024 ),
-		     SEEK_SET,
-		     4096,
-		     -1,
-		     (size64_t) -1 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read.\n" );
-
-			goto on_error;
-		}
-	}
-	else
-	{
-		/* Test: offset: <file_size - 1024> size: 4096
-		 * Expected result: offset: <file_size - 1024> size: 1024
-		 */
-		if( cfile_test_read(
-		     file,
-		     (off64_t) ( file_size - 1024 ),
-		     SEEK_SET,
-		     4096,
-		     (off64_t) ( file_size - 1024 ),
-		     1024 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read.\n" );
-
-			goto on_error;
-		}
-		/* Test: offset: <file_size - 1024> size: 4096
-		 * Expected result: offset: <file_size - 1024> size: 1024
-		 */
-		if( cfile_test_read(
-		     file,
-		     (off64_t) ( file_size - 1024 ),
-		     SEEK_SET,
-		     4096,
-		     (off64_t) ( file_size - 1024 ),
-		     1024 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read.\n" );
-
-			goto on_error;
-		}
-	}
-	/* Clean up
-	 */
 	if( libcfile_file_close(
 	     file,
 	     &error ) != 0 )

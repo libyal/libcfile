@@ -1,5 +1,5 @@
 TODO
-* add support for reading Windows devices make sure reads are sector aligned
+* add block support for write ?
 * Cygwin
 * add file stream support
   - what about non-CRT WINAPI version ? use HANDLE functions or remove?
@@ -26,6 +26,10 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20140501
+* worked on dynamic late binding functions
+* worked on block-based read/write to support Windows device files
 
 20140428
 * small changes
