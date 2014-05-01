@@ -2679,7 +2679,7 @@ off64_t libcfile_file_seek_offset(
 	if( offset_remainder > 0 )
 	{
 		internal_file->current_offset   += offset_remainder;
-		internal_file->block_data_offset = offset_remainder;
+		internal_file->block_data_offset = (size_t) offset_remainder;
 		internal_file->block_data_size   = 0;
 	}
 	return( internal_file->current_offset );
@@ -2785,7 +2785,7 @@ off64_t libcfile_file_seek_offset(
 	if( offset_remainder > 0 )
 	{
 		internal_file->current_offset   += offset_remainder;
-		internal_file->block_data_offset = offset_remainder;
+		internal_file->block_data_offset = (size_t) offset_remainder;
 		internal_file->block_data_size   = 0;
 	}
 	return( internal_file->current_offset );
