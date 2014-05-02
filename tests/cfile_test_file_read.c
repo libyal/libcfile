@@ -706,17 +706,6 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcfile_file_set_block_size(
-	     file,
-	     512,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to set block size.\n" );
-
-		goto on_error;
-	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
 	     file,
@@ -753,6 +742,17 @@ int main( int argc, char * const argv[] )
 	 "File size: %" PRIu64 " bytes\n",
 	 file_size );
 
+	if( libcfile_file_set_block_size(
+	     file,
+	     512,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set block size.\n" );
+
+		goto on_error;
+	}
 	if( cfile_file_test_read_from_file(
 	     file,
 	     file_size ) != 1 )

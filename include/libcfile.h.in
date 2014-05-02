@@ -335,6 +335,7 @@ int libcfile_file_set_access_behavior(
 
 /* Sets the block size for the read and seek operations
  * A block size of 0 represents no block-based operations
+ * The total size must be a multitude of block size
  * Returns 1 if successful or -1 on error
  */
 LIBCFILE_EXTERN \

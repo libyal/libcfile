@@ -1600,6 +1600,28 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 
 		return( -1 );
 	}
+	if( internal_file->block_size != 0 )
+	{
+		if( internal_file->current_offset < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid file - current offset value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		if( (size64_t) internal_file->current_offset > internal_file->size )
+		{
+			return( 0 );
+		}
+		if( ( (size64_t) internal_file->current_offset + size ) > internal_file->size )
+		{
+			size = (size_t) ( internal_file->size - internal_file->current_offset );
+		}
+	}
 	if( size == 0 )
 	{
 		return( 0 );
@@ -1657,7 +1679,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 					return( -1 );
 			}
 		}
-		if( read_count < 0 )
+		if( read_count != (DWORD) internal_file->block_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -1712,57 +1734,62 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		read_size_remainder = size % internal_file->block_size;
 		read_size           = size - read_size_remainder;
 	}
+	if( read_size > 0 )
+	{
 #if ( WINVER <= 0x0500 )
-	result = libcfile_ReadFile(
-	          internal_file->handle,
-	          &( buffer[ buffer_offset ] ),
-	          (DWORD) read_size,
-	          &read_count,
-	          NULL );
+		result = libcfile_ReadFile(
+		          internal_file->handle,
+		          &( buffer[ buffer_offset ] ),
+		          (DWORD) read_size,
+		          &read_count,
+		          NULL );
 #else
-	result = ReadFile(
-	          internal_file->handle,
-	          &( buffer[ buffer_offset ] ),
-	          (DWORD) read_size,
-	          &read_count,
-	          NULL );
+		result = ReadFile(
+		          internal_file->handle,
+		          &( buffer[ buffer_offset ] ),
+		          (DWORD) read_size,
+		          &read_count,
+		          NULL );
 #endif
-	if( result == 0 )
-	{
-		*error_code = (uint32_t) GetLastError();
-
-		switch( *error_code )
+		if( result == 0 )
 		{
-			case ERROR_HANDLE_EOF:
-				break;
+			*error_code = (uint32_t) GetLastError();
 
-			default:
-				libcerror_system_set_error(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 *error_code,
-				 "%s: unable to read from file.",
-				 function );
+			switch( *error_code )
+			{
+				case ERROR_HANDLE_EOF:
+					break;
 
-				return( -1 );
+				default:
+					libcerror_system_set_error(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 *error_code,
+					 "%s: unable to read from file.",
+					 function );
+
+					return( -1 );
+			}
 		}
-	}
-	if( read_count < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: invalid read count: %" PRIzd " returned.",
-		 function,
-		 read_count );
+		if( ( ( internal_file->block_size == 0 )
+		  &&  ( read_count < 0 ) )
+		 || ( ( internal_file->block_size != 0 )
+		  &&  ( read_count != (DWORD) read_size ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: invalid read count: %" PRIzd " returned.",
+			 function,
+			 read_count );
 
-		return( -1 );
+			return( -1 );
+		}
+		buffer_offset                 += (size_t) read_count;
+		internal_file->current_offset += read_count;
 	}
-	buffer_offset                 += (size_t) read_count;
-	internal_file->current_offset += read_count;
-
 	if( read_size_remainder > 0 )
 	{
 		/* The read was cut short
@@ -1821,7 +1848,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 					return( -1 );
 			}
 		}
-		if( read_count < 0 )
+		if( read_count != (DWORD) internal_file->block_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -1934,6 +1961,28 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 
 		return( -1 );
 	}
+	if( internal_file->block_size != 0 )
+	{
+		if( internal_file->current_offset < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid file - current offset value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		if( (size64_t) internal_file->current_offset > internal_file->size )
+		{
+			return( 0 );
+		}
+		if( ( (size64_t) internal_file->current_offset + size ) > internal_file->size )
+		{
+			size = (size_t) ( internal_file->size - internal_file->current_offset );
+		}
+	}
 	if( size == 0 )
 	{
 		return( 0 );
@@ -1960,7 +2009,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		              internal_file->block_data,
 		              internal_file->block_size );
 
-		if( read_count < 0 )
+		if( read_count != (ssize_t) internal_file->block_size )
 		{
 			*error_code = (uint32_t) errno;
 
@@ -2017,28 +2066,33 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		read_size_remainder = size % internal_file->block_size;
 		read_size           = size - read_size_remainder;
 	}
-	read_count = read(
-	              internal_file->descriptor,
-	              (void *) &( buffer[ buffer_offset ] ),
-	              read_size );
-
-	if( read_count < 0 )
+	if( read_size > 0 )
 	{
-		*error_code = (uint32_t) errno;
+		read_count = read(
+		              internal_file->descriptor,
+		              (void *) &( buffer[ buffer_offset ] ),
+		              read_size );
 
-		libcerror_system_set_error(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 *error_code,
-		 "%s: unable to read from file.",
-		 function );
+		if( ( ( internal_file->block_size == 0 )
+		  &&  ( read_count < 0 ) )
+		 || ( ( internal_file->block_size != 0 )
+		  &&  ( read_count != (ssize_t) read_size ) ) )
+		{
+			*error_code = (uint32_t) errno;
 
-		return( -1 );
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 *error_code,
+			 "%s: unable to read from file.",
+			 function );
+
+			return( -1 );
+		}
+		buffer_offset                 += (size_t) read_count;
+		internal_file->current_offset += read_count;
 	}
-	buffer_offset                 += (size_t) read_count;
-	internal_file->current_offset += read_count;
-
 	if( read_size_remainder > 0 )
 	{
 		/* The read was cut short
@@ -2066,7 +2120,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		              internal_file->block_data,
 		              internal_file->block_size );
 
-		if( read_count < 0 )
+		if( read_count != (ssize_t) internal_file->block_size )
 		{
 			*error_code = (uint32_t) errno;
 
@@ -4359,6 +4413,7 @@ int libcfile_file_set_access_behavior(
 
 /* Sets the block size for the read and seek operations
  * A block size of 0 represents no block-based operations
+ * The total size must be a multitude of block size
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_set_block_size(
@@ -4393,6 +4448,31 @@ int libcfile_file_set_block_size(
 
 		return( -1 );
 	}
+#if defined( WINAPI )
+	if( internal_file->handle == INVALID_HANDLE_VALUE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing handle.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( internal_file->descriptor == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing descriptor.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( WINAPI ) && ( UINT32_MAX < SSIZE_MAX )
 	if( block_size > (size_t) UINT32_MAX )
 #else
@@ -4410,6 +4490,20 @@ int libcfile_file_set_block_size(
 	}
 	if( block_size != internal_file->block_size )
 	{
+		if( libcfile_file_get_size(
+		     file,
+		     &( internal_file->size ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size.",
+			 function );
+
+			return( -1 );
+		}
 		if( internal_file->block_data != NULL )
 		{
 			memory_free(
@@ -4420,6 +4514,17 @@ int libcfile_file_set_block_size(
 		}
 		if( block_size > 0 )
 		{
+			if( ( internal_file->size % block_size ) != 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid block size value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
 			internal_file->block_data = (uint8_t *) memory_allocate(
 			                                         sizeof( uint8_t ) * block_size );
 
@@ -4450,21 +4555,6 @@ int libcfile_file_set_block_size(
 			}
 		}
 		internal_file->block_size = block_size;
-
-		if( libcfile_file_get_size(
-		     file,
-		     &( internal_file->size ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size.",
-			 function );
-
-			return( -1 );
-		}
 	}
 	return( 1 );
 }
