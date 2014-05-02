@@ -1772,10 +1772,32 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 					return( -1 );
 			}
 		}
-		if( ( ( internal_file->block_size == 0 )
-		  &&  ( read_count < 0 ) )
-		 || ( ( internal_file->block_size != 0 )
-		  &&  ( read_count != (DWORD) read_size ) ) )
+		if( ( internal_file->block_size == 0 )
+		 && ( read_count < 0 ) )
+		{
+			result = 0;
+		}
+		else if( ( internal_file->block_size != 0 )
+		      && ( read_count != (ssize_t) read_size ) )
+		{
+			/* Windows devices sometimes don't allow to read the last block
+			 * this behavior is seen with e.g. \\.\D:
+			 */
+			if( ( ( read_size - read_count ) == internal_file->block_size )
+			 && ( ( internal_file->current_offset + read_count ) == ( internal_file->size - internal_file->block_size ) ) )
+			{
+				result = 1;
+			}
+			else
+			{
+				result = 0;
+			}
+		}
+		else
+		{
+			result = 1;
+		}
+		if( result == 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1903,6 +1925,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 	size_t read_size                        = 0;
 	size_t read_size_remainder              = 0;
 	ssize_t read_count                      = 0;
+	int result                              = 0;
 
 	if( file == NULL )
 	{
@@ -2073,10 +2096,21 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		              (void *) &( buffer[ buffer_offset ] ),
 		              read_size );
 
-		if( ( ( internal_file->block_size == 0 )
-		  &&  ( read_count < 0 ) )
-		 || ( ( internal_file->block_size != 0 )
-		  &&  ( read_count != (ssize_t) read_size ) ) )
+		if( ( internal_file->block_size == 0 )
+		 && ( read_count < 0 ) )
+		{
+			result = 0;
+		}
+		else if( ( internal_file->block_size != 0 )
+		      && ( read_count != (ssize_t) read_size ) )
+		{
+			result = 0;
+		}
+		else
+		{
+			result = 1;
+		}
+		if( result == 0 )
 		{
 			*error_code = (uint32_t) errno;
 
