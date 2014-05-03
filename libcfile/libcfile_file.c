@@ -1784,7 +1784,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 			 * this behavior is seen with e.g. \\.\D:
 			 */
 			if( ( ( read_size - read_count ) == internal_file->block_size )
-			 && ( ( internal_file->current_offset + read_count ) == ( internal_file->size - internal_file->block_size ) ) )
+			 && ( ( (size64_t) internal_file->current_offset + read_count ) == ( internal_file->size - internal_file->block_size ) ) )
 			{
 				result = 1;
 			}
@@ -2412,6 +2412,8 @@ ssize_t libcfile_file_write_buffer_with_error_code(
 
 		return( -1 );
 	}
+	internal_file->current_offset += write_count;
+
 	return( write_count );
 }
 
@@ -2508,6 +2510,8 @@ ssize_t libcfile_file_write_buffer_with_error_code(
 
 		return( -1 );
 	}
+	internal_file->current_offset += write_count;
+
 	return( write_count );
 }
 
@@ -2764,7 +2768,7 @@ off64_t libcfile_file_seek_offset(
 	}
 	internal_file->current_offset = offset;
 
-	if( offset_remainder > 0 )
+	if( internal_file->block_size != 0 )
 	{
 		internal_file->current_offset   += offset_remainder;
 		internal_file->block_data_offset = (size_t) offset_remainder;
@@ -2870,7 +2874,7 @@ off64_t libcfile_file_seek_offset(
 	}
 	internal_file->current_offset = offset;
 
-	if( offset_remainder > 0 )
+	if( internal_file->block_size != 0 )
 	{
 		internal_file->current_offset   += offset_remainder;
 		internal_file->block_data_offset = (size_t) offset_remainder;
@@ -3032,6 +3036,8 @@ int libcfile_file_resize(
 
 		return( -1 );
 	}
+	internal_file->current_offset = offset;
+
 #if ( WINVER <= 0x0500 )
 	if( libcfile_SetEndOfFile(
 	     internal_file->handle ) == 0 )
@@ -3122,6 +3128,25 @@ int libcfile_file_resize(
 
 		return( -1 );
 	}
+	offset = lseek(
+	          internal_file->descriptor,
+	          (off_t) offset,
+	          whence );
+
+	if( offset < 0 )
+	{
+		libcerror_system_set_error(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 errno,
+		 "%s: unable to seek offset in file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file->current_offset = offset;
+
 	return( 1 );
 }
 
