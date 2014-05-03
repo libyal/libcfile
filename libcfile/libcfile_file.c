@@ -1783,7 +1783,8 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 			/* Windows devices sometimes don't allow to read the last block
 			 * this behavior is seen with e.g. \\.\D:
 			 */
-			if( ( ( read_size - read_count ) == internal_file->block_size )
+			if( ( internal_file->is_device_filename != 0 )
+			 && ( ( read_size - read_count ) == internal_file->block_size )
 			 && ( ( (size64_t) internal_file->current_offset + read_count ) == ( internal_file->size - internal_file->block_size ) ) )
 			{
 				result = 1;
