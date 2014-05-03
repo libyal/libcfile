@@ -3074,6 +3074,7 @@ int libcfile_file_resize(
 {
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_resize";
+	off_t offset                            = 0;
 
 	if( file == NULL )
 	{
@@ -3130,8 +3131,8 @@ int libcfile_file_resize(
 	}
 	offset = lseek(
 	          internal_file->descriptor,
-	          (off_t) offset,
-	          whence );
+	          0,
+	          SEEK_CUR );
 
 	if( offset < 0 )
 	{
@@ -3145,7 +3146,7 @@ int libcfile_file_resize(
 
 		return( -1 );
 	}
-	internal_file->current_offset = offset;
+	internal_file->current_offset = (off64_t) offset;
 
 	return( 1 );
 }
