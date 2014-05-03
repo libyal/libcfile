@@ -22,7 +22,7 @@ check_SCRIPTS = \
 	test_stream_write.sh
 
 input_FILES = \
-	input/test.raw
+	input/set1/test.raw
 
 EXTRA_DIST = \
 	$(check_SCRIPTS) \
