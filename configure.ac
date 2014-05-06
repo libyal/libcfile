@@ -79,7 +79,7 @@ AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT
 dnl Check if libcfile should be build with debug output
 AX_COMMON_CHECK_ENABLE_DEBUG_OUTPUT
 
-dnl Check if DLL support is needed in ewftools
+dnl Check if DLL support is needed
 AS_IF(
  [test "x$enable_shared" = xyes],
  [AS_CASE(
