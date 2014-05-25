@@ -45,6 +45,10 @@ struct libcfile_internal_file
 	/* Value to indicate the filename indicate this is a device file
 	 */
 	uint8_t is_device_filename;
+
+	/* Value to indicate asynchronous IO should be used.
+	 */
+	uint8_t use_asynchronous_io;
 #else
 	/* The (file) descriptor
 	 */
@@ -162,6 +166,14 @@ ssize_t libcfile_file_read_buffer(
          uint8_t *buffer,
          size_t size,
          libcerror_error_t **error );
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+BOOL libcfile_GetOverlappedResult(
+      HANDLE file_handle,
+      OVERLAPPED *overlapped,
+      DWORD *read_count,
+      BOOL wait_io_complete );
+#endif
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
 BOOL libcfile_ReadFile(
