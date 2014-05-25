@@ -4694,12 +4694,12 @@ int libcfile_file_set_access_behavior(
 	          0,
 	          advice );
 
-	/* Safely ignore if the device does not support fadvise
+	/* Safely ignore if the device does not support fadvise.
 	 * Note that FreeBSD 10.0 had a bug and was returning -1
 	 * and setting errno.
 	 */
 	if( ( result != 0 )
-	 && ( errno != ENODEV ) )
+	 && ( result != ENODEV ) )
 	{
 		libcerror_system_set_error(
 		 error,
