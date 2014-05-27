@@ -1801,9 +1801,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 	size_t read_size                        = 0;
 	size_t read_size_remainder              = 0;
 	DWORD read_count                        = 0;
-	BOOL io_pending                         = FALSE;
 	BOOL result                             = FALSE;
-	BOOL retry                              = FALSE;
 
 	if( file == NULL )
 	{
