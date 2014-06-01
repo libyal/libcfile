@@ -2365,7 +2365,7 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 	{
 		/* The read was cut short
 		 */
-		if( read_count != (size_t) read_size )
+		if( read_count != (ssize_t) read_size )
 		{
 			return( (ssize_t) buffer_offset );
 		}
