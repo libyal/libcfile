@@ -31,6 +31,10 @@
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
 
+/* Define to make cfile_file_test_seek generate verbose output
+#define CFILE_FILE_TEST_SEEK_VERBOSE
+ */
+
 /* Tests libcfile_file_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -401,7 +405,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* Test file seek
+	/* Initialization
 	 */
 	if( libcfile_file_initialize(
 	     &file,
@@ -454,6 +458,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	/* Clean up
+	 */
 	if( libcfile_file_close(
 	     file,
 	     &error ) != 0 )

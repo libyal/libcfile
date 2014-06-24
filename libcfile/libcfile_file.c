@@ -1360,6 +1360,7 @@ int libcfile_file_close(
 		internal_file->is_device_filename  = 0;
 		internal_file->use_asynchronous_io = 0;
 		internal_file->access_flags        = 0;
+		internal_file->size                = 0;
 		internal_file->current_offset      = 0;
 	}
 	if( internal_file->block_data != NULL )
@@ -1425,6 +1426,7 @@ int libcfile_file_close(
 		}
 		internal_file->descriptor     = -1;
 		internal_file->access_flags   = 0;
+		internal_file->size           = 0;
 		internal_file->current_offset = 0;
 	}
 	if( internal_file->block_data != NULL )
