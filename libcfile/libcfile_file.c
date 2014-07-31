@@ -251,7 +251,7 @@ HANDLE libcfile_CreateFileA(
 
 	if( filename == NULL )
 	{
-		return( FALSE );
+		return( INVALID_HANDLE_VALUE );
 	}
 	library_handle = LoadLibrary(
 	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
@@ -703,7 +703,7 @@ HANDLE libcfile_CreateFileW(
 
 	if( filename == NULL )
 	{
-		return( FALSE );
+		return( INVALID_HANDLE_VALUE );
 	}
 	library_handle = LoadLibrary(
 	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );

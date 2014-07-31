@@ -10,8 +10,16 @@ Package: libcfile
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: libcfile-dbg
 Description: Library to support cross-platform C file functions
  libcfile is a library to support cross-platform C file functions.
+
+Package: libcfile-dbg
+Architecture: any
+Section: debug
+Depends: libcfile (= ${Source-Version}), ${misc:Depends}
+Description: Debugging symbols for libcfile
+ Debugging symbols for libcfile.
 
 Package: libcfile-dev
 Section: libdevel
