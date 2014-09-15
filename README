@@ -1,4 +1,6 @@
-See:
-* http://code.google.com/p/libcfile/wiki/Building
-* README.macosx
+libcfile is a library for cross-platform C file functions.
+
+For more information see:
+* Project documentation: https://github.com/libyal/libcfile/wiki/Home
+* How to build from source: https://github.com/libyal/libcfile/wiki/Building
 
