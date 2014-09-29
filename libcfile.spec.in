@@ -1,7 +1,7 @@
 Name: libcfile
 Version: @VERSION@
 Release: 1
-Summary: Library to support cross-platform C path functions
+Summary: Library to support cross-platform C file functions
 Group: System Environment/Libraries
 License: LGPL
 Source: %{name}-%{version}.tar.gz
@@ -11,7 +11,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libcfile_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libcstring_spec_build_requires@ @ax_libuna_spec_build_requires@
 
 %description
-libcfile is a library to support cross-platform C path functions
+libcfile is a library to support cross-platform C file functions
 
 %package devel
 Summary: Header files and libraries for developing applications for libcfile
