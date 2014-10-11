@@ -84,6 +84,11 @@ struct libcfile_internal_file
 	size_t block_data_size;
 };
 
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+BOOL libcfile_CloseHandle(
+      HANDLE file_handle );
+#endif
+
 LIBCFILE_EXTERN \
 int libcfile_file_initialize(
      libcfile_file_t **file,
@@ -149,11 +154,6 @@ int libcfile_file_open_wide_with_error_code(
      libcerror_error_t **error );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
-
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-BOOL libcfile_CloseHandle(
-      HANDLE file_handle );
-#endif
 
 LIBCFILE_EXTERN \
 int libcfile_file_close(

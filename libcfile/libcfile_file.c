@@ -93,6 +93,51 @@ typedef size_t u64;
 #include "libcfile_libuna.h"
 #include "libcfile_types.h"
 
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Cross Windows safe version of CloseHandle
+ * Returns TRUE if successful or FALSE on error
+ */
+BOOL libcfile_CloseHandle(
+      HANDLE file_handle )
+{
+	FARPROC function       = NULL;
+	HMODULE library_handle = NULL;
+	BOOL result            = FALSE;
+
+	if( file_handle == NULL )
+	{
+		return( FALSE );
+	}
+	library_handle = LoadLibrary(
+	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+
+	if( library_handle == NULL )
+	{
+		return( FALSE );
+	}
+	function = GetProcAddress(
+		    library_handle,
+		    (LPCSTR) "CloseHandle" );
+
+	if( function != NULL )
+	{
+		result = function(
+			  file_handle );
+	}
+	/* This call should be after using the function
+	 * in most cases kernel32.dll will still be available after free
+	 */
+	if( FreeLibrary(
+	     library_handle ) != TRUE )
+	{
+		result = FALSE;
+	}
+	return( result );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
 /* Creates a file
  * Make sure the value file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -1258,51 +1303,6 @@ int libcfile_file_open_wide_with_error_code(
 #endif
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
-
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Cross Windows safe version of CloseHandle
- * Returns TRUE if successful or FALSE on error
- */
-BOOL libcfile_CloseHandle(
-      HANDLE file_handle )
-{
-	FARPROC function       = NULL;
-	HMODULE library_handle = NULL;
-	BOOL result            = FALSE;
-
-	if( file_handle == NULL )
-	{
-		return( FALSE );
-	}
-	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
-
-	if( library_handle == NULL )
-	{
-		return( FALSE );
-	}
-	function = GetProcAddress(
-		    library_handle,
-		    (LPCSTR) "CloseHandle" );
-
-	if( function != NULL )
-	{
-		result = function(
-			  file_handle );
-	}
-	/* This call should be after using the function
-	 * in most cases kernel32.dll will still be available after free
-	 */
-	if( FreeLibrary(
-	     library_handle ) != TRUE )
-	{
-		result = FALSE;
-	}
-	return( result );
-}
-
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 #if defined( WINAPI )
 
