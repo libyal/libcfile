@@ -154,11 +154,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_SET offset: <file_size>
 	 * Expected result: <file_size>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     (off64_t) file_size,
-	     SEEK_SET,
-	     (off64_t) file_size ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          (off64_t) file_size,
+	          SEEK_SET,
+	          (off64_t) file_size );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -169,11 +171,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_SET offset: <file_size / 5>
 	 * Expected result: <file_size / 5>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     (off64_t) ( file_size / 5 ),
-	     SEEK_SET,
-	     (off64_t) ( file_size / 5 ) ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          (off64_t) ( file_size / 5 ),
+	          SEEK_SET,
+	          (off64_t) ( file_size / 5 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -184,11 +188,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_SET offset: <file_size + 987>
 	 * Expected result: <file_size + 987>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     (off64_t) ( file_size + 987 ),
-	     SEEK_SET,
-	     (off64_t) ( file_size + 987 ) ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          (off64_t) ( file_size + 987 ),
+	          SEEK_SET,
+	          (off64_t) ( file_size + 987 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -199,11 +205,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     -987,
-	     SEEK_SET,
-	     -1 ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          -987,
+	          SEEK_SET,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -214,11 +222,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_CUR offset: 0
 	 * Expected result: <file_size + 987>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     0,
-	     SEEK_CUR,
-	     (off64_t) ( file_size + 987 ) ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          0,
+	          SEEK_CUR,
+	          (off64_t) ( file_size + 987 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -229,11 +239,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_CUR offset: <-1 * (file_size + 987)>
 	 * Expected result: 0
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     -1 * (off64_t) ( file_size + 987 ),
-	     SEEK_CUR,
-	     0 ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          -1 * (off64_t) ( file_size + 987 ),
+	          SEEK_CUR,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -244,11 +256,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_CUR offset: <file_size / 3>
 	 * Expected result: <file_size / 3>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     (off64_t) ( file_size / 3 ),
-	     SEEK_CUR,
-	     (off64_t) ( file_size / 3 ) ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          (off64_t) ( file_size / 3 ),
+	          SEEK_CUR,
+	          (off64_t) ( file_size / 3 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -261,11 +275,13 @@ int cfile_file_test_seek_file(
 		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
 		 * Expected result: 0
 		 */
-		if( cfile_file_test_seek_offset(
-		     file,
-		     -2 * (off64_t) ( file_size / 3 ),
-		     SEEK_CUR,
-		     0 ) != 1 )
+		result = cfile_file_test_seek_offset(
+		          file,
+		          -2 * (off64_t) ( file_size / 3 ),
+		          SEEK_CUR,
+		          0 );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -279,11 +295,13 @@ int cfile_file_test_seek_file(
 		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
 		 * Expected result: -1
 		 */
-		if( cfile_file_test_seek_offset(
-		     file,
-		     -2 * (off64_t) ( file_size / 3 ),
-		     SEEK_CUR,
-		     -1 ) != 1 )
+		result = cfile_file_test_seek_offset(
+		          file,
+		          -2 * (off64_t) ( file_size / 3 ),
+		          SEEK_CUR,
+		          -1 );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -295,11 +313,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_END offset: 0
 	 * Expected result: <file_size>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     0,
-	     SEEK_END,
-	     (off64_t) file_size ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          0,
+	          SEEK_END,
+	          (off64_t) file_size );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -310,11 +330,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_END offset: <-1 * file_size>
 	 * Expected result: 0
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     -1 * (off64_t) file_size,
-	     SEEK_END,
-	     0 ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          -1 * (off64_t) file_size,
+	          SEEK_END,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -325,11 +347,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_END offset: <-1 * (file_size / 4)>
 	 * Expected result: <file_size - (file_size / 4)>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     -1 * (off64_t) ( file_size / 4 ),
-	     SEEK_END,
-	     (off64_t) file_size - (off64_t) ( file_size / 4 ) ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          -1 * (off64_t) ( file_size / 4 ),
+	          SEEK_END,
+	          (off64_t) file_size - (off64_t) ( file_size / 4 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -340,11 +364,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_END offset: 542
 	 * Expected result: <file_size + 542>
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     542,
-	     SEEK_END,
-	     (off64_t) ( file_size + 542 ) ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          542,
+	          SEEK_END,
+	          (off64_t) ( file_size + 542 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -355,11 +381,13 @@ int cfile_file_test_seek_file(
 	/* Test: SEEK_END offset: <-1 * (file_size + 542)>
 	 * Expected result: -1
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     -1 * (off64_t) ( file_size + 542 ),
-	     SEEK_END,
-	     -1 ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          -1 * (off64_t) ( file_size + 542 ),
+	          SEEK_END,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -370,11 +398,13 @@ int cfile_file_test_seek_file(
 	/* Test: UNKNOWN (88) offset: 0
 	 * Expected result: -1
 	 */
-	if( cfile_file_test_seek_offset(
-	     file,
-	     0,
-	     88,
-	     -1 ) != 1 )
+	result = cfile_file_test_seek_offset(
+	          file,
+	          0,
+	          88,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
