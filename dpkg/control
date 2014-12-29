@@ -1,13 +1,12 @@
 Source: libcfile
-Section: unknown
+Section: libs
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
 Build-Depends: debhelper (>= 7), autotools-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.9.5
 Homepage: https://github.com/libyal/libcfile/
 
 Package: libcfile
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: libcfile-dbg
@@ -17,14 +16,14 @@ Description: Library to support cross-platform C file functions
 Package: libcfile-dbg
 Architecture: any
 Section: debug
-Depends: libcfile (= ${Source-Version}), ${misc:Depends}
+Depends: libcfile (= ${binary:Version}), ${misc:Depends}
 Description: Debugging symbols for libcfile
  Debugging symbols for libcfile.
 
 Package: libcfile-dev
 Section: libdevel
 Architecture: any
-Depends: libcfile (= ${Source-Version})
+Depends: libcfile (= ${binary:Version}), ${misc:Depends}
 Description: Header files and libraries for developing applications for libcfile
  Header files and libraries for developing applications for libcfile.
 
