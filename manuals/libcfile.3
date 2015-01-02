@@ -1,4 +1,4 @@
-.Dd May 1, 2014
+.Dd January  2, 2015
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -12,6 +12,12 @@
 Support functions
 .Ft const char *
 .Fn libcfile_get_version "void"
+.Ft int
+.Fn libcfile_file_exists "const char *filename, libcfile_error_t **error"
+.Pp
+Available when compiled with wide character string support:
+.Ft int
+.Fn libcfile_file_exists_wide "const wchar_t *filename, libcfile_error_t **error"
 .Pp
 Notify functions
 .Ft void
@@ -65,9 +71,9 @@ File functions
 .Ft int
 .Fn libcfile_file_get_size "libcfile_file_t *file, size64_t *size, libcfile_error_t **error"
 .Ft int
-.Ft libcfile_file_io_control_read "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, libcfile_error_t **error"
+.Fn libcfile_file_io_control_read "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, libcfile_error_t **error"
 .Ft int
-.Ft libcfile_file_io_control_read_with_error_code "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, uint32_t *error_code, libcfile_error_t **error"
+.Fn libcfile_file_io_control_read_with_error_code "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, uint32_t *error_code, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_set_access_behavior "libcfile_file_t *file, int access_behavior, libcfile_error_t **error"
 .Ft int
@@ -76,6 +82,8 @@ File functions
 Available when compiled with wide character string support:
 .Ft int
 .Fn libcfile_file_open_wide "libcfile_file_t *file, const wchar_t *filename, int access_flags, libcfile_error_t **error"
+.Pp
+Available when compiled with wide character string support:
 .Ft int
 .Fn libcfile_file_open_wide_with_error_code "libcfile_file_t *file, const wchar_t *filename, int access_flags, uint32_t *error_code, libcfile_error_t **error"
 .Pp
@@ -101,24 +109,26 @@ File stream functions
 .Pp
 Available when compiled with wide character string support:
 .Ft int
-.Fn libcfile_stream_open_wide "libcfile_stream_t *file, const wchar_t *filename, int access_flags, libcfile_error_t **error"
+.Fn libcfile_stream_open_wide "libcfile_stream_t *stream, const wchar_t *filename, int access_flags, libcfile_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libcfile_get_version
 function is used to retrieve the library version.
 .Sh RETURN VALUES
-Most of the functions return NULL or -1 on error, dependent on the return type. For the actual return values refer to libcfile.h
+Most of the functions return NULL or -1 on error, dependent on the return type.
+For the actual return values see "libcfile.h".
 .Sh ENVIRONMENT
 None
 .Sh FILES
 None
 .Sh BUGS
-Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
-https://github.com/libyal/libcfile/
+Please report bugs of any kind on the project issue tracker: https://github.com/libyal/libcfile/issues
 .Sh AUTHOR
-These man pages were written by Joachim Metz.
+These man pages are generated from "libcfile.h".
 .Sh COPYRIGHT
 Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>.
-This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 the libcfile.h include file
