@@ -48,14 +48,14 @@ int libcfile_file_exists(
      const char *filename,
      libcfile_error_t **error );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBCFILE_HAVE_WIDE_CHARACTER_TYPE )
 
 LIBCFILE_EXTERN \
 int libcfile_file_exists_wide(
      const wchar_t *filename,
      libcfile_error_t **error );
 
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+#endif /* defined( LIBCFILE_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* -------------------------------------------------------------------------
  * Notify functions
@@ -177,7 +177,7 @@ int libcfile_file_open_with_error_code(
      uint32_t *error_code,
      libcfile_error_t **error );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBCFILE_HAVE_WIDE_CHARACTER_TYPE )
 
 /* Opens a file
  * Returns 1 if successful or -1 on error
@@ -200,7 +200,7 @@ int libcfile_file_open_wide_with_error_code(
      uint32_t *error_code,
      libcfile_error_t **error );
 
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+#endif /* defined( LIBCFILE_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Closes the file
  * Returns 0 if successful or -1 on error
@@ -375,7 +375,7 @@ int libcfile_stream_open(
      int access_flags,
      libcfile_error_t **error );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBCFILE_HAVE_WIDE_CHARACTER_TYPE )
 
 /* Opens a file stream
  * Returns 1 if successful or -1 on error
@@ -387,7 +387,7 @@ int libcfile_stream_open_wide(
      int access_flags,
      libcfile_error_t **error );
 
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+#endif /* defined( LIBCFILE_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Closes the file stream
  * Returns 0 if successful or -1 on error
