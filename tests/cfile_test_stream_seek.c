@@ -33,7 +33,7 @@
 #include "cfile_test_unused.h"
 
 /* Define to make cfile_stream_test_seek generate verbose output
-#define CFILE_FILE_TEST_SEEK_VERBOSE
+#define CFILE_STREAM_TEST_SEEK_VERBOSE
  */
 
 /* Tests libcfile_stream_seek_offset
@@ -626,7 +626,7 @@ int main( int argc, char * const argv[] )
 	}
 	source = argv[ 1 ];
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_FILE_TEST_SEEK_VERBOSE )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_STREAM_TEST_SEEK_VERBOSE )
 	libcfile_notify_set_verbose(
 	 1 );
 	libcfile_notify_set_stream(
