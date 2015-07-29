@@ -279,40 +279,30 @@ int main( int argc, char * const argv[] )
 {
 	libcstring_system_character_t *filename = NULL;
 	libcerror_error_t *error                = NULL;
-	size_t filename_size                    = 0;
+	size64_t file_size                      = 0;
 
-	if( argc != 1 )
+	if( argc < 2 )
 	{
 		fprintf(
 		 stderr,
-		 "Unsupported number of arguments.\n" );
+		 "Missing filename.\n" );
 
 		return( EXIT_FAILURE );
 	}
-#if defined( HAVE_WINAPI )
-	filename = _LIBCSTRING_SYSTEM_STRING( "tmp\\test1" );
-#else
-	filename = _LIBCSTRING_SYSTEM_STRING( "tmp/test1" );
-#endif
-	if( cfile_test_stream_write(
-	     filename,
-	     0,
-	     &error ) != 1 )
+	if( argc < 3 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test write.\n" );
+		 "Missing file size.\n" );
 
-		goto on_error;
+		return( EXIT_FAILURE );
 	}
-#if defined( HAVE_WINAPI )
-	filename = _LIBCSTRING_SYSTEM_STRING( "tmp\\test2" );
-#else
-	filename = _LIBCSTRING_SYSTEM_STRING( "tmp/test2" );
-#endif
+	filename = argv[ 1 ];
+	file_size = (size64_t) atoi( argv[ 2 ] );
+
 	if( cfile_test_stream_write(
 	     filename,
-	     100000,
+	     file_size,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -326,10 +316,10 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libcfile_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
-		libcfile_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( EXIT_FAILURE );

@@ -18,7 +18,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -26,32 +25,33 @@ EXIT_IGNORE=77;
 
 test_stream_write()
 { 
-	rm -rf tmp;
-	mkdir tmp;
+	FILENAME=$1;
+	FILE_SIZE=$2;
 
-	echo "Testing write";
+	TMPDIR="tmp$$";
 
-	${TEST_RUNNER} ./${CFILE_TEST_STREAM_WRITE};
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
+
+	${TEST_RUNNER} ${TMPDIR} ./${TEST_STREAM_WRITE} "${TMPDIR}/${FILENAME}" ${FILE_SIZE};
 
 	RESULT=$?;
 
-	echo "";
-
-	rm -rf tmp;
+	rm -rf ${TMPDIR};
 
 	return ${RESULT};
 }
 
-CFILE_TEST_STREAM_WRITE="cfile_test_stream_write";
+TEST_STREAM_WRITE="cfile_test_stream_write";
 
-if ! test -x ${CFILE_TEST_STREAM_WRITE};
+if ! test -x ${TEST_STREAM_WRITE};
 then
-	CFILE_TEST_STREAM_WRITE="cfile_test_stream_write.exe";
+	TEST_STREAM_WRITE="cfile_test_stream_write.exe";
 fi
 
-if ! test -x ${CFILE_TEST_STREAM_WRITE};
+if ! test -x ${TEST_STREAM_WRITE};
 then
-	echo "Missing executable: ${CFILE_TEST_STREAM_WRITE}";
+	echo "Missing executable: ${TEST_STREAM_WRITE}";
 
 	exit ${EXIT_FAILURE};
 fi
@@ -70,10 +70,23 @@ then
         exit ${EXIT_FAILURE};
 fi
 
-if ! test_stream_write;
+echo "Testing write";
+
+if ! test_stream_write "test1" 0;
 then
+	echo "";
+
 	exit ${EXIT_FAILURE};
 fi
+
+if ! test_stream_write "test2" 100000;
+then
+	echo "";
+
+	exit ${EXIT_FAILURE};
+fi
+
+echo "";
 
 exit ${EXIT_SUCCESS};
 

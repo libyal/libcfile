@@ -30,6 +30,7 @@
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
+#include "cfile_test_unused.h"
 
 /* Define to make cfile_file_test_seek generate verbose output
 #define CFILE_FILE_TEST_SEEK_VERBOSE
@@ -44,8 +45,8 @@ int cfile_file_test_seek_offset(
      int input_whence,
      off64_t output_offset )
 {
-	const char *whence_string = NULL;
 	libcerror_error_t *error  = NULL;
+	const char *whence_string = NULL;
 	off64_t result_offset     = 0;
 	int result                = 0;
 
@@ -81,15 +82,6 @@ int cfile_file_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset == -1 )
-	{
-		libcfile_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libcfile_error_free(
-		 &error );
-	}
 	if( result_offset == output_offset )
 	{
 		result = 1;
@@ -110,13 +102,24 @@ int cfile_file_test_seek_offset(
 	 stdout,
 	 "\n" );
 
+	if( error != NULL )
+	{
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
+		libcerror_error_free(
+		 &error );
+	}
 	return( result );
 }
 
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_seek_file(
+int cfile_file_test_seek(
      libcfile_file_t *file,
      size64_t file_size )
 {
@@ -415,6 +418,192 @@ int cfile_file_test_seek_file(
 	return( result );
 }
 
+/* Tests seeking in a file
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_file_test_file_seek(
+     libcstring_system_character_t *source,
+     libcerror_error_t **error )
+{
+	libcfile_file_t *file = NULL;
+	size64_t file_size    = 0;
+	int result            = 0;
+
+	if( libcfile_file_initialize(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
+	     file,
+	     source,
+	     LIBCFILE_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libcfile_file_open(
+	     file,
+	     source,
+	     LIBCFILE_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_get_size(
+	     file,
+	     &file_size,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve file size.\n" );
+
+		goto on_error;
+	}
+	result = cfile_file_test_seek(
+	          file,
+	          file_size );
+
+	if( result == -1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to seek in file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_close(
+	     file,
+	     error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to close file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( file != NULL )
+	{
+		libcfile_file_close(
+		 file,
+		 NULL );
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Tests seeking in a file without opening it
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_file_test_seek_file_no_open(
+     libcstring_system_character_t *source CFILE_TEST_ATTRIBUTE_UNUSED,
+     libcerror_error_t **error )
+{
+	libcfile_file_t *file = NULL;
+	off64_t result_offset = 0;
+	int result            = 0;
+
+	CFILE_TEST_UNREFERENCED_PARAMETER( source );
+
+	if( libcfile_file_initialize(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file.\n" );
+
+		goto on_error;
+	}
+	fprintf(
+	 stdout,
+	 "Testing seek without open: \t" );
+
+	result_offset = libcfile_file_seek_offset(
+	                 file,
+	                 0,
+	                 SEEK_SET,
+	                 error );
+
+	if( result_offset == -1 )
+	{
+		result = 1;
+	}
+	if( result != 0 )
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	if( ( error != NULL )
+	 && ( *error != NULL ) )
+	{
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 *error,
+			 stderr );
+		}
+		libcerror_error_free(
+		 error );
+	}
+	if( libcfile_file_free(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( file != NULL )
+	{
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -423,9 +612,9 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error = NULL;
-	libcfile_file_t *file    = NULL;
-	size64_t file_size       = 0;
+	libcerror_error_t *error              = NULL;
+	libcstring_system_character_t *source = NULL;
+	int result                            = 0;
 
 	if( argc != 2 )
 	{
@@ -435,52 +624,20 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* Initialization
-	 */
-	if( libcfile_file_initialize(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to create file.\n" );
+	source = argv[ 1 ];
 
-		goto on_error;
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcfile_file_open_wide(
-	     file,
-	     argv[ 1 ],
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
-#else
-	if( libcfile_file_open(
-	     file,
-	     argv[ 1 ],
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_FILE_TEST_SEEK_VERBOSE )
+	libcfile_notify_set_verbose(
+	 1 );
+	libcfile_notify_set_stream(
+	 stderr,
+	 NULL );
 #endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open file.\n" );
+	result = cfile_file_test_file_seek(
+	          source,
+	          &error );
 
-		goto on_error;
-	}
-	if( libcfile_file_get_size(
-	     file,
-	     &file_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve file size.\n" );
-
-		goto on_error;
-	}
-	if( cfile_file_test_seek_file(
-	     file,
-	     file_size ) != 1 )
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -488,131 +645,29 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	/* Clean up
-	 */
-	if( libcfile_file_close(
-	     file,
-	     &error ) != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to close file.\n" );
+	result = cfile_file_test_seek_file_no_open(
+	          source,
+	          &error );
 
-		goto on_error;
-	}
-	if( libcfile_file_free(
-	     &file,
-	     &error ) != 1 )
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to free file.\n" );
-
-		goto on_error;
-	}
-	/* Test file seek with block size
-	 */
-	if( libcfile_file_initialize(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to create file.\n" );
-
-		goto on_error;
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcfile_file_open_wide(
-	     file,
-	     argv[ 1 ],
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
-#else
-	if( libcfile_file_open(
-	     file,
-	     argv[ 1 ],
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
-#endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_get_size(
-	     file,
-	     &file_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve file size.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_set_block_size(
-	     file,
-	     512,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to set block size.\n" );
-
-		goto on_error;
-	}
-	if( cfile_file_test_seek_file(
-	     file,
-	     file_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to seek in file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_close(
-	     file,
-	     &error ) != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to close file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_free(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free file.\n" );
+		 "Unable to seek in file without open.\n" );
 
 		goto on_error;
 	}
 	return( EXIT_SUCCESS );
 
+
 on_error:
 	if( error != NULL )
 	{
-		libcfile_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
-		libcfile_error_free(
+		libcerror_error_free(
 		 &error );
-	}
-	if( file != NULL )
-	{
-		libcfile_file_close(
-		 file,
-		 NULL );
-		libcfile_file_free(
-		 &file,
-		 NULL );
 	}
 	return( EXIT_FAILURE );
 }

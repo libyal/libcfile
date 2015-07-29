@@ -1,5 +1,5 @@
 /*
- * Library file seek testing program
+ * Library stream seek testing program
  *
  * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -30,9 +30,10 @@
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
+#include "cfile_test_unused.h"
 
 /* Define to make cfile_stream_test_seek generate verbose output
- * #define CFILE_STREAM_TEST_SEEK_VERBOSE
+#define CFILE_FILE_TEST_SEEK_VERBOSE
  */
 
 /* Tests libcfile_stream_seek_offset
@@ -44,8 +45,8 @@ int cfile_stream_test_seek_offset(
      int input_whence,
      off64_t output_offset )
 {
-	const char *whence_string = NULL;
 	libcerror_error_t *error  = NULL;
+	const char *whence_string = NULL;
 	off64_t result_offset     = 0;
 	int result                = 0;
 
@@ -81,15 +82,6 @@ int cfile_stream_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset == -1 )
-	{
-		libcfile_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libcfile_error_free(
-		 &error );
-	}
 	if( result_offset == output_offset )
 	{
 		result = 1;
@@ -110,15 +102,26 @@ int cfile_stream_test_seek_offset(
 	 stdout,
 	 "\n" );
 
+	if( error != NULL )
+	{
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
+		libcerror_error_free(
+		 &error );
+	}
 	return( result );
 }
 
 /* Tests seeking in a stream
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_stream_test_seek_stream(
+int cfile_stream_test_seek(
      libcfile_stream_t *stream,
-     size64_t stream_size )
+     size64_t file_size )
 {
 	int result = 0;
 
@@ -126,11 +129,11 @@ int cfile_stream_test_seek_stream(
 	{
 		return( -1 );
 	}
-	if( stream_size > (size64_t) INT64_MAX )
+	if( file_size > (size64_t) INT64_MAX )
 	{
 		fprintf(
 		 stderr,
-		 "Stream size exceeds maximum.\n" );
+		 "File size exceeds maximum.\n" );
 
 		return( -1 );
 	}
@@ -151,14 +154,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_SET offset: <stream_size>
-	 * Expected result: <stream_size>
+	/* Test: SEEK_SET offset: <file_size>
+	 * Expected result: <file_size>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     (off64_t) stream_size,
-	     SEEK_SET,
-	     (off64_t) stream_size ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          (off64_t) file_size,
+	          SEEK_SET,
+	          (off64_t) file_size );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -166,14 +171,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_SET offset: <stream_size / 5>
-	 * Expected result: <stream_size / 5>
+	/* Test: SEEK_SET offset: <file_size / 5>
+	 * Expected result: <file_size / 5>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     (off64_t) ( stream_size / 5 ),
-	     SEEK_SET,
-	     (off64_t) ( stream_size / 5 ) ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          (off64_t) ( file_size / 5 ),
+	          SEEK_SET,
+	          (off64_t) ( file_size / 5 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -181,14 +188,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_SET offset: <stream_size + 987>
-	 * Expected result: <stream_size + 987>
+	/* Test: SEEK_SET offset: <file_size + 987>
+	 * Expected result: <file_size + 987>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     (off64_t) ( stream_size + 987 ),
-	     SEEK_SET,
-	     (off64_t) ( stream_size + 987 ) ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          (off64_t) ( file_size + 987 ),
+	          SEEK_SET,
+	          (off64_t) ( file_size + 987 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -199,11 +208,13 @@ int cfile_stream_test_seek_stream(
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     -987,
-	     SEEK_SET,
-	     -1 ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          -987,
+	          SEEK_SET,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -212,13 +223,15 @@ int cfile_stream_test_seek_stream(
 		return( result );
 	}
 	/* Test: SEEK_CUR offset: 0
-	 * Expected result: <stream_size + 987>
+	 * Expected result: <file_size + 987>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     0,
-	     SEEK_CUR,
-	     (off64_t) ( stream_size + 987 ) ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          0,
+	          SEEK_CUR,
+	          (off64_t) ( file_size + 987 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -226,14 +239,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_CUR offset: <-1 * (stream_size + 987)>
+	/* Test: SEEK_CUR offset: <-1 * (file_size + 987)>
 	 * Expected result: 0
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     -1 * (off64_t) ( stream_size + 987 ),
-	     SEEK_CUR,
-	     0 ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          -1 * (off64_t) ( file_size + 987 ),
+	          SEEK_CUR,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -241,14 +256,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_CUR offset: <stream_size / 3>
-	 * Expected result: <stream_size / 3>
+	/* Test: SEEK_CUR offset: <file_size / 3>
+	 * Expected result: <file_size / 3>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     (off64_t) ( stream_size / 3 ),
-	     SEEK_CUR,
-	     (off64_t) ( stream_size / 3 ) ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          (off64_t) ( file_size / 3 ),
+	          SEEK_CUR,
+	          (off64_t) ( file_size / 3 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -256,16 +273,18 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	if( stream_size == 0 )
+	if( file_size == 0 )
 	{
-		/* Test: SEEK_CUR offset: <-2 * (stream_size / 3)>
+		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
 		 * Expected result: 0
 		 */
-		if( cfile_stream_test_seek_offset(
-		     stream,
-		     -2 * (off64_t) ( stream_size / 3 ),
-		     SEEK_CUR,
-		     0 ) != 1 )
+		result = cfile_stream_test_seek_offset(
+		          stream,
+		          -2 * (off64_t) ( file_size / 3 ),
+		          SEEK_CUR,
+		          0 );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -276,14 +295,16 @@ int cfile_stream_test_seek_stream(
 	}
 	else
 	{
-		/* Test: SEEK_CUR offset: <-2 * (stream_size / 3)>
+		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
 		 * Expected result: -1
 		 */
-		if( cfile_stream_test_seek_offset(
-		     stream,
-		     -2 * (off64_t) ( stream_size / 3 ),
-		     SEEK_CUR,
-		     -1 ) != 1 )
+		result = cfile_stream_test_seek_offset(
+		          stream,
+		          -2 * (off64_t) ( file_size / 3 ),
+		          SEEK_CUR,
+		          -1 );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -293,13 +314,15 @@ int cfile_stream_test_seek_stream(
 		}
 	}
 	/* Test: SEEK_END offset: 0
-	 * Expected result: <stream_size>
+	 * Expected result: <file_size>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     0,
-	     SEEK_END,
-	     (off64_t) stream_size ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          0,
+	          SEEK_END,
+	          (off64_t) file_size );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -307,14 +330,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_END offset: <-1 * stream_size>
+	/* Test: SEEK_END offset: <-1 * file_size>
 	 * Expected result: 0
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     -1 * (off64_t) stream_size,
-	     SEEK_END,
-	     0 ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          -1 * (off64_t) file_size,
+	          SEEK_END,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -322,14 +347,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_END offset: <-1 * (stream_size / 4)>
-	 * Expected result: <stream_size - (stream_size / 4)>
+	/* Test: SEEK_END offset: <-1 * (file_size / 4)>
+	 * Expected result: <file_size - (file_size / 4)>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     -1 * (off64_t) ( stream_size / 4 ),
-	     SEEK_END,
-	     (off64_t) stream_size - (off64_t) ( stream_size / 4 ) ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          -1 * (off64_t) ( file_size / 4 ),
+	          SEEK_END,
+	          (off64_t) file_size - (off64_t) ( file_size / 4 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -338,13 +365,15 @@ int cfile_stream_test_seek_stream(
 		return( result );
 	}
 	/* Test: SEEK_END offset: 542
-	 * Expected result: <stream_size + 542>
+	 * Expected result: <file_size + 542>
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     542,
-	     SEEK_END,
-	     (off64_t) ( stream_size + 542 ) ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          542,
+	          SEEK_END,
+	          (off64_t) ( file_size + 542 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -352,14 +381,16 @@ int cfile_stream_test_seek_stream(
 
 		return( result );
 	}
-	/* Test: SEEK_END offset: <-1 * (stream_size + 542)>
+	/* Test: SEEK_END offset: <-1 * (file_size + 542)>
 	 * Expected result: -1
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     -1 * (off64_t) ( stream_size + 542 ),
-	     SEEK_END,
-	     -1 ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          -1 * (off64_t) ( file_size + 542 ),
+	          SEEK_END,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -370,11 +401,13 @@ int cfile_stream_test_seek_stream(
 	/* Test: UNKNOWN (88) offset: 0
 	 * Expected result: -1
 	 */
-	if( cfile_stream_test_seek_offset(
-	     stream,
-	     0,
-	     88,
-	     -1 ) != 1 )
+	result = cfile_stream_test_seek_offset(
+	          stream,
+	          0,
+	          88,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -385,31 +418,20 @@ int cfile_stream_test_seek_stream(
 	return( result );
 }
 
-/* The main program
+/* Tests seeking in a stream
+ * Returns 1 if successful, 0 if not or -1 on error
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
-#else
-int main( int argc, char * const argv[] )
-#endif
+int cfile_stream_test_seek_stream(
+     libcstring_system_character_t *source,
+     libcerror_error_t **error )
 {
-	libcerror_error_t *error  = NULL;
 	libcfile_stream_t *stream = NULL;
-	size64_t stream_size      = 0;
+	size64_t file_size        = 0;
+	int result                = 0;
 
-	if( argc != 2 )
-	{
-		fprintf(
-		 stderr,
-		 "Unsupported number of arguments.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	/* Initialization
-	 */
 	if( libcfile_stream_initialize(
 	     &stream,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -420,15 +442,15 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_stream_open_wide(
 	     stream,
-	     argv[ 1 ],
+	     source,
 	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
+	     error ) != 1 )
 #else
 	if( libcfile_stream_open(
 	     stream,
-	     argv[ 1 ],
+	     source,
 	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
+	     error ) != 1 )
 #endif
 	{
 		fprintf(
@@ -439,18 +461,20 @@ int main( int argc, char * const argv[] )
 	}
 	if( libcfile_stream_get_size(
 	     stream,
-	     &stream_size,
-	     &error ) != 1 )
+	     &file_size,
+	     error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to retrieve stream size.\n" );
+		 "Unable to retrieve file size.\n" );
 
 		goto on_error;
 	}
-	if( cfile_stream_test_seek_stream(
-	     stream,
-	     stream_size ) != 1 )
+	result = cfile_stream_test_seek(
+	          stream,
+	          file_size );
+
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -458,11 +482,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	/* Clean up
-	 */
 	if( libcfile_stream_close(
 	     stream,
-	     &error ) != 0 )
+	     error ) != 0 )
 	{
 		fprintf(
 		 stderr,
@@ -472,7 +494,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( libcfile_stream_free(
 	     &stream,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -480,17 +502,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	return( EXIT_SUCCESS );
+	return( result );
 
 on_error:
-	if( error != NULL )
-	{
-		libcfile_error_backtrace_fprint(
-		 error,
-		 stderr );
-		libcfile_error_free(
-		 &error );
-	}
 	if( stream != NULL )
 	{
 		libcfile_stream_close(
@@ -499,6 +513,161 @@ on_error:
 		libcfile_stream_free(
 		 &stream,
 		 NULL );
+	}
+	return( -1 );
+}
+
+/* Tests seeking in a stream without opening it
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_stream_test_seek_stream_no_open(
+     libcstring_system_character_t *source CFILE_TEST_ATTRIBUTE_UNUSED,
+     libcerror_error_t **error )
+{
+	libcfile_stream_t *stream = NULL;
+	off64_t result_offset     = 0;
+	int result                = 0;
+
+	CFILE_TEST_UNREFERENCED_PARAMETER( source );
+
+	if( libcfile_stream_initialize(
+	     &stream,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create stream.\n" );
+
+		goto on_error;
+	}
+	fprintf(
+	 stdout,
+	 "Testing seek without open: \t" );
+
+	result_offset = libcfile_stream_seek_offset(
+	                 stream,
+	                 0,
+	                 SEEK_SET,
+	                 error );
+
+	if( result_offset == -1 )
+	{
+		result = 1;
+	}
+	if( result != 0 )
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	if( ( error != NULL )
+	 && ( *error != NULL ) )
+	{
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 *error,
+			 stderr );
+		}
+		libcerror_error_free(
+		 error );
+	}
+	if( libcfile_stream_free(
+	     &stream,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free stream.\n" );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( stream != NULL )
+	{
+		libcfile_stream_free(
+		 &stream,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* The main program
+ */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+int wmain( int argc, wchar_t * const argv[] )
+#else
+int main( int argc, char * const argv[] )
+#endif
+{
+	libcerror_error_t *error              = NULL;
+	libcstring_system_character_t *source = NULL;
+	int result                            = 0;
+
+	if( argc != 2 )
+	{
+		fprintf(
+		 stderr,
+		 "Unsupported number of arguments.\n" );
+
+		return( EXIT_FAILURE );
+	}
+	source = argv[ 1 ];
+
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_FILE_TEST_SEEK_VERBOSE )
+	libcfile_notify_set_verbose(
+	 1 );
+	libcfile_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
+	result = cfile_stream_test_seek_stream(
+	          source,
+	          &error );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to seek in stream.\n" );
+
+		goto on_error;
+	}
+	result = cfile_stream_test_seek_stream_no_open(
+	          source,
+	          &error );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to seek in stream without open.\n" );
+
+		goto on_error;
+	}
+	return( EXIT_SUCCESS );
+
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libcerror_error_free(
+		 &error );
 	}
 	return( EXIT_FAILURE );
 }

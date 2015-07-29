@@ -47,9 +47,9 @@ int cfile_file_test_seek_offset(
      int input_whence,
      off64_t expected_offset )
 {
-	libcfile_error_t *error = NULL;
-	off64_t result_offset   = 0;
-	int result              = 0;
+	libcerror_error_t *error = NULL;
+	off64_t result_offset    = 0;
+	int result               = 0;
 
 	if( file == NULL )
 	{
@@ -76,11 +76,11 @@ int cfile_file_test_seek_offset(
 	{
 		if( result != 1 )
 		{
-			libcfile_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libcfile_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -96,12 +96,12 @@ int cfile_file_test_read_buffer(
 {
 	uint8_t buffer[ CFILE_TEST_READ_BUFFER_SIZE ];
 
-	libcfile_error_t *error = NULL;
-	size64_t remaining_size = 0;
-	size64_t result_size    = 0;
-	size_t read_size        = 0;
-	ssize_t read_count      = 0;
-	int result              = 0;
+	libcerror_error_t *error = NULL;
+	size64_t remaining_size  = 0;
+	size64_t result_size     = 0;
+	size_t read_size         = 0;
+	ssize_t read_count       = 0;
+	int result               = 0;
 
 	if( file == NULL )
 	{
@@ -150,11 +150,11 @@ int cfile_file_test_read_buffer(
 	{
 		if( result != 1 )
 		{
-			libcfile_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libcfile_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -174,13 +174,13 @@ int cfile_file_test_read_buffer_at_offset(
 {
 	uint8_t buffer[ CFILE_TEST_READ_BUFFER_SIZE ];
 
-	libcfile_error_t *error = NULL;
-	off64_t result_offset   = 0;
-	size64_t remaining_size = 0;
-	size64_t result_size    = 0;
-	size_t read_size        = 0;
-	ssize_t read_count      = 0;
-	int result              = 0;
+	libcerror_error_t *error = NULL;
+	off64_t result_offset    = 0;
+	size64_t remaining_size  = 0;
+	size64_t result_size     = 0;
+	size_t read_size         = 0;
+	ssize_t read_count       = 0;
+	int result               = 0;
 
 	if( file == NULL )
 	{
@@ -267,11 +267,11 @@ int cfile_file_test_read_buffer_at_offset(
 	{
 		if( result != 1 )
 		{
-			libcfile_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libcfile_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -597,9 +597,10 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcfile_error_t *error   = NULL;
-	libcfile_file_t *file = NULL;
-	size64_t file_size      = 0;
+	libcerror_error_t *error              = NULL;
+	libcfile_file_t *file                 = NULL;
+	libcstring_system_character_t *source = NULL;
+	size64_t file_size                    = 0;
 
 	if( argc < 2 )
 	{
@@ -609,6 +610,8 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	source = argv[ 1 ];
+
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_TEST_READ_VERBOSE )
 	libcfile_notify_set_verbose(
 	 1 );
@@ -631,13 +634,13 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
 	     file,
-	     argv[ 1 ],
+	     source,
 	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
 #else
 	if( libcfile_file_open(
 	     file,
-	     argv[ 1 ],
+	     source,
 	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
 #endif
@@ -709,13 +712,13 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
 	     file,
-	     argv[ 1 ],
+	     source,
 	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
 #else
 	if( libcfile_file_open(
 	     file,
-	     argv[ 1 ],
+	     source,
 	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
 #endif
@@ -788,10 +791,10 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libcfile_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
-		libcfile_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( file != NULL )
