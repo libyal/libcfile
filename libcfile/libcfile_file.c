@@ -311,14 +311,14 @@ HANDLE libcfile_CreateFileA(
 
 	if( function != NULL )
 	{
-		result = function(
-			  filename,
-			  desired_access,
-			  share_mode,
-			  security_attributes,
-			  creation_disposition,
-			  flags_and_attributes,
-			  template_file );
+		result = (HANDLE) function(
+		                   filename,
+		                   desired_access,
+		                   share_mode,
+		                   security_attributes,
+		                   creation_disposition,
+		                   flags_and_attributes,
+		                   template_file );
 	}
 	/* This call should be after using the function
 	 * in most cases kernel32.dll will still be available after free
@@ -763,14 +763,14 @@ HANDLE libcfile_CreateFileW(
 
 	if( function != NULL )
 	{
-		result = function(
-			  filename,
-			  desired_access,
-			  share_mode,
-			  security_attributes,
-			  creation_disposition,
-			  flags_and_attributes,
-			  template_file );
+		result = (HANDLE) function(
+		                   filename,
+		                   desired_access,
+		                   share_mode,
+		                   security_attributes,
+		                   creation_disposition,
+		                   flags_and_attributes,
+		                   template_file );
 	}
 	/* This call should be after using the function
 	 * in most cases kernel32.dll will still be available after free
@@ -1506,7 +1506,7 @@ BOOL libcfile_GetOverlappedResult(
 	{
 		return( FALSE );
 	}
-	if( buffer == NULL )
+	if( overlapped == NULL )
 	{
 		return( FALSE );
 	}
@@ -1715,7 +1715,7 @@ ssize_t libcfile_internal_file_read_buffer_at_offset_with_error_code(
 #else
 	result = ReadFile(
 		  internal_file->handle,
-		  buffer,
+		  (VOID *) buffer,
 		  (DWORD) size,
 		  &read_count,
 		  overlapped );
@@ -2490,7 +2490,7 @@ BOOL libcfile_WriteFile(
 	{
 		return( FALSE );
 	}
-	if( read_count == NULL )
+	if( write_count == NULL )
 	{
 		return( FALSE );
 	}
@@ -2510,8 +2510,8 @@ BOOL libcfile_WriteFile(
 		result = function(
 			  file_handle,
 			  buffer,
-			  read_size,
-			  read_count,
+			  write_size,
+			  write_count,
 			  overlapped );
 	}
 	/* This call should be after using the function
@@ -2610,14 +2610,14 @@ ssize_t libcfile_file_write_buffer_with_error_code(
 #if ( WINVER <= 0x0500 )
 	result = libcfile_WriteFile(
 	          internal_file->handle,
-	          buffer,
+	          (VOID *) buffer,
 	          (DWORD) size,
 	          (DWORD *) &write_count,
 	          NULL );
 #else
 	result = WriteFile(
 	          internal_file->handle,
-	          buffer,
+	          (VOID *) buffer,
 	          (DWORD) size,
 	          (DWORD *) &write_count,
 	          NULL );
