@@ -1,29 +1,16 @@
 #!/bin/bash
+# Library write testing script
 #
-# Library file write testing script
-#
-# Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# Version: 20160125
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-test_file_write()
+TEST_PREFIX="cfile";
+TEST_EXECUTABLE="${TEST_PREFIX}_test_file_write";
+
+test_write()
 { 
 	FILENAME=$1;
 	FILE_SIZE=$2;
@@ -33,7 +20,7 @@ test_file_write()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	${TEST_RUNNER} ${TMPDIR} ./${TEST_FILE_WRITE} "${TMPDIR}/${FILENAME}" ${FILE_SIZE};
+	${TEST_RUNNER} ${TMPDIR} ./${TEST_WRITE} "${TMPDIR}/${FILENAME}" ${FILE_SIZE};
 
 	RESULT=$?;
 
@@ -42,16 +29,16 @@ test_file_write()
 	return ${RESULT};
 }
 
-TEST_FILE_WRITE="cfile_test_file_write";
+TEST_WRITE="./${TEST_EXECUTABLE}";
 
-if ! test -x ${TEST_FILE_WRITE};
+if ! test -x ${TEST_WRITE};
 then
-	TEST_FILE_WRITE="cfile_test_file_write.exe";
+	TEST_WRITE="${TEST_EXECUTABLE}.exe";
 fi
 
-if ! test -x ${TEST_FILE_WRITE};
+if ! test -x ${TEST_WRITE};
 then
-	echo "Missing executable: ${TEST_FILE_WRITE}";
+	echo "Missing executable: ${TEST_WRITE}";
 
 	exit ${EXIT_FAILURE};
 fi
@@ -72,14 +59,14 @@ fi
 
 echo "Testing write";
 
-if ! test_file_write "test1" 0;
+if ! test_write "test1" 0;
 then
 	echo "";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_file_write "test2" 100000;
+if ! test_write "test2" 100000;
 then
 	echo "";
 
