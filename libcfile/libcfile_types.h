@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCFILE_TYPES_H )
-#define _LIBCFILE_TYPES_H
+#if !defined( _LIBCFILE_INTERNAL_TYPES_H )
+#define _LIBCFILE_INTERNAL_TYPES_H
 
 #include <common.h>
 #include <types.h>
@@ -41,9 +41,9 @@ typedef struct libcfile_stream {}	libcfile_stream_t;
 typedef intptr_t libcfile_file_t;
 typedef intptr_t libcfile_stream_t;
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCFILE ) */
 
-#endif
+#endif /* !defined( _LIBCFILE_INTERNAL_TYPES_H ) */
 
