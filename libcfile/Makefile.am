@@ -26,7 +26,7 @@ libcfile_la_SOURCES = \
 	libcfile_types.h \
 	libcfile_unused.h
 
-libcfile_la_LIBADD  = \
+libcfile_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
