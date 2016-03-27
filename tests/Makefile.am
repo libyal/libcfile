@@ -2,8 +2,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
-	@LIBCERROR_CPPFLAGS@ \
-	@MEMWATCH_CPPFLAGS@
+	@LIBCERROR_CPPFLAGS@
 
 TESTS = \
 	test_file_seek.sh \
@@ -43,10 +42,9 @@ cfile_test_file_read_SOURCES = \
 	cfile_test_file_read.c
 
 cfile_test_file_read_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcfile/libcfile.la
 	@LIBCERROR_LIBADD@ \
-	../libcfile/libcfile.la \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 cfile_test_file_seek_SOURCES = \
 	cfile_test_libcerror.h \
@@ -55,10 +53,9 @@ cfile_test_file_seek_SOURCES = \
 	cfile_test_file_seek.c
 
 cfile_test_file_seek_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcfile/libcfile.la
 	@LIBCERROR_LIBADD@ \
-	../libcfile/libcfile.la \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 cfile_test_file_write_SOURCES = \
 	cfile_test_libcerror.h \
@@ -67,10 +64,9 @@ cfile_test_file_write_SOURCES = \
 	cfile_test_file_write.c
 
 cfile_test_file_write_LDADD = \
-	@LIBCSTRING_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
 	../libcfile/libcfile.la \
-        @MEMWATCH_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
 
 cfile_test_stream_read_SOURCES = \
 	cfile_test_libcerror.h \
@@ -79,10 +75,9 @@ cfile_test_stream_read_SOURCES = \
 	cfile_test_stream_read.c
 
 cfile_test_stream_read_LDADD = \
-	@LIBCSTRING_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
 	../libcfile/libcfile.la \
-        @MEMWATCH_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
 
 cfile_test_stream_seek_SOURCES = \
 	cfile_test_libcerror.h \
@@ -91,10 +86,9 @@ cfile_test_stream_seek_SOURCES = \
 	cfile_test_stream_seek.c
 
 cfile_test_stream_seek_LDADD = \
-	@LIBCSTRING_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
 	../libcfile/libcfile.la \
-        @MEMWATCH_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
 
 cfile_test_stream_write_SOURCES = \
 	cfile_test_libcerror.h \
@@ -103,10 +97,9 @@ cfile_test_stream_write_SOURCES = \
 	cfile_test_stream_write.c
 
 cfile_test_stream_write_LDADD = \
-	@LIBCSTRING_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
 	../libcfile/libcfile.la \
-        @MEMWATCH_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
