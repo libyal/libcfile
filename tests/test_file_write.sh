@@ -1,27 +1,34 @@
 #!/bin/bash
 # Library write testing script
 #
-# Version: 20160125
+# Version: 20160327
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_PREFIX="cfile";
-TEST_EXECUTABLE="${TEST_PREFIX}_test_file_write";
+TEST_PREFIX=`dirname ${PWD}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
+
+TEST_PROFILE="lib${TEST_PREFIX}";
+TEST_DESCRIPTION="file write";
+OPTION_SETS="";
+
+TEST_TOOL_DIRECTORY=".";
+TEST_TOOL="${TEST_PREFIX}_test_file_write";
 
 test_write()
 { 
-	FILENAME=$1;
-	FILE_SIZE=$2;
+	local TEST_EXECUTABLE=$1;
+	shift 1;
+	local ARGUMENTS=$@;
 
 	TMPDIR="tmp$$";
 
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	${TEST_RUNNER} ${TMPDIR} ./${TEST_WRITE} "${TMPDIR}/${FILENAME}" ${FILE_SIZE};
-
+	run_test_with_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[*]};
 	RESULT=$?;
 
 	rm -rf ${TMPDIR};
@@ -29,51 +36,51 @@ test_write()
 	return ${RESULT};
 }
 
-TEST_WRITE="./${TEST_EXECUTABLE}";
-
-if ! test -x ${TEST_WRITE};
+if ! test -z ${SKIP_LIBRARY_TESTS};
 then
-	TEST_WRITE="${TEST_EXECUTABLE}.exe";
+	exit ${EXIT_IGNORE};
 fi
 
-if ! test -x ${TEST_WRITE};
+TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+
+if ! test -x "${TEST_EXECUTABLE}";
 then
-	echo "Missing executable: ${TEST_WRITE}";
+	TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+fi
+
+if ! test -x "${TEST_EXECUTABLE}";
+then
+	echo "Missing test executable: ${TEST_EXECUTABLE}";
 
 	exit ${EXIT_FAILURE};
 fi
 
 TEST_RUNNER="tests/test_runner.sh";
 
-if ! test -x ${TEST_RUNNER};
+if ! test -f "${TEST_RUNNER}";
 then
-        TEST_RUNNER="./test_runner.sh";
+	TEST_RUNNER="./test_runner.sh";
 fi
 
-if ! test -x ${TEST_RUNNER};
+if ! test -f "${TEST_RUNNER}";
 then
-        echo "Missing test runner: ${TEST_RUNNER}";
-
-        exit ${EXIT_FAILURE};
-fi
-
-echo "Testing write";
-
-if ! test_write "test1" 0;
-then
-	echo "";
+	echo "Missing test runner: ${TEST_RUNNER}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_write "test2" 100000;
-then
-	echo "";
+source ${TEST_RUNNER};
 
-	exit ${EXIT_FAILURE};
+test_write "${TEST_EXECUTABLE}" "test1" 0;
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
+then
+	exit ${RESULT};
 fi
 
-echo "";
+test_write "${TEST_EXECUTABLE}" "test2" 100000;
+RESULT=$?;
 
-exit ${EXIT_SUCCESS};
+exit ${RESULT};
 
