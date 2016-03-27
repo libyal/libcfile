@@ -48,6 +48,9 @@
 /* Define to 1 if you have the `fgetws' function. */
 #undef HAVE_FGETWS
 
+/* Define to 1 if you have the `fileno' function. */
+#undef HAVE_FILENO
+
 /* Define to 1 if you have the `fopen' function. */
 #undef HAVE_FOPEN
 
@@ -203,6 +206,9 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H

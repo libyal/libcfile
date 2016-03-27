@@ -2761,7 +2761,7 @@ int libcfile_file_get_size(
 		}
 		/* If the file is a device try to seek the end of the file
 		 */
-/* TODO does not work on mac os x */
+/* TODO does not work on Mac OS X or WINAPI */
 		offset = libcfile_file_seek_offset(
 		          file,
 		          0,
