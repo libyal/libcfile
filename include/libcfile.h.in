@@ -218,6 +218,106 @@ int libcfile_file_get_size(
      size64_t *size,
      libcfile_error_t **error );
 
+/* -------------------------------------------------------------------------
+ * File stream functions
+ * ------------------------------------------------------------------------- */
+
+/* Initializes the file stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_initialize(
+     libcfile_stream_t **stream,
+     libcfile_error_t **error );
+
+/* Frees the file stream including elements
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_free(
+     libcfile_stream_t **stream,
+     libcfile_error_t **error );
+
+/* Opens a file stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_open(
+     libcfile_stream_t *stream,
+     const char *filename,
+     int access_flags,
+     libcfile_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Opens a file stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_open_wide(
+     libcfile_stream_t *stream,
+     const wchar_t *filename,
+     int access_flags,
+     libcfile_error_t **error );
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+/* Closes the file stream
+ * Returns 0 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_close(
+     libcfile_stream_t *stream,
+     libcfile_error_t **error );
+
+/* Reads a buffer from the file stream
+ * Returns the number of bytes read if successful, or -1 on error
+ */
+LIBCFILE_EXTERN \
+ssize_t libcfile_stream_read_buffer(
+         libcfile_stream_t *stream,
+         uint8_t *buffer,
+         size_t size,
+         libcfile_error_t **error );
+
+/* Writes a buffer to the file stream
+ * Returns the number of bytes written if successful, or -1 on error
+ */
+LIBCFILE_EXTERN \
+ssize_t libcfile_stream_write_buffer(
+         libcfile_stream_t *stream,
+         const uint8_t *buffer,
+         size_t size,
+         libcfile_error_t **error );
+
+/* Seeks a certain offset within the file stream
+ * Returns the offset if the seek is successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+off64_t libcfile_stream_seek_offset(
+         libcfile_stream_t *stream,
+         off64_t offset,
+         int whence,
+         libcfile_error_t **error );
+
+/* Retrieves the current offset in the file stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_get_offset(
+     libcfile_stream_t *stream,
+     off64_t *offset,
+     libcfile_error_t **error );
+
+/* Retrieves the size of the file stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_stream_get_size(
+     libcfile_stream_t *stream,
+     size64_t *size,
+     libcfile_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

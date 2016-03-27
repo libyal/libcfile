@@ -760,3 +760,112 @@ int libcfile_stream_get_offset(
 #error Missing file stream ftello function
 #endif
 
+#if ( defined( HAVE_FSEEKO ) && defined( HAVE_FTELLO ) ) || ( defined( HAVE_FSEEKO64 ) && defined( HAVE_FTELLO64 ) ) || defined( WINAPI )
+
+/* Retrieves the size of the file stream
+ * This function uses the POSIX fseeko and ftello functions or equivalent
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_stream_get_size(
+     libcfile_stream_t *stream,
+     size64_t *size,
+     libcerror_error_t **error )
+{
+	libcfile_internal_stream_t *internal_stream = NULL;
+	static char *function                       = "libcfile_stream_get_size";
+	off64_t current_offset                      = 0;
+	off64_t offset                              = 0;
+
+	if( stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	internal_stream = (libcfile_internal_stream_t *) stream;
+
+	if( internal_stream->stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid stream - missing stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcfile_stream_get_offset(
+	     stream,
+	     &current_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to get current offset.",
+		 function );
+
+		return( -1 );
+	}
+	offset = libcfile_stream_seek_offset(
+		  stream,
+		  0,
+		  SEEK_END,
+		  error );
+
+	if( offset == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek end of stream.",
+		 function );
+
+		return( -1 );
+	}
+	*size = (size64_t) offset;
+
+	offset = libcfile_stream_seek_offset(
+		  stream,
+		  current_offset,
+		  SEEK_SET,
+		  error );
+
+	if( offset == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset: %" PRIi64 ".",
+		 function,
+		 current_offset );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#else
+#error Missing file stream get size function
+#endif
+

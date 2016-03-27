@@ -94,4 +94,6 @@ Makefile.in
 # Local library dependencies specific files
 /libcerror
 /libclocale
+/libcnotify
+/libcstring
 /libuna

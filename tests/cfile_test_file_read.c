@@ -1,5 +1,5 @@
 /*
- * Cross-platform C file functions library read testing program
+ * Cross-platform C file functions library file read testing program
  *
  * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -31,13 +31,13 @@
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
 
-#define CFILE_TEST_READ_BUFFER_SIZE	4096
+#define CFILE_TEST_FILE_READ_BUFFER_SIZE	4096
 
 /* Tests libcfile_file_get_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_get_offset(
-     libcfile_file_t *handle,
+     libcfile_file_t *file,
      off64_t expected_offset,
      libcerror_error_t **error )
 {
@@ -47,7 +47,7 @@ int cfile_test_get_offset(
 	if( expected_offset != -1 )
 	{
 		if( libcfile_file_get_offset(
-		     handle,
+		     file,
 		     &result_offset,
 		     error ) != 1 )
 		{
@@ -78,7 +78,7 @@ int cfile_test_get_offset(
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_seek_offset(
-     libcfile_file_t *handle,
+     libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
      off64_t expected_offset )
@@ -87,12 +87,12 @@ int cfile_test_seek_offset(
 	off64_t result_offset    = 0;
 	int result               = 0;
 
-	if( handle == NULL )
+	if( file == NULL )
 	{
 		return( -1 );
 	}
 	result_offset = libcfile_file_seek_offset(
-	                 handle,
+	                 file,
 	                 input_offset,
 	                 input_whence,
 	                 &error );
@@ -133,11 +133,11 @@ int cfile_test_seek_offset(
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_read_buffer(
-     libcfile_file_t *handle,
+     libcfile_file_t *file,
      size64_t input_size,
      size64_t expected_size )
 {
-	uint8_t buffer[ CFILE_TEST_READ_BUFFER_SIZE ];
+	uint8_t buffer[ CFILE_TEST_FILE_READ_BUFFER_SIZE ];
 
 	libcerror_error_t *error = NULL;
 	size64_t remaining_size  = 0;
@@ -146,7 +146,7 @@ int cfile_test_read_buffer(
 	ssize_t read_count       = 0;
 	int result               = 0;
 
-	if( handle == NULL )
+	if( file == NULL )
 	{
 		return( -1 );
 	}
@@ -154,14 +154,14 @@ int cfile_test_read_buffer(
 
 	while( remaining_size > 0 )
 	{
-		read_size = CFILE_TEST_READ_BUFFER_SIZE;
+		read_size = CFILE_TEST_FILE_READ_BUFFER_SIZE;
 
 		if( remaining_size < (size64_t) read_size )
 		{
 			read_size = (size_t) remaining_size;
 		}
 		read_count = libcfile_file_read_buffer(
-			      handle,
+			      file,
 			      buffer,
 			      read_size,
 			      &error );
@@ -203,7 +203,7 @@ int cfile_test_read_buffer(
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_read(
-     libcfile_file_t *handle,
+     libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
      size64_t input_size,
@@ -214,7 +214,7 @@ int cfile_test_read(
 	const char *whence_string = NULL;
 	int result                = 0;
 
-	if( handle == NULL )
+	if( file == NULL )
 	{
 		return( -1 );
 	}
@@ -242,7 +242,7 @@ int cfile_test_read(
 	 input_size );
 
 	result = cfile_test_seek_offset(
-	          handle,
+	          file,
 	          input_offset,
 	          input_whence,
 	          expected_offset );
@@ -252,7 +252,7 @@ int cfile_test_read(
 		if( input_offset >= 0 )
 		{
 			result = cfile_test_read_buffer(
-				  handle,
+				  file,
 				  input_size,
 				  expected_size );
 		}
@@ -262,7 +262,7 @@ int cfile_test_read(
 		if( input_offset >= 0 )
 		{
 			result = cfile_test_get_offset(
-			          handle,
+			          file,
 			          input_offset + expected_size,
 			          &error );
 		}
@@ -304,7 +304,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcerror_error_t *error = NULL;
-	libcfile_file_t *handle  = NULL;
+	libcfile_file_t *file    = NULL;
 	size64_t file_size       = 0;
 
 	if( argc != 2 )
@@ -318,24 +318,24 @@ int main( int argc, char * const argv[] )
 	/* Initialization
 	 */
 	if( libcfile_file_initialize(
-	     &handle,
+	     &file,
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to create handle.\n" );
+		 "Unable to create file.\n" );
 
 		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
-	     handle,
+	     file,
 	     argv[ 1 ],
 	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
 #else
 	if( libcfile_file_open(
-	     handle,
+	     file,
 	     argv[ 1 ],
 	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
@@ -348,7 +348,7 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 	if( libcfile_file_get_size(
-	     handle,
+	     file,
 	     &file_size,
 	     &error ) != 1 )
 	{
@@ -378,7 +378,7 @@ int main( int argc, char * const argv[] )
 	 * Expected result: offset: 0 size: <file_size>
 	 */
 	if( cfile_test_read(
-	     handle,
+	     file,
 	     0,
 	     SEEK_SET,
 	     file_size,
@@ -395,7 +395,7 @@ int main( int argc, char * const argv[] )
 	 * Expected result: offset: 0 size: <file_size>
 	 */
 	if( cfile_test_read(
-	     handle,
+	     file,
 	     0,
 	     SEEK_SET,
 	     file_size,
@@ -416,7 +416,7 @@ int main( int argc, char * const argv[] )
 	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
 	 */
 	if( cfile_test_read(
-	     handle,
+	     file,
 	     (off64_t) ( file_size / 7 ),
 	     SEEK_SET,
 	     file_size / 2,
@@ -433,7 +433,7 @@ int main( int argc, char * const argv[] )
 	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
 	 */
 	if( cfile_test_read(
-	     handle,
+	     file,
 	     (off64_t) ( file_size / 7 ),
 	     SEEK_SET,
 	     file_size / 2,
@@ -456,7 +456,7 @@ int main( int argc, char * const argv[] )
 		 * Expected result: offset: -1 size: <undetermined>
 		 */
 		if( cfile_test_read(
-		     handle,
+		     file,
 		     (off64_t) ( file_size - 1024 ),
 		     SEEK_SET,
 		     4096,
@@ -473,7 +473,7 @@ int main( int argc, char * const argv[] )
 		 * Expected result: offset: -1 size: <undetermined>
 		 */
 		if( cfile_test_read(
-		     handle,
+		     file,
 		     (off64_t) ( file_size - 1024 ),
 		     SEEK_SET,
 		     4096,
@@ -493,7 +493,7 @@ int main( int argc, char * const argv[] )
 		 * Expected result: offset: <file_size - 1024> size: 1024
 		 */
 		if( cfile_test_read(
-		     handle,
+		     file,
 		     (off64_t) ( file_size - 1024 ),
 		     SEEK_SET,
 		     4096,
@@ -510,7 +510,7 @@ int main( int argc, char * const argv[] )
 		 * Expected result: offset: <file_size - 1024> size: 1024
 		 */
 		if( cfile_test_read(
-		     handle,
+		     file,
 		     (off64_t) ( file_size - 1024 ),
 		     SEEK_SET,
 		     4096,
@@ -527,7 +527,7 @@ int main( int argc, char * const argv[] )
 	/* Clean up
 	 */
 	if( libcfile_file_close(
-	     handle,
+	     file,
 	     &error ) != 0 )
 	{
 		fprintf(
@@ -537,12 +537,12 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 	if( libcfile_file_free(
-	     &handle,
+	     &file,
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to free handle.\n" );
+		 "Unable to free file.\n" );
 
 		goto on_error;
 	}
@@ -557,13 +557,13 @@ on_error:
 		libcfile_error_free(
 		 &error );
 	}
-	if( handle != NULL )
+	if( file != NULL )
 	{
 		libcfile_file_close(
-		 handle,
+		 file,
 		 NULL );
 		libcfile_file_free(
-		 &handle,
+		 &file,
 		 NULL );
 	}
 	return( EXIT_FAILURE );

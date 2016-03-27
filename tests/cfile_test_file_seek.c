@@ -1,5 +1,5 @@
 /*
- * Cross-platform C file functions library seek offset testing program
+ * Cross-platform C file functions library file seek offset testing program
  *
  * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *

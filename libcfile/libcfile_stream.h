@@ -110,7 +110,6 @@ int libcfile_stream_get_offset(
      off64_t *offset,
      libcerror_error_t **error );
 
-/* TODO */
 LIBCFILE_EXTERN \
 int libcfile_stream_get_size(
      libcfile_stream_t *stream,

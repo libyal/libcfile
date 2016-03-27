@@ -2,8 +2,6 @@ TODO
 * add file stream support
   - what about non-CRT WINAPI version ?
   - implement libcfile_stream_open_wide
-  - implement libcfile_stream_get_size
-  - add tests
 * validate WINAPI versions of fallback functions
 * add fallback versions of
   - CreateFileA
@@ -15,7 +13,6 @@ TODO
   - GetFileAttributesW
   - GetLastError
 * add libcfile_codepage.h and codepage functions
-* update man page
 * add msvscpp, borlandc5 and codegear files
 * improve tests ?
   - add write when opened with read ?
@@ -26,6 +23,11 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20120526
+* added tests for stream
+* updated man page
+* added file stream get size function
 
 20120524
 * worked on file stream support

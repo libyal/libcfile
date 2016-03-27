@@ -1,5 +1,5 @@
 /*
- * Cross-platform C file functions library write testing program
+ * Cross-platform C file functions library file stream write testing program
  *
  * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -39,41 +39,41 @@ int cfile_test_write(
      size_t file_size,
      libcerror_error_t **error )
 {
-	libcfile_file_t *handle = NULL;
-	uint8_t *buffer         = NULL;
-	static char *function   = "cfile_test_write";
-	size_t write_size       = 0;
-	ssize_t write_count     = 0;
-	int result              = 1;
-	int sector_iterator     = 0;
+	libcfile_stream_t *stream = NULL;
+	uint8_t *buffer           = NULL;
+	static char *function     = "cfile_test_write";
+	size_t write_size         = 0;
+	ssize_t write_count       = 0;
+	int result                = 1;
+	int sector_iterator       = 0;
 
 	fprintf(
 	 stdout,
 	 "Testing writing file size: %" PRIzd "\t",
 	 file_size );
 
-	if( libcfile_file_initialize(
-	     &handle,
+	if( libcfile_stream_initialize(
+	     &stream,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create handle.",
+		 "%s: unable to create stream.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcfile_file_open_wide(
-	     handle,
+	if( libcfile_stream_open_wide(
+	     stream,
 	     filename,
 	     LIBCFILE_OPEN_WRITE,
 	     error ) != 1 )
 #else
-	if( libcfile_file_open(
-	     handle,
+	if( libcfile_stream_open(
+	     stream,
 	     filename,
 	     LIBCFILE_OPEN_WRITE,
 	     error ) != 1 )
@@ -83,7 +83,7 @@ int cfile_test_write(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open handle.",
+		 "%s: unable to open stream.",
 		 function );
 
 		goto on_error;
@@ -122,8 +122,8 @@ int cfile_test_write(
 
 			goto on_error;
 		}
-		write_count = libcfile_file_write_buffer(
-		               handle,
+		write_count = libcfile_stream_write_buffer(
+		               stream,
 		               buffer,
 		               write_size,
 		               error );
@@ -168,8 +168,8 @@ int cfile_test_write(
 
 			goto on_error;
 		}
-		write_count = libcfile_file_write_buffer(
-		               handle,
+		write_count = libcfile_stream_write_buffer(
+		               stream,
 		               buffer,
 		               write_size,
 		               error );
@@ -201,28 +201,28 @@ int cfile_test_write(
 
 	/* Clean up
 	 */
-	if( libcfile_file_close(
-	     handle,
+	if( libcfile_stream_close(
+	     stream,
 	     error ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close handle.",
+		 "%s: unable to close stream.",
 		 function );
 
 		goto on_error;
 	}
-	if( libcfile_file_free(
-	     &handle,
+	if( libcfile_stream_free(
+	     &stream,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free handle.",
+		 "%s: unable to free stream.",
 		 function );
 
 		goto on_error;
@@ -251,13 +251,13 @@ on_error:
 		memory_free(
 		 buffer );
 	}
-	if( handle != NULL )
+	if( stream != NULL )
 	{
-		libcfile_file_close(
-		 handle,
+		libcfile_stream_close(
+		 stream,
 		 NULL );
-		libcfile_file_free(
-		 &handle,
+		libcfile_stream_free(
+		 &stream,
 		 NULL );
 	}
 	return( -1 );

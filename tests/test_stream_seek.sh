@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Cross-platform C file functions library read offset testing script
+# Cross-platform C file functions library file stream seek offset testing script
 #
 # Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -27,11 +27,11 @@ EXIT_IGNORE=77;
 INPUT="input";
 TMP="tmp";
 
-test_read()
+test_stream_seek()
 { 
-	echo "Testing read offset of input:" $*;
+	echo "Testing seek offset of input:" $*;
 
-	./${CFILE_TEST_READ} $*;
+	./${CFILE_TEST_STREAM_SEEK} $*;
 
 	RESULT=$?;
 
@@ -40,30 +40,30 @@ test_read()
 	return ${RESULT};
 }
 
-CFILE_TEST_READ="cfile_test_read";
+CFILE_TEST_STREAM_SEEK="cfile_test_stream_seek";
 
-if ! test -x ${CFILE_TEST_READ};
+if ! test -x ${CFILE_TEST_STREAM_SEEK};
 then
-	CFILE_TEST_READ="cfile_test_read.exe";
+	CFILE_TEST_STREAM_SEEK="cfile_test_stream_seek.exe";
 fi
 
-if ! test -x ${CFILE_TEST_READ};
+if ! test -x ${CFILE_TEST_STREAM_SEEK};
 then
-	echo "Missing executable: ${CFILE_TEST_READ}";
+	echo "Missing executable: ${CFILE_TEST_STREAM_SEEK}";
 
 	exit ${EXIT_FAILURE};
 fi
 
 if ! test -d ${INPUT};
 then
-	echo "No input directory found, to test read create input directory and place test files in directory.";
+	echo "No input directory found, to test seek create input directory and place test files in directory.";
 
 	exit ${EXIT_IGNORE};
 fi
 
 for FILENAME in ${INPUT}/*;
 do
-	if ! test_read ${FILENAME};
+	if ! test_stream_seek ${FILENAME};
 	then
 		exit ${EXIT_FAILURE};
 	fi

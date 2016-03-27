@@ -2592,7 +2592,7 @@ int libcfile_file_get_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - invalid handle.",
+		 "%s: invalid file - misisng handle.",
 		 function );
 
 		return( -1 );
@@ -2657,6 +2657,7 @@ int libcfile_file_get_size(
 
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_get_size";
+	off64_t current_offset                  = 0;
 	off64_t offset                          = 0;
 	size_t file_statistics_size             = 0;
 
@@ -2679,7 +2680,7 @@ int libcfile_file_get_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - invalid descriptor.",
+		 "%s: invalid file - missing descriptor.",
 		 function );
 
 		return( -1 );
@@ -2744,6 +2745,20 @@ int libcfile_file_get_size(
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
 	{
+		if( libcfile_file_get_offset(
+		     file,
+		     &current_offset,
+		     error ) != 1  )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve current offset.",
+			 function );
+
+			return( -1 );
+		}
 		/* If the file is a device try to seek the end of the file
 		 */
 /* TODO does not work on mac os x */
@@ -2768,7 +2783,7 @@ int libcfile_file_get_size(
 
 		offset = libcfile_file_seek_offset(
 		          file,
-		          0,
+		          current_offset,
 		          SEEK_SET,
 		          error );
 
@@ -2778,8 +2793,9 @@ int libcfile_file_get_size(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek start of file.",
-			 function );
+			 "%s: unable to seek offset: %" PRIi64 ".",
+			 function,
+			 current_offset );
 
 			return( -1 );
 		}

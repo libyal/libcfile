@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Cross-platform C file functions library seek offset testing script
+# Cross-platform C file functions library file write offset testing script
 #
 # Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,50 +24,45 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
 TMP="tmp";
 
-test_seek()
+test_file_write()
 { 
-	echo "Testing seek offset of input:" $*;
+	mkdir ${TMP};
+	cd ${TMP};
 
-	./${CFILE_TEST_SEEK} $*;
+	echo "Testing write";
+
+	../${CFILE_TEST_FILE_WRITE};
 
 	RESULT=$?;
 
 	echo "";
 
+	cd ..;
+	rm -rf ${TMP};
+
 	return ${RESULT};
 }
 
-CFILE_TEST_SEEK="cfile_test_seek";
+CFILE_TEST_FILE_WRITE="cfile_test_file_write";
 
-if ! test -x ${CFILE_TEST_SEEK};
+if ! test -x ${CFILE_TEST_FILE_WRITE};
 then
-	CFILE_TEST_SEEK="cfile_test_seek.exe";
+	CFILE_TEST_FILE_WRITE="cfile_test_file_write.exe";
 fi
 
-if ! test -x ${CFILE_TEST_SEEK};
+if ! test -x ${CFILE_TEST_FILE_WRITE};
 then
-	echo "Missing executable: ${CFILE_TEST_SEEK}";
+	echo "Missing executable: ${CFILE_TEST_FILE_WRITE}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
+if ! test_file_write
 then
-	echo "No input directory found, to test seek create input directory and place test files in directory.";
-
-	exit ${EXIT_IGNORE};
+	exit ${EXIT_FAILURE};
 fi
-
-for FILENAME in ${INPUT}/*;
-do
-	if ! test_seek ${FILENAME};
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
 
 exit ${EXIT_SUCCESS};
 

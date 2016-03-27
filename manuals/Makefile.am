@@ -1,8 +1,8 @@
 man_MANS = \
-	libcpath.3
+	libcfile.3
 
 EXTRA_DIST = \
-	libcpath.3
+	libcfile.3
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

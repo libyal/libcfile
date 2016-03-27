@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Cross-platform C file functions library write offset testing script
+# Cross-platform C file functions library file stream write offset testing script
 #
 # Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -26,14 +26,14 @@ EXIT_IGNORE=77;
 
 TMP="tmp";
 
-test_write()
+test_stream_write()
 { 
 	mkdir ${TMP};
 	cd ${TMP};
 
 	echo "Testing write";
 
-	../${CFILE_TEST_WRITE};
+	../${CFILE_TEST_STREAM_WRITE};
 
 	RESULT=$?;
 
@@ -45,21 +45,21 @@ test_write()
 	return ${RESULT};
 }
 
-CFILE_TEST_WRITE="cfile_test_write";
+CFILE_TEST_STREAM_WRITE="cfile_test_stream_write";
 
-if ! test -x ${CFILE_TEST_WRITE};
+if ! test -x ${CFILE_TEST_STREAM_WRITE};
 then
-	CFILE_TEST_WRITE="cfile_test_write.exe";
+	CFILE_TEST_STREAM_WRITE="cfile_test_stream_write.exe";
 fi
 
-if ! test -x ${CFILE_TEST_WRITE};
+if ! test -x ${CFILE_TEST_STREAM_WRITE};
 then
-	echo "Missing executable: ${CFILE_TEST_WRITE}";
+	echo "Missing executable: ${CFILE_TEST_STREAM_WRITE}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_write
+if ! test_stream_write
 then
 	exit ${EXIT_FAILURE};
 fi
