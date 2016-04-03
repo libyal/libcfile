@@ -32,7 +32,7 @@
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
 
-#define CFILE_TEST_BUFFER_SIZE	4096
+#define CFILE_TEST_BUFFER_SIZE		4096
 
 int cfile_test_file_write(
      const libcstring_system_character_t *filename,

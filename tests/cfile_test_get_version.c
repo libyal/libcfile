@@ -1,5 +1,5 @@
 /*
- * The internal libcfile header
+ * Library get version test program
  *
  * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,19 +19,43 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _CFILE_TEST_LIBCFILE_H )
-#define _CFILE_TEST_LIBCFILE_H
-
 #include <common.h>
+#include <file_stream.h>
 
-/* If Cygwin libtool DLL support is enabled set LIBCFILE_DLL_IMPORT
- * before including libcfile.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBCFILE_DLL_IMPORT
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
 #endif
 
-#include <libcfile.h>
+#include "cfile_test_libcfile.h"
+#include "cfile_test_libcstring.h"
 
-#endif /* !defined( _CFILE_TEST_LIBCFILE_H ) */
+/* The main program
+ */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+int wmain( int argc, wchar_t * const argv[] )
+#else
+int main( int argc, char * const argv[] )
+#endif
+{
+	const char *version_string = NULL;
+
+	if( argc != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unsupported number of arguments.\n" );
+
+		return( EXIT_FAILURE );
+	}
+	version_string = libcfile_get_version();
+
+	if( libcstring_narrow_string_compare(
+	     version_string,
+	     LIBCFILE_VERSION_STRING,
+	     9 ) != 0 )
+	{
+		return( EXIT_FAILURE );
+	}
+	return( EXIT_SUCCESS );
+}
 

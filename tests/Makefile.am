@@ -6,21 +6,13 @@ AM_CPPFLAGS = \
 	@LIBCFILE_DLL_IMPORT@
 
 TESTS = \
-	test_file_seek.sh \
-	test_file_read.sh \
-	test_file_write.sh \
-	test_stream_seek.sh \
-	test_stream_read.sh \
-	test_stream_write.sh
+	test_api_functions.sh \
+	test_write_functions.sh
 
 check_SCRIPTS = \
-	test_file_seek.sh \
-	test_file_read.sh \
-	test_file_write.sh \
+	test_api_functions.sh \
 	test_runner.sh \
-	test_stream_seek.sh \
-	test_stream_read.sh \
-	test_stream_write.sh
+	test_write_functions.sh
 
 input_FILES = \
 	input/set1/test.raw
@@ -33,6 +25,7 @@ check_PROGRAMS = \
 	cfile_test_file_read \
 	cfile_test_file_seek \
 	cfile_test_file_write \
+	cfile_test_get_version \
 	cfile_test_stream_read \
 	cfile_test_stream_seek \
 	cfile_test_stream_write
@@ -69,6 +62,15 @@ cfile_test_file_write_SOURCES = \
 cfile_test_file_write_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
+
+cfile_test_get_version_SOURCES = \
+	cfile_test_get_version.c \
+	cfile_test_libcstring.h \
+	cfile_test_libcfile.h
+
+cfile_test_get_version_LDADD = \
+	../libcfile/libcfile.la \
 	@LIBCSTRING_LIBADD@
 
 cfile_test_stream_read_SOURCES = \
