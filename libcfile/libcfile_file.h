@@ -53,7 +53,8 @@ struct libcfile_internal_file
 	/* The (file) descriptor
 	 */
 	int descriptor;
-#endif
+
+#endif /* defined( WINAPI ) */
 
 	/* The access flags
 	 */
@@ -85,9 +86,11 @@ struct libcfile_internal_file
 };
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_CloseHandle(
       HANDLE file_handle );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_initialize(
@@ -100,6 +103,7 @@ int libcfile_file_free(
      libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 HANDLE libcfile_CreateFileA(
         LPCSTR filename,
         DWORD desired_access,
@@ -108,7 +112,8 @@ HANDLE libcfile_CreateFileA(
         DWORD creation_disposition,
         DWORD flags_and_attributes,
         HANDLE template_file );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_open(
@@ -128,6 +133,7 @@ int libcfile_file_open_with_error_code(
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 HANDLE libcfile_CreateFileW(
         LPCWSTR filename,
         DWORD desired_access,
@@ -136,7 +142,8 @@ HANDLE libcfile_CreateFileW(
         DWORD creation_disposition,
         DWORD flags_and_attributes,
         HANDLE template_file );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_open_wide(
@@ -168,21 +175,37 @@ ssize_t libcfile_file_read_buffer(
          libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_GetOverlappedResult(
       HANDLE file_handle,
       OVERLAPPED *overlapped,
       DWORD *read_count,
       BOOL wait_io_complete );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_ReadFile(
       HANDLE file_handle,
       VOID *buffer,
       DWORD read_size,
       DWORD *read_count,
       OVERLAPPED *overlapped );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( WINAPI )
+
+ssize_t libcfile_internal_file_read_buffer_at_offset_with_error_code(
+         libcfile_internal_file_t *internal_file,
+         off64_t current_offset,
+         uint8_t *buffer,
+         size_t size,
+         uint32_t *error_code,
+         libcerror_error_t **error );
+
+#endif /* defined( WINAPI ) */
 
 LIBCFILE_EXTERN \
 ssize_t libcfile_file_read_buffer_with_error_code(
@@ -200,13 +223,15 @@ ssize_t libcfile_file_write_buffer(
          libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_WriteFile(
       HANDLE file_handle,
       VOID *buffer,
       DWORD write_size,
       DWORD *write_count,
       OVERLAPPED *overlapped );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 ssize_t libcfile_file_write_buffer_with_error_code(
@@ -217,12 +242,14 @@ ssize_t libcfile_file_write_buffer_with_error_code(
          libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_SetFilePointerEx(
       HANDLE file_handle,
       LARGE_INTEGER distance_to_move_large_integer,
       LARGE_INTEGER *new_file_pointer_large_integer,
       DWORD move_method );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 off64_t libcfile_file_seek_offset(
@@ -232,9 +259,11 @@ off64_t libcfile_file_seek_offset(
          libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_SetEndOfFile(
       HANDLE file_handle );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_resize(
@@ -248,10 +277,12 @@ int libcfile_file_is_open(
      libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 BOOL libcfile_GetFileSizeEx(
       HANDLE file_handle,
       LARGE_INTEGER *file_size_large_integer );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_get_offset(
@@ -266,9 +297,11 @@ int libcfile_file_get_size(
      libcerror_error_t **error );
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
 DWORD libcfile_GetFileType(
        HANDLE file_handle );
-#endif
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_is_device(
@@ -312,5 +345,5 @@ int libcfile_file_set_block_size(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCFILE_INTERNAL_FILE_H ) */
 
