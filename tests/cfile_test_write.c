@@ -279,7 +279,7 @@ int main( int argc, char * const argv[] )
 {
 	libcstring_system_character_t *filename = NULL;
 	libcerror_error_t *error                = NULL;
-	size64_t file_size                      = 0;
+	size_t file_size                        = 0;
 
 	if( argc < 2 )
 	{
@@ -298,7 +298,12 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	filename = argv[ 1 ];
-	file_size = (size64_t) atoi( argv[ 2 ] );
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	file_size = (size_t) _wtoi( argv[ 2 ] );
+#else
+	file_size = (size_t) atoi( argv[ 2 ] );
+#endif
 
 	if( cfile_test_file_write(
 	     filename,
