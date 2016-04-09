@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library API functions testing script
 #
-# Version: 20160401
+# Version: 20160403
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -12,7 +12,7 @@ TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
 
 TEST_PROFILE="lib${TEST_PREFIX}";
 TEST_FUNCTIONS="get_version";
-TEST_FUNCTIONS_WITH_INPUT="file_seek file_read stream_seek stream_read";
+TEST_FUNCTIONS_WITH_INPUT="";
 OPTION_SETS="";
 
 TEST_TOOL_DIRECTORY=".";
