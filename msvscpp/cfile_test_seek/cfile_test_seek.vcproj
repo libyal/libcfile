@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="cfile_test_file_write"
-	ProjectGUID="{1CAB2A17-1F27-4AD1-AB96-2A4EA0C70EB4}"
-	RootNamespace="cfile_test_file_write"
+	Name="cfile_test_seek"
+	ProjectGUID="{EE56FCD1-4155-4A99-A21D-879A8EE940A9}"
+	RootNamespace="cfile_test_seek"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\cfile_test_file_write.c"
+				RelativePath="..\..\tests\cfile_test_seek.c"
 				>
 			</File>
 		</Filter>

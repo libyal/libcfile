@@ -1,11 +1,8 @@
 MSVSCPP_FILES = \
-	cfile_test_file_read/cfile_test_file_read.vcproj \
-	cfile_test_file_seek/cfile_test_file_seek.vcproj \
-	cfile_test_file_write/cfile_test_file_write.vcproj \
 	cfile_test_get_version/cfile_test_get_version.vcproj \
-	cfile_test_stream_read/cfile_test_stream_read.vcproj \
-	cfile_test_stream_seek/cfile_test_stream_seek.vcproj \
-	cfile_test_stream_write/cfile_test_stream_write.vcproj \
+	cfile_test_read/cfile_test_read.vcproj \
+	cfile_test_seek/cfile_test_seek.vcproj \
+	cfile_test_write/cfile_test_write.vcproj \
 	libcerror/libcerror.vcproj \
 	libcfile/libcfile.vcproj \
 	libclocale/libclocale.vcproj \

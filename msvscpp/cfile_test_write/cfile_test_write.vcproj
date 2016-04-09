@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="cfile_test_file_read"
-	ProjectGUID="{6A8B802E-314A-4B7E-BCFC-1FF411E1DF82}"
-	RootNamespace="cfile_test_file_read"
+	Name="cfile_test_write"
+	ProjectGUID="{7CE74FCF-DD4E-426C-B684-89FB2E8EF35C}"
+	RootNamespace="cfile_test_write"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\cfile_test_file_read.c"
+				RelativePath="..\..\tests\cfile_test_write.c"
 				>
 			</File>
 		</Filter>
@@ -195,10 +195,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\cfile_test_libcstring.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\cfile_test_unused.h"
 				>
 			</File>
 		</Filter>
