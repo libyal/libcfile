@@ -101,8 +101,8 @@ int libcfile_file_remove_wide(
      libcerror_error_t **error );
 
 LIBCFILE_EXTERN \
-int libcfile_file_remove_with_error_code(
-     const char *filename,
+int libcfile_file_remove_wide_with_error_code(
+     const wchar_t *filename,
      uint32_t *error_code,
      libcerror_error_t **error );
 

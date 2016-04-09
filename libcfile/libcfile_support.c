@@ -665,7 +665,7 @@ int libcfile_file_remove_with_error_code(
 	result = libcfile_DeleteFileA(
 	          filename );
 #else
-	result = libcfile_DeleteFileA(
+	result = DeleteFileA(
 	          filename );
 #endif
 	if( result == 0 )
@@ -814,6 +814,7 @@ int libcfile_file_remove_wide(
 		return( -1 );
 	}
 	return( 1 );
+}
 
 #if defined( WINAPI )
 
@@ -823,12 +824,11 @@ int libcfile_file_remove_wide(
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_remove_wide_with_error_code(
-     const char *filename,
+     const wchar_t *filename,
      uint32_t *error_code,
      libcerror_error_t **error )
 {
 	static char *function = "libcfile_file_remove_wide_with_error_code";
-	DWORD error_code      = 0;
 	BOOL result           = FALSE;
 
 	if( error_code == NULL )
@@ -843,10 +843,10 @@ int libcfile_file_remove_wide_with_error_code(
 		return( -1 );
 	}
 #if ( WINVER <= 0x0500 )
-	result = libcfile_DeleteFileA(
+	result = libcfile_DeleteFileW(
 	          filename );
 #else
-	result = libcfile_DeleteFileA(
+	result = DeleteFileW(
 	          filename );
 #endif
 	if( result == 0 )
@@ -873,14 +873,15 @@ int libcfile_file_remove_wide_with_error_code(
  * Returns 1 if successful or -1 on error
  */
 int libcfile_file_remove_wide_with_error_code(
-     const char *filename,
+     const wchar_t *filename,
      uint32_t *error_code,
      libcerror_error_t **error )
 {
 	char *narrow_filename       = NULL;
-	static char *function       = "libcfile_file_remove_with_error_code";
+	static char *function       = "libcfile_file_remove_wide_with_error_code";
 	size_t narrow_filename_size = 0;
 	size_t filename_size        = 0;
+	int result                  = 0;
 
 	if( filename == NULL )
 	{
