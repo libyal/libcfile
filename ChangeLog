@@ -1,21 +1,11 @@
 TODO
 * add block support for write ?
-* Cygwin
-* add file stream support
-  - what about non-CRT WINAPI version ? use HANDLE functions or remove?
-  - implement libcfile_stream_open_wide
 * validate WINAPI versions of fallback functions
 * add fallback versions of
-  - CreateFileA
-  - CreateFileW
-  - CloseHandle
-  - ReadFile
-  - WriteFile
-  - GetFileAttributesA
-  - GetFileAttributesW
   - GetLastError
 * add libcfile_codepage.h and codepage functions
 * improve tests ?
+  - add open close
   - add write when opened with read ?
   - add IO control tests ?
   - add test to retrieve size from device ?
@@ -26,6 +16,12 @@ Notes:
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
+
+20160409
+* worked on tests
+* added remove file function
+* worked on fallback functions
+* remove stream functions
 
 20160105
 * 2016 update

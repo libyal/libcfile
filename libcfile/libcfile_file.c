@@ -1166,7 +1166,7 @@ int libcfile_file_open_wide_with_error_code(
 		 "%s: unable to determine narrow character filename size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	narrow_filename = libcstring_narrow_string_allocate(
 	                   narrow_filename_size );
@@ -1180,7 +1180,7 @@ int libcfile_file_open_wide_with_error_code(
 		 "%s: unable to create narrow character filename.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libclocale_codepage == 0 )
 	{
@@ -1233,10 +1233,7 @@ int libcfile_file_open_wide_with_error_code(
 		 "%s: unable to set narrow character filename.",
 		 function );
 
-		memory_free(
-		 narrow_filename );
-
-		return( -1 );
+		goto on_error;
 	}
 #if defined( HAVE_GLIB_H )
 	internal_file->descriptor = g_open(
@@ -1252,6 +1249,8 @@ int libcfile_file_open_wide_with_error_code(
 
 	memory_free(
 	 narrow_filename );
+
+	narrow_filename = NULL;
 
 	if( internal_file->descriptor == -1 )
 	{
@@ -1293,9 +1292,17 @@ int libcfile_file_open_wide_with_error_code(
 
 				break;
 		}
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( narrow_filename != NULL )
+	{
+		memory_free(
+		 narrow_filename );
+	}
+	return( -1 );
 }
 
 #else

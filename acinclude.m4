@@ -1,6 +1,6 @@
 dnl Functions for libcfile
 dnl
-dnl Version: 20130414
+dnl Version: 20160409
 
 dnl Function to detect if posix_fadvise is available
 AC_DEFUN([AX_LIBCFILE_CHECK_FUNC_POSIX_FADVISE],
@@ -43,7 +43,7 @@ posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]] )],
 
 dnl Function to detect if libcfile dependencies are available
 AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
- [dnl Headers included in libcfile/libcfile_file.c, libcfile/libcfile_stream.c and libcfile/libcfile_support.c
+ [dnl Headers included in libcfile/libcfile_file.c and libcfile/libcfile_support.c
  AC_CHECK_HEADERS([errno.h stdio.h sys/stat.h])
 
  dnl Headers included in libcfile/libcfile_file.c
@@ -113,72 +113,20 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [1])
   ])
 
- dnl File stream functions used in libcfile/libcfile_stream.c
- AC_CHECK_FUNCS([fclose feof fileno fopen fread fseeko fseeko64 ftello ftello64 fwrite])
-
- AS_IF(
-  [test "x$ac_cv_func_fclose" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fclose],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_feof" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: feof],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_fileno" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fileno],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_fopen" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fopen],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_fread" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fread],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_fseeko" != xyes && test "x$ac_cv_func_fseeko64" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fseeko and fseeko64],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_ftello" != xyes && test "x$ac_cv_func_ftello64" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: ftello and ftello64],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_fwrite" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fwrite],
-   [1])
-  ])
- 
  dnl File input/output functions used in libcfile/libcfile_support.c
- AC_CHECK_FUNCS([stat])
+ AC_CHECK_FUNCS([stat unlink])
 
  AS_IF(
   [test "x$ac_cv_func_stat" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: stat],
+   [1])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_func_unlink" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: unlink],
    [1])
   ])
  ])

@@ -116,13 +116,10 @@ stamp-h[1-9]
 /include/libcfile/types.h
 /libcfile/libcfile.rc
 /libcfile/libcfile_definitions.h
-/tests/cfile_test_file_read
-/tests/cfile_test_file_seek
-/tests/cfile_test_file_write
 /tests/cfile_test_get_version
-/tests/cfile_test_stream_read
-/tests/cfile_test_stream_seek
-/tests/cfile_test_stream_write
+/tests/cfile_test_read
+/tests/cfile_test_seek
+/tests/cfile_test_write
 /tests/tmp*
 
 # Local library dependencies specific files

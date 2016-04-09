@@ -1,4 +1,4 @@
-.Dd April  3, 2016
+.Dd April  9, 2016
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -14,10 +14,12 @@ Support functions
 .Fn libcfile_get_version "void"
 .Ft int
 .Fn libcfile_file_exists "const char *filename, libcfile_error_t **error"
+.Fn libcfile_file_remove "const char *filename, libcfile_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
 .Fn libcfile_file_exists_wide "const wchar_t *filename, libcfile_error_t **error"
+.Fn libcfile_file_remove_wide "const wchar_t *filename, libcfile_error_t **error"
 .Pp
 Notify functions
 .Ft void
@@ -84,30 +86,6 @@ Available when compiled with wide character string support:
 .Fn libcfile_file_open_wide "libcfile_file_t *file, const wchar_t *filename, int access_flags, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_open_wide_with_error_code "libcfile_file_t *file, const wchar_t *filename, int access_flags, uint32_t *error_code, libcfile_error_t **error"
-.Pp
-File stream functions
-.Ft int
-.Fn libcfile_stream_initialize "libcfile_stream_t **stream, libcfile_error_t **error"
-.Ft int
-.Fn libcfile_stream_free "libcfile_stream_t **stream, libcfile_error_t **error"
-.Ft int
-.Fn libcfile_stream_open "libcfile_stream_t *stream, const char *filename, int access_flags, libcfile_error_t **error"
-.Ft int
-.Fn libcfile_stream_close "libcfile_stream_t *stream, libcfile_error_t **error"
-.Ft ssize_t
-.Fn libcfile_stream_read_buffer "libcfile_stream_t *stream, uint8_t *buffer, size_t size, libcfile_error_t **error"
-.Ft ssize_t
-.Fn libcfile_stream_write_buffer "libcfile_stream_t *stream, const uint8_t *buffer, size_t size, libcfile_error_t **error"
-.Ft off64_t
-.Fn libcfile_stream_seek_offset "libcfile_stream_t *stream, off64_t offset, int whence, libcfile_error_t **error"
-.Ft int
-.Fn libcfile_stream_get_offset "libcfile_stream_t *stream, off64_t *offset, libcfile_error_t **error"
-.Ft int
-.Fn libcfile_stream_get_size "libcfile_stream_t *stream, size64_t *size, libcfile_error_t **error"
-.Pp
-Available when compiled with wide character string support:
-.Ft int
-.Fn libcfile_stream_open_wide "libcfile_stream_t *stream, const wchar_t *filename, int access_flags, libcfile_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libcfile_get_version

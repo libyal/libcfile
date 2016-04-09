@@ -22,47 +22,10 @@ EXTRA_DIST = \
 	$(input_FILES)
 
 check_PROGRAMS = \
-	cfile_test_file_read \
-	cfile_test_file_seek \
-	cfile_test_file_write \
 	cfile_test_get_version \
-	cfile_test_stream_read \
-	cfile_test_stream_seek \
-	cfile_test_stream_write
-
-cfile_test_file_read_SOURCES = \
-	cfile_test_libcerror.h \
-	cfile_test_libcfile.h \
-	cfile_test_libcstring.h \
-	cfile_test_file_read.c \
-	cfile_test_unused.h
-
-cfile_test_file_read_LDADD = \
-	../libcfile/libcfile.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
-
-cfile_test_file_seek_SOURCES = \
-	cfile_test_libcerror.h \
-	cfile_test_libcfile.h \
-	cfile_test_libcstring.h \
-	cfile_test_file_seek.c
-
-cfile_test_file_seek_LDADD = \
-	../libcfile/libcfile.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
-
-cfile_test_file_write_SOURCES = \
-	cfile_test_libcerror.h \
-	cfile_test_libcfile.h \
-	cfile_test_libcstring.h \
-	cfile_test_file_write.c
-
-cfile_test_file_write_LDADD = \
-	../libcfile/libcfile.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	cfile_test_read \
+	cfile_test_seek \
+	cfile_test_write
 
 cfile_test_get_version_SOURCES = \
 	cfile_test_get_version.c \
@@ -73,36 +36,36 @@ cfile_test_get_version_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCSTRING_LIBADD@
 
-cfile_test_stream_read_SOURCES = \
+cfile_test_read_SOURCES = \
 	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_libcstring.h \
-	cfile_test_stream_read.c \
+	cfile_test_read.c \
 	cfile_test_unused.h
 
-cfile_test_stream_read_LDADD = \
+cfile_test_read_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
-cfile_test_stream_seek_SOURCES = \
+cfile_test_seek_SOURCES = \
 	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_libcstring.h \
-	cfile_test_stream_seek.c
+	cfile_test_seek.c
 
-cfile_test_stream_seek_LDADD = \
+cfile_test_seek_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
-cfile_test_stream_write_SOURCES = \
+cfile_test_write_SOURCES = \
 	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_libcstring.h \
-	cfile_test_stream_write.c
+	cfile_test_write.c
 
-cfile_test_stream_write_LDADD = \
+cfile_test_write_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@

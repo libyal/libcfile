@@ -31,6 +31,10 @@
 #include <errno.h>
 #endif
 
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
 #include "libcfile_definitions.h"
 #include "libcfile_libcerror.h"
 #include "libcfile_libclocale.h"
@@ -50,10 +54,56 @@ const char *libcfile_get_version(
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 
-/* Determines if a file exists using get file attibutes
- * This function uses the WINAPI functions for Windows XP or later
+/* Cross Windows safe version of GetFileAttributesA
+ * Returns the file attributs if successful or INVALID_FILE_ATTRIBUTES on error
+ */
+DWORD libcfile_GetFileAttributesA(
+       LPCSTR filename )
+{
+	FARPROC function       = NULL;
+	HMODULE library_handle = NULL;
+	DWORD result           = 0;
+
+	if( filename == NULL )
+	{
+		return( INVALID_FILE_ATTRIBUTES );
+	}
+	library_handle = LoadLibrary(
+	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+
+	if( library_handle == NULL )
+	{
+		return( INVALID_FILE_ATTRIBUTES );
+	}
+	function = GetProcAddress(
+		    library_handle,
+		    (LPCSTR) "GetFileAttributesA" );
+
+	if( function != NULL )
+	{
+		result = function(
+			  filename );
+	}
+	/* This call should be after using the function
+	 * in most cases kernel32.dll will still be available after free
+	 */
+	if( FreeLibrary(
+	     library_handle ) != TRUE )
+	{
+		result = INVALID_FILE_ATTRIBUTES;
+	}
+	return( result );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( WINAPI )
+
+/* Determines if a file exists
+ * This function uses the WINAPI function for Windows XP (0x0501) or later,
+ * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
  * Returns 1 if the file exists, 0 if not or -1 on error
  */
 int libcfile_file_exists(
@@ -76,9 +126,13 @@ int libcfile_file_exists(
 
 		return( -1 );
 	}
+#if ( WINVER <= 0x0500 )
+	file_attributes = libcfile_GetFileAttributesA(
+	                   (LPCSTR) filename );
+#else
 	file_attributes = GetFileAttributesA(
 	                   (LPCSTR) filename );
-
+#endif
 	if( file_attributes == INVALID_FILE_ATTRIBUTES )
 	{
 		error_code = GetLastError();
@@ -111,11 +165,6 @@ int libcfile_file_exists(
 	}
 	return( result );
 }
-
-#elif defined( WINAPI )
-
-/* TODO */
-#error WINAPI file stat function for Windows 2000 or earlier NOT implemented yet
 
 #elif defined( HAVE_STAT )
 
@@ -201,10 +250,56 @@ int libcfile_file_exists(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Cross Windows safe version of GetFileAttributesW
+ * Returns the file attributs if successful or INVALID_FILE_ATTRIBUTES on error
+ */
+DWORD libcfile_GetFileAttributesW(
+       LPCWSTR filename )
+{
+	FARPROC function       = NULL;
+	HMODULE library_handle = NULL;
+	DWORD result           = 0;
+
+	if( filename == NULL )
+	{
+		return( INVALID_FILE_ATTRIBUTES );
+	}
+	library_handle = LoadLibrary(
+	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+
+	if( library_handle == NULL )
+	{
+		return( INVALID_FILE_ATTRIBUTES );
+	}
+	function = GetProcAddress(
+		    library_handle,
+		    (LPCSTR) "GetFileAttributesW" );
+
+	if( function != NULL )
+	{
+		result = function(
+			  filename );
+	}
+	/* This call should be after using the function
+	 * in most cases kernel32.dll will still be available after free
+	 */
+	if( FreeLibrary(
+	     library_handle ) != TRUE )
+	{
+		result = INVALID_FILE_ATTRIBUTES;
+	}
+	return( result );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( WINAPI )
 
 /* Determines if a file exists using get file attibutes
- * This function uses the WINAPI functions for Windows XP or later
+ * This function uses the WINAPI function for Windows XP (0x0501) or later,
+ * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
  * Returns 1 if the file exists, 0 if not or -1 on error
  */
 int libcfile_file_exists_wide(
@@ -227,9 +322,13 @@ int libcfile_file_exists_wide(
 
 		return( -1 );
 	}
+#if ( WINVER <= 0x0500 )
+	file_attributes = libcfile_GetFileAttributesW(
+	                   (LPCWSTR) filename );
+#else
 	file_attributes = GetFileAttributesW(
 	                   (LPCWSTR) filename );
-
+#endif
 	if( file_attributes == INVALID_FILE_ATTRIBUTES )
 	{
 		error_code = GetLastError();
@@ -262,11 +361,6 @@ int libcfile_file_exists_wide(
 	}
 	return( result );
 }
-
-#elif defined( WINAPI )
-
-/* TODO */
-#error WINAPI file stat function for Windows 2000 or earlier NOT implemented yet
 
 #elif defined( HAVE_STAT )
 
@@ -465,6 +559,504 @@ int libcfile_file_exists_wide(
 
 #else
 #error Missing file exists wide function
+#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Cross Windows safe version of DeleteFileA
+ * Returns TRUE if successful or FALSE on error
+ */
+BOOL libcfile_DeleteFileA(
+      LPCSTR filename )
+{
+	FARPROC function       = NULL;
+	HMODULE library_handle = NULL;
+	BOOL result            = FALSE;
+
+	if( filename == NULL )
+	{
+		return( FALSE );
+	}
+	library_handle = LoadLibrary(
+	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+
+	if( library_handle == NULL )
+	{
+		return( FALSE );
+	}
+	function = GetProcAddress(
+		    library_handle,
+		    (LPCSTR) "DeleteFileA" );
+
+	if( function != NULL )
+	{
+		result = function(
+			  filename );
+	}
+	/* This call should be after using the function
+	 * in most cases kernel32.dll will still be available after free
+	 */
+	if( FreeLibrary(
+	     library_handle ) != TRUE )
+	{
+		result = FALSE;
+	}
+	return( result );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+/* Removes a file
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_remove(
+     const char *filename,
+     libcerror_error_t **error )
+{
+	static char *function = "libcfile_file_remove";
+	uint32_t error_code   = 0;
+
+	if( libcfile_file_remove_with_error_code(
+	     filename,
+	     &error_code,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 "%s: unable to remove file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#if defined( WINAPI )
+
+/* Removes a file
+ * This function uses the WINAPI function for Windows XP (0x0501) or later,
+ * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_remove_with_error_code(
+     const char *filename,
+     uint32_t *error_code,
+     libcerror_error_t **error )
+{
+	static char *function = "libcfile_file_remove_with_error_code";
+	BOOL result           = FALSE;
+
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
+#if ( WINVER <= 0x0500 )
+	result = libcfile_DeleteFileA(
+	          filename );
+#else
+	result = libcfile_DeleteFileA(
+	          filename );
+#endif
+	if( result == 0 )
+	{
+		*error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 *error_code,
+		 "%s: unable to remove file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#elif defined( HAVE_UNLINK )
+
+/* Removes a file
+ * This function uses the POSIX unlink function or equivalent
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_remove_with_error_code(
+     const char *filename,
+     uint32_t *error_code,
+     libcerror_error_t **error )
+{
+	static char *function = "libcfile_file_remove_with_error_code";
+
+	if( filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
+	if( unlink(
+	     filename ) != 0 )
+	{
+		*error_code = (uint32_t) errno;
+
+		libcerror_system_set_error(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 *error_code,
+		 "%s: unable to unlink file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#else
+#error Missing file remove function
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Cross Windows safe version of DeleteFileW
+ * Returns TRUE if successful or FALSE on error
+ */
+BOOL libcfile_DeleteFileW(
+      LPCWSTR filename )
+{
+	FARPROC function       = NULL;
+	HMODULE library_handle = NULL;
+	BOOL result            = FALSE;
+
+	if( filename == NULL )
+	{
+		return( FALSE );
+	}
+	library_handle = LoadLibrary(
+	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+
+	if( library_handle == NULL )
+	{
+		return( FALSE );
+	}
+	function = GetProcAddress(
+		    library_handle,
+		    (LPCSTR) "DeleteFileW" );
+
+	if( function != NULL )
+	{
+		result = function(
+			  filename );
+	}
+	/* This call should be after using the function
+	 * in most cases kernel32.dll will still be available after free
+	 */
+	if( FreeLibrary(
+	     library_handle ) != TRUE )
+	{
+		result = FALSE;
+	}
+	return( result );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+/* Removes a file
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_remove_wide(
+     const wchar_t *filename,
+     libcerror_error_t **error )
+{
+	static char *function = "libcfile_file_remove_wide";
+	uint32_t error_code   = 0;
+
+	if( libcfile_file_remove_wide_with_error_code(
+	     filename,
+	     &error_code,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 "%s: unable to remove file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+
+#if defined( WINAPI )
+
+/* Removes a file
+ * This function uses the WINAPI function for Windows XP (0x0501) or later,
+ * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_remove_wide_with_error_code(
+     const char *filename,
+     uint32_t *error_code,
+     libcerror_error_t **error )
+{
+	static char *function = "libcfile_file_remove_wide_with_error_code";
+	DWORD error_code      = 0;
+	BOOL result           = FALSE;
+
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
+#if ( WINVER <= 0x0500 )
+	result = libcfile_DeleteFileA(
+	          filename );
+#else
+	result = libcfile_DeleteFileA(
+	          filename );
+#endif
+	if( result == 0 )
+	{
+		*error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 *error_code,
+		 "%s: unable to remove file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#elif defined( HAVE_UNLINK )
+
+/* Removes a file
+ * This function uses the POSIX unlink function or equivalent
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_remove_wide_with_error_code(
+     const char *filename,
+     uint32_t *error_code,
+     libcerror_error_t **error )
+{
+	char *narrow_filename       = NULL;
+	static char *function       = "libcfile_file_remove_with_error_code";
+	size_t narrow_filename_size = 0;
+	size_t filename_size        = 0;
+
+	if( filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( error_code == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error code.",
+		 function );
+
+		return( -1 );
+	}
+	filename_size = 1 + libcstring_wide_string_length(
+	                     filename );
+
+	/* Convert the filename to a narrow string
+	 * if the platform has no wide character open function
+	 */
+	if( libclocale_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_size_from_utf32(
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          &narrow_filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_size_from_utf16(
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          &narrow_filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_size_from_utf32(
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          libclocale_codepage,
+		          &narrow_filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_size_from_utf16(
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          libclocale_codepage,
+		          &narrow_filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine narrow character filename size.",
+		 function );
+
+		goto on_error;
+	}
+	narrow_filename = libcstring_narrow_string_allocate(
+	                   narrow_filename_size );
+
+	if( narrow_filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create narrow character filename.",
+		 function );
+
+		goto on_error;
+	}
+	if( libclocale_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_copy_from_utf32(
+		          (libuna_utf8_character_t *) narrow_filename,
+		          narrow_filename_size,
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_copy_from_utf16(
+		          (libuna_utf8_character_t *) narrow_filename,
+		          narrow_filename_size,
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_copy_from_utf32(
+		          (uint8_t *) narrow_filename,
+		          narrow_filename_size,
+		          libclocale_codepage,
+		          (libuna_utf32_character_t *) filename,
+		          filename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_copy_from_utf16(
+		          (uint8_t *) narrow_filename,
+		          narrow_filename_size,
+		          libclocale_codepage,
+		          (libuna_utf16_character_t *) filename,
+		          filename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set narrow character filename.",
+		 function );
+
+		goto on_error;
+	}
+	if( unlink(
+	     narrow_filename ) != 0 )
+	{
+		*error_code = (uint32_t) errno;
+
+		libcerror_system_set_error(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 *error_code,
+		 "%s: unable to unlink file.",
+		 function );
+
+		goto on_error;
+	}
+	memory_free(
+	 narrow_filename );
+
+	return( 1 );
+
+on_error:
+	if( narrow_filename != NULL )
+	{
+		memory_free(
+		 narrow_filename );
+	}
+	return( -1 );
+}
+
+#else
+#error Missing file remove wide function
 #endif
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */

@@ -40,12 +40,26 @@ const char *libcfile_get_version(
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+DWORD libcfile_GetFileAttributesA(
+        LPCSTR filename );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
 LIBCFILE_EXTERN \
 int libcfile_file_exists(
      const char *filename,
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+DWORD libcfile_GetFileAttributesW(
+       LPCWSTR filename );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 LIBCFILE_EXTERN \
 int libcfile_file_exists_wide(
@@ -54,9 +68,49 @@ int libcfile_file_exists_wide(
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+BOOL libcfile_DeleteFileA(
+      LPCSTR filename );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+LIBCFILE_EXTERN \
+int libcfile_file_remove(
+     const char *filename,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_remove_with_error_code(
+     const char *filename,
+     uint32_t *error_code,
+     libcerror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+BOOL libcfile_DeleteFileW(
+      LPCWSTR filename );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+LIBCFILE_EXTERN \
+int libcfile_file_remove_wide(
+     const wchar_t *filename,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_file_remove_with_error_code(
+     const char *filename,
+     uint32_t *error_code,
+     libcerror_error_t **error );
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCFILE_SUPPORT_H ) */
 
