@@ -11,6 +11,11 @@ TODO
   - add test to retrieve size from device ?
 * what about disk full on write errno = ENOSPC
 
+Tests:
+* add file open close
+* add file exists test
+* add file remove test
+
 Notes:
 * WINAPI ReadFile
   When the file is UNBUFFERED it appears that nNumberOfBytesToRead must be a
