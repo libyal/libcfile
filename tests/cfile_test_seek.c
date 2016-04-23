@@ -123,7 +123,8 @@ int cfile_file_test_seek(
      libcfile_file_t *file,
      size64_t file_size )
 {
-	int result = 0;
+	size64_t seek_offset = 0;
+	int result           = 0;
 
 	if( file == NULL )
 	{
@@ -140,11 +141,13 @@ int cfile_file_test_seek(
 	/* Test: SEEK_SET offset: 0
 	 * Expected result: 0
 	 */
+	seek_offset = 0;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          0,
+	          seek_offset,
 	          SEEK_SET,
-	          0 );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -157,11 +160,13 @@ int cfile_file_test_seek(
 	/* Test: SEEK_SET offset: <file_size>
 	 * Expected result: <file_size>
 	 */
+	seek_offset = (off64_t) file_size;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          (off64_t) file_size,
+	          seek_offset,
 	          SEEK_SET,
-	          (off64_t) file_size );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -174,11 +179,13 @@ int cfile_file_test_seek(
 	/* Test: SEEK_SET offset: <file_size / 5>
 	 * Expected result: <file_size / 5>
 	 */
+	seek_offset = (off64_t) ( file_size / 5 );
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          (off64_t) ( file_size / 5 ),
+	          seek_offset,
 	          SEEK_SET,
-	          (off64_t) ( file_size / 5 ) );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -191,11 +198,13 @@ int cfile_file_test_seek(
 	/* Test: SEEK_SET offset: <file_size + 987>
 	 * Expected result: <file_size + 987>
 	 */
+	seek_offset = (off64_t) ( file_size + 987 );
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          (off64_t) ( file_size + 987 ),
+	          seek_offset,
 	          SEEK_SET,
-	          (off64_t) ( file_size + 987 ) );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -208,9 +217,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
 	 */
+	seek_offset = -987;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          -987,
+	          seek_offset,
 	          SEEK_SET,
 	          -1 );
 
@@ -225,9 +236,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_CUR offset: 0
 	 * Expected result: <file_size + 987>
 	 */
+	seek_offset = 0;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          0,
+	          seek_offset,
 	          SEEK_CUR,
 	          (off64_t) ( file_size + 987 ) );
 
@@ -242,9 +255,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_CUR offset: <-1 * (file_size + 987)>
 	 * Expected result: 0
 	 */
+	seek_offset = -1 * (off64_t) ( file_size + 987 );
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          -1 * (off64_t) ( file_size + 987 ),
+	          seek_offset,
 	          SEEK_CUR,
 	          0 );
 
@@ -259,11 +274,13 @@ int cfile_file_test_seek(
 	/* Test: SEEK_CUR offset: <file_size / 3>
 	 * Expected result: <file_size / 3>
 	 */
+	seek_offset = (off64_t) ( file_size / 3 );
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          (off64_t) ( file_size / 3 ),
+	          seek_offset,
 	          SEEK_CUR,
-	          (off64_t) ( file_size / 3 ) );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -273,6 +290,8 @@ int cfile_file_test_seek(
 
 		return( result );
 	}
+	seek_offset = -2 * (off64_t) ( file_size / 3 );
+
 	if( file_size == 0 )
 	{
 		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
@@ -280,7 +299,7 @@ int cfile_file_test_seek(
 		 */
 		result = cfile_file_test_seek_offset(
 		          file,
-		          -2 * (off64_t) ( file_size / 3 ),
+		          seek_offset,
 		          SEEK_CUR,
 		          0 );
 
@@ -300,7 +319,7 @@ int cfile_file_test_seek(
 		 */
 		result = cfile_file_test_seek_offset(
 		          file,
-		          -2 * (off64_t) ( file_size / 3 ),
+		          seek_offset,
 		          SEEK_CUR,
 		          -1 );
 
@@ -316,9 +335,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_END offset: 0
 	 * Expected result: <file_size>
 	 */
+	seek_offset = 0;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          0,
+	          seek_offset,
 	          SEEK_END,
 	          (off64_t) file_size );
 
@@ -333,9 +354,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_END offset: <-1 * file_size>
 	 * Expected result: 0
 	 */
+	seek_offset = -1 * (off64_t) file_size;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          -1 * (off64_t) file_size,
+	          seek_offset,
 	          SEEK_END,
 	          0 );
 
@@ -350,11 +373,13 @@ int cfile_file_test_seek(
 	/* Test: SEEK_END offset: <-1 * (file_size / 4)>
 	 * Expected result: <file_size - (file_size / 4)>
 	 */
+	seek_offset = (off64_t) ( file_size / 4 );
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          -1 * (off64_t) ( file_size / 4 ),
+	          -1 * seek_offset,
 	          SEEK_END,
-	          (off64_t) file_size - (off64_t) ( file_size / 4 ) );
+	          (off64_t) file_size - seek_offset );
 
 	if( result != 1 )
 	{
@@ -367,9 +392,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_END offset: 542
 	 * Expected result: <file_size + 542>
 	 */
+	seek_offset = 542;
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          542,
+	          seek_offset,
 	          SEEK_END,
 	          (off64_t) ( file_size + 542 ) );
 
@@ -384,9 +411,11 @@ int cfile_file_test_seek(
 	/* Test: SEEK_END offset: <-1 * (file_size + 542)>
 	 * Expected result: -1
 	 */
+	seek_offset = -1 * (off64_t) ( file_size + 542 );
+
 	result = cfile_file_test_seek_offset(
 	          file,
-	          -1 * (off64_t) ( file_size + 542 ),
+	          seek_offset,
 	          SEEK_END,
 	          -1 );
 
@@ -614,7 +643,6 @@ int main( int argc, char * const argv[] )
 {
 	libcerror_error_t *error              = NULL;
 	libcstring_system_character_t *source = NULL;
-	int result                            = 0;
 
 	if( argc != 2 )
 	{
@@ -633,11 +661,9 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-	result = cfile_file_test_file_seek(
-	          source,
-	          &error );
-
-	if( result != 1 )
+	if( cfile_file_test_file_seek(
+	     source,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -645,11 +671,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	result = cfile_file_test_seek_file_no_open(
-	          source,
-	          &error );
-
-	if( result != 1 )
+	if( cfile_file_test_seek_file_no_open(
+	     source,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -658,7 +682,6 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 	return( EXIT_SUCCESS );
-
 
 on_error:
 	if( error != NULL )
