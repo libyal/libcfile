@@ -27,21 +27,22 @@
 
 #include <stdio.h>
 
-#include "cfile_test_libcstring.h"
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
+#include "cfile_test_libcstring.h"
 #include "cfile_test_unused.h"
 
 /* Define to make cfile_test_read generate verbose output
 #define CFILE_TEST_READ_VERBOSE
  */
 
-#define CFILE_TEST_READ_BUFFER_SIZE	4096
+#define CFILE_TEST_READ_BUFFER_SIZE		4096
+#define CFILE_TEST_READ_NUMBER_OF_THREADS	4
 
 /* Tests libcfile_file_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_seek_offset(
+int cfile_test_seek_offset(
      libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
@@ -89,7 +90,7 @@ int cfile_file_test_seek_offset(
 /* Tests libcfile_file_read_buffer
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_read_buffer(
+int cfile_test_read_buffer(
      libcfile_file_t *file,
      size64_t input_size,
      size64_t expected_size )
@@ -123,7 +124,7 @@ int cfile_file_test_read_buffer(
 			      read_size,
 			      &error );
 
-		if( read_count < 0 )
+		if( read_count <= 0 )
 		{
 			break;
 		}
@@ -160,129 +161,10 @@ int cfile_file_test_read_buffer(
 	return( result );
 }
 
-#ifdef TODO
-
-/* Tests libcfile_file_read_buffer_at_offset
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int cfile_file_test_read_buffer_at_offset(
-     libcfile_file_t *file,
-     off64_t input_offset,
-     size64_t input_size,
-     off64_t expected_offset,
-     size64_t expected_size )
-{
-	uint8_t buffer[ CFILE_TEST_READ_BUFFER_SIZE ];
-
-	libcerror_error_t *error = NULL;
-	off64_t result_offset    = 0;
-	size64_t remaining_size  = 0;
-	size64_t result_size     = 0;
-	size_t read_size         = 0;
-	ssize_t read_count       = 0;
-	int result               = 0;
-
-	if( file == NULL )
-	{
-		return( -1 );
-	}
-	remaining_size = input_size;
-
-	fprintf(
-	 stdout,
-	 "Testing reading buffer at offset: %" PRIi64 " and size: %" PRIu64 "\t",
-	 input_offset,
-	 input_size );
-
-	while( remaining_size > 0 )
-	{
-		read_size = CFILE_TEST_READ_BUFFER_SIZE;
-
-		if( remaining_size < (size64_t) read_size )
-		{
-			read_size = (size_t) remaining_size;
-		}
-		read_count = libcfile_file_read_buffer_at_offset(
-			      file,
-			      buffer,
-			      read_size,
-			      input_offset,
-			      &error );
-
-		if( read_count < 0 )
-		{
-			break;
-		}
-		input_offset   += (size64_t) read_count;
-		remaining_size -= (size64_t) read_count;
-		result_size    += (size64_t) read_count;
-
-		if( read_count != (ssize_t) read_size )
-		{
-			break;
-		}
-	}
-	if( libcfile_file_get_offset(
-	     file,
-	     &result_offset,
-	     &error ) != 1 )
-	{
-		result = -1;
-	}
-	if( expected_offset != result_offset )
-	{
-		fprintf(
-		 stderr,
-		 "Unexpected offset: %" PRIi64 "\n",
-		 result_offset );
-	}
-	else if( expected_size != result_size )
-	{
-		fprintf(
-		 stderr,
-		 "Unexpected read count: %" PRIu64 "\n",
-		 result_size );
-	}
-	else
-	{
-		result = 1;
-	}
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
-
-	if( error != NULL )
-	{
-		if( result != 1 )
-		{
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stderr );
-		}
-		libcerror_error_free(
-		 &error );
-	}
-	return( result );
-}
-
-#endif /* TODO */
-
 /* Tests reading data at a specific offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_seek_offset_and_read_buffer(
+int cfile_test_seek_offset_and_read_buffer(
      libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
@@ -320,7 +202,7 @@ int cfile_file_test_seek_offset_and_read_buffer(
 	 whence_string,
 	 input_size );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          input_offset,
 	          input_whence,
@@ -330,7 +212,7 @@ int cfile_file_test_seek_offset_and_read_buffer(
 	{
 		if( input_offset >= 0 )
 		{
-			result = cfile_file_test_read_buffer(
+			result = cfile_test_read_buffer(
 				  file,
 				  input_size,
 				  expected_size );
@@ -358,11 +240,13 @@ int cfile_file_test_seek_offset_and_read_buffer(
 /* Tests reading data from a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_read_from_file(
+int cfile_test_read_from_file(
      libcfile_file_t *file,
      size64_t file_size )
 {
-	int result = 0;
+	off64_t read_offset = 0;
+	size64_t read_size  = 0;
+	int result          = 0;
 
 	if( file == NULL )
 	{
@@ -382,13 +266,16 @@ int cfile_file_test_read_from_file(
 	/* Test: offset: 0 size: <file_size>
 	 * Expected result: offset: 0 size: <file_size>
 	 */
-	result = cfile_file_test_seek_offset_and_read_buffer(
+	read_offset = 0;
+	read_size   = file_size;
+
+	result = cfile_test_seek_offset_and_read_buffer(
 	          file,
-	          0,
+	          read_offset,
 	          SEEK_SET,
-	          file_size,
-	          0,
-	          file_size );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -398,16 +285,13 @@ int cfile_file_test_read_from_file(
 
 		return( result );
 	}
-	/* Test: offset: 0 size: <file_size>
-	 * Expected result: offset: 0 size: <file_size>
-	 */
-	result = cfile_file_test_seek_offset_and_read_buffer(
+	result = cfile_test_seek_offset_and_read_buffer(
 	          file,
-	          0,
+	          read_offset,
 	          SEEK_SET,
-	          file_size,
-	          0,
-	          file_size );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -424,13 +308,16 @@ int cfile_file_test_read_from_file(
 	/* Test: offset: <file_size / 7> size: <file_size / 2>
 	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
 	 */
-	result = cfile_file_test_seek_offset_and_read_buffer(
+	read_offset = (off64_t) ( file_size / 7 );
+	read_size   = file_size / 2;
+
+	result = cfile_test_seek_offset_and_read_buffer(
 	          file,
-	          (off64_t) ( file_size / 7 ),
+	          read_offset,
 	          SEEK_SET,
-	          file_size / 2,
-	          (off64_t) ( file_size / 7 ),
-	          file_size / 2 );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -440,16 +327,13 @@ int cfile_file_test_read_from_file(
 
 		return( result );
 	}
-	/* Test: offset: <file_size / 7> size: <file_size / 2>
-	 * Expected result: offset: <file_size / 7> size: <file_size / 2>
-	 */
-	result = cfile_file_test_seek_offset_and_read_buffer(
+	result = cfile_test_seek_offset_and_read_buffer(
 	          file,
-	          (off64_t) ( file_size / 7 ),
+	          read_offset,
 	          SEEK_SET,
-	          file_size / 2,
-	          (off64_t) ( file_size / 7 ),
-	          file_size / 2 );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -462,17 +346,19 @@ int cfile_file_test_read_from_file(
 
 	/* Case 2: test read beyond file size
 	 */
+	read_offset = (off64_t) ( file_size - 1024 );
+	read_size   = 4096;
 
 	if( file_size < 1024 )
 	{
 		/* Test: offset: <file_size - 1024> size: 4096
 		 * Expected result: offset: -1 size: <undetermined>
 		 */
-		result = cfile_file_test_seek_offset_and_read_buffer(
+		result = cfile_test_seek_offset_and_read_buffer(
 		          file,
-		          (off64_t) ( file_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
+		          read_size,
 		          -1,
 		          (size64_t) -1 );
 
@@ -484,14 +370,11 @@ int cfile_file_test_read_from_file(
 
 			return( result );
 		}
-		/* Test: offset: <file_size - 1024> size: 4096
-		 * Expected result: offset: -1 size: <undetermined>
-		 */
-		result = cfile_file_test_seek_offset_and_read_buffer(
+		result = cfile_test_seek_offset_and_read_buffer(
 		          file,
-		          (off64_t) ( file_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
+		          read_size,
 		          -1,
 		          (size64_t) -1 );
 
@@ -509,12 +392,12 @@ int cfile_file_test_read_from_file(
 		/* Test: offset: <file_size - 1024> size: 4096
 		 * Expected result: offset: <file_size - 1024> size: 1024
 		 */
-		result = cfile_file_test_seek_offset_and_read_buffer(
+		result = cfile_test_seek_offset_and_read_buffer(
 		          file,
-		          (off64_t) ( file_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
-		          (off64_t) ( file_size - 1024 ),
+		          read_size,
+		          read_offset,
 		          1024 );
 
 		if( result != 1 )
@@ -525,15 +408,12 @@ int cfile_file_test_read_from_file(
 
 			return( result );
 		}
-		/* Test: offset: <file_size - 1024> size: 4096
-		 * Expected result: offset: <file_size - 1024> size: 1024
-		 */
-		result = cfile_file_test_seek_offset_and_read_buffer(
+		result = cfile_test_seek_offset_and_read_buffer(
 		          file,
-		          (off64_t) ( file_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
-		          (off64_t) ( file_size - 1024 ),
+		          read_size,
+		          read_offset,
 		          1024 );
 
 		if( result != 1 )
@@ -545,48 +425,227 @@ int cfile_file_test_read_from_file(
 			return( result );
 		}
 	}
-#ifdef TODO
-	/* Case 3: test buffer at offset read
-	 */
-
-	/* Test: offset: <file_size / 7> size: <file_size / 2>
-	 * Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
-	 */
-	result = cfile_file_test_read_buffer_at_offset(
-	          file,
-	          (off64_t) ( file_size / 7 ),
-	          file_size / 2,
-	          (off64_t) ( file_size / 7 ) + ( file_size / 2 ),
-	          file_size / 2 );
-
-	if( result != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test read buffer at offset.\n" );
-
-		return( result );
-	}
-	/* Test: offset: <file_size / 7> size: <file_size / 2>
-	 * Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
-	 */
-	result = cfile_file_test_read_buffer_at_offset(
-	          file,
-	          (off64_t) ( file_size / 7 ),
-	          file_size / 2,
-	          (off64_t) ( file_size / 7 ) + ( file_size / 2 ),
-	          file_size / 2 );
-
-	if( result != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test read buffer at offset.\n" );
-
-		return( result );
-	}
-#endif /* TODO */
 	return( 1 );
+}
+
+/* Tests reading a file
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_test_file_read(
+     libcstring_system_character_t *source,
+     libcerror_error_t **error )
+{
+	libcfile_file_t *file = NULL;
+	size64_t file_size    = 0;
+	int result            = 0;
+
+	if( libcfile_file_initialize(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
+	     file,
+	     source,
+	     LIBCFILE_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libcfile_file_open(
+	     file,
+	     source,
+	     LIBCFILE_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_get_size(
+	     file,
+	     &file_size,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve file size.\n" );
+
+		goto on_error;
+	}
+	fprintf(
+	 stdout,
+	 "File size: %" PRIu64 " bytes\n",
+	 file_size );
+
+	result = cfile_test_read_from_file(
+	          file,
+	          file_size );
+
+	if( result == -1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to read from file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_close(
+	     file,
+	     error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to close file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( file != NULL )
+	{
+		libcfile_file_close(
+		 file,
+		 NULL );
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Tests reading a file with a block size
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cfile_test_file_read_with_block_size(
+     libcstring_system_character_t *source,
+     size_t block_size,
+     libcerror_error_t **error )
+{
+	libcfile_file_t *file = NULL;
+	size64_t file_size    = 0;
+	int result            = 0;
+
+	if( libcfile_file_initialize(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
+	     file,
+	     source,
+	     LIBCFILE_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libcfile_file_open(
+	     file,
+	     source,
+	     LIBCFILE_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_set_block_size(
+	     file,
+	     block_size,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set block size.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_get_size(
+	     file,
+	     &file_size,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve file size.\n" );
+
+		goto on_error;
+	}
+	fprintf(
+	 stdout,
+	 "File size: %" PRIu64 " bytes\n",
+	 file_size );
+
+	result = cfile_test_read_from_file(
+	          file,
+	          file_size );
+
+	if( result == -1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to read from file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_close(
+	     file,
+	     error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to close file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &file,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( file != NULL )
+	{
+		libcfile_file_close(
+		 file,
+		 NULL );
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* The main program
@@ -598,9 +657,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcerror_error_t *error              = NULL;
-	libcfile_file_t *file                 = NULL;
 	libcstring_system_character_t *source = NULL;
-	size64_t file_size                    = 0;
 
 	if( argc < 2 )
 	{
@@ -619,170 +676,24 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-	/* Test file read
-	 */
-	if( libcfile_file_initialize(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to create file.\n" );
-
-		goto on_error;
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcfile_file_open_wide(
-	     file,
+	if( cfile_test_file_read(
 	     source,
-	     LIBCFILE_OPEN_READ,
 	     &error ) != 1 )
-#else
-	if( libcfile_file_open(
-	     file,
+	{
+		fprintf(
+		 stderr,
+		 "Unable to read file.\n" );
+
+		goto on_error;
+	}
+	if( cfile_test_file_read_with_block_size(
 	     source,
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
-#endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_get_size(
-	     file,
-	     &file_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve file size.\n" );
-
-		goto on_error;
-	}
-	fprintf(
-	 stdout,
-	 "File size: %" PRIu64 " bytes\n",
-	 file_size );
-
-	if( cfile_file_test_read_from_file(
-	     file,
-	     file_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to read from file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_close(
-	     file,
-	     &error ) != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to close file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_free(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free file.\n" );
-
-		goto on_error;
-	}
-	/* Test file read with block size
-	 */
-	if( libcfile_file_initialize(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to create file.\n" );
-
-		goto on_error;
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcfile_file_open_wide(
-	     file,
-	     source,
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
-#else
-	if( libcfile_file_open(
-	     file,
-	     source,
-	     LIBCFILE_OPEN_READ,
-	     &error ) != 1 )
-#endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_get_size(
-	     file,
-	     &file_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve file size.\n" );
-
-		goto on_error;
-	}
-	fprintf(
-	 stdout,
-	 "File size: %" PRIu64 " bytes\n",
-	 file_size );
-
-	if( libcfile_file_set_block_size(
-	     file,
 	     512,
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to set block size.\n" );
-
-		goto on_error;
-	}
-	if( cfile_file_test_read_from_file(
-	     file,
-	     file_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to read from file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_close(
-	     file,
-	     &error ) != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to close file.\n" );
-
-		goto on_error;
-	}
-	if( libcfile_file_free(
-	     &file,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free file.\n" );
+		 "Unable to read file with block size.\n" );
 
 		goto on_error;
 	}
@@ -796,15 +707,6 @@ on_error:
 		 stderr );
 		libcerror_error_free(
 		 &error );
-	}
-	if( file != NULL )
-	{
-		libcfile_file_close(
-		 file,
-		 NULL );
-		libcfile_file_free(
-		 &file,
-		 NULL );
 	}
 	return( EXIT_FAILURE );
 }

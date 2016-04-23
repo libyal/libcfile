@@ -32,14 +32,14 @@
 #include "cfile_test_libcstring.h"
 #include "cfile_test_unused.h"
 
-/* Define to make cfile_file_test_seek generate verbose output
-#define CFILE_FILE_TEST_SEEK_VERBOSE
+/* Define to make cfile_test_seek generate verbose output
+#define CFILE_TEST_SEEK_VERBOSE
  */
 
 /* Tests libcfile_file_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_seek_offset(
+int cfile_test_seek_offset(
      libcfile_file_t *file,
      off64_t input_offset,
      int input_whence,
@@ -119,7 +119,7 @@ int cfile_file_test_seek_offset(
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_seek(
+int cfile_test_seek(
      libcfile_file_t *file,
      size64_t file_size )
 {
@@ -143,7 +143,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = 0;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_SET,
@@ -162,7 +162,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = (off64_t) file_size;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_SET,
@@ -181,7 +181,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = (off64_t) ( file_size / 5 );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_SET,
@@ -200,7 +200,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = (off64_t) ( file_size + 987 );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_SET,
@@ -219,7 +219,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = -987;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_SET,
@@ -238,7 +238,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = 0;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_CUR,
@@ -257,7 +257,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = -1 * (off64_t) ( file_size + 987 );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_CUR,
@@ -276,7 +276,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = (off64_t) ( file_size / 3 );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_CUR,
@@ -297,7 +297,7 @@ int cfile_file_test_seek(
 		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
 		 * Expected result: 0
 		 */
-		result = cfile_file_test_seek_offset(
+		result = cfile_test_seek_offset(
 		          file,
 		          seek_offset,
 		          SEEK_CUR,
@@ -317,7 +317,7 @@ int cfile_file_test_seek(
 		/* Test: SEEK_CUR offset: <-2 * (file_size / 3)>
 		 * Expected result: -1
 		 */
-		result = cfile_file_test_seek_offset(
+		result = cfile_test_seek_offset(
 		          file,
 		          seek_offset,
 		          SEEK_CUR,
@@ -337,7 +337,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = 0;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_END,
@@ -356,7 +356,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = -1 * (off64_t) file_size;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_END,
@@ -375,7 +375,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = (off64_t) ( file_size / 4 );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          -1 * seek_offset,
 	          SEEK_END,
@@ -394,7 +394,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = 542;
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_END,
@@ -413,7 +413,7 @@ int cfile_file_test_seek(
 	 */
 	seek_offset = -1 * (off64_t) ( file_size + 542 );
 
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          seek_offset,
 	          SEEK_END,
@@ -430,7 +430,7 @@ int cfile_file_test_seek(
 	/* Test: UNKNOWN (88) offset: 0
 	 * Expected result: -1
 	 */
-	result = cfile_file_test_seek_offset(
+	result = cfile_test_seek_offset(
 	          file,
 	          0,
 	          88,
@@ -450,7 +450,7 @@ int cfile_file_test_seek(
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_file_seek(
+int cfile_test_file_seek(
      libcstring_system_character_t *source,
      libcerror_error_t **error )
 {
@@ -499,7 +499,7 @@ int cfile_file_test_file_seek(
 
 		goto on_error;
 	}
-	result = cfile_file_test_seek(
+	result = cfile_test_seek(
 	          file,
 	          file_size );
 
@@ -549,7 +549,7 @@ on_error:
 /* Tests seeking in a file without opening it
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_file_test_seek_file_no_open(
+int cfile_test_seek_file_no_open(
      libcstring_system_character_t *source CFILE_TEST_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
@@ -654,14 +654,14 @@ int main( int argc, char * const argv[] )
 	}
 	source = argv[ 1 ];
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_FILE_TEST_SEEK_VERBOSE )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_TEST_SEEK_VERBOSE )
 	libcfile_notify_set_verbose(
 	 1 );
 	libcfile_notify_set_stream(
 	 stderr,
 	 NULL );
 #endif
-	if( cfile_file_test_file_seek(
+	if( cfile_test_file_seek(
 	     source,
 	     &error ) != 1 )
 	{
@@ -671,7 +671,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( cfile_file_test_seek_file_no_open(
+	if( cfile_test_seek_file_no_open(
 	     source,
 	     &error ) != 1 )
 	{
