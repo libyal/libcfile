@@ -36,8 +36,7 @@
 #define CFILE_TEST_READ_VERBOSE
  */
 
-#define CFILE_TEST_READ_BUFFER_SIZE		4096
-#define CFILE_TEST_READ_NUMBER_OF_THREADS	4
+#define CFILE_TEST_READ_BUFFER_SIZE	4096
 
 /* Tests libcfile_file_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error

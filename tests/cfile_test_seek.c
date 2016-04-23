@@ -1,5 +1,5 @@
 /*
- * Library file seek testing program
+ * Library seek testing program
  *
  * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
