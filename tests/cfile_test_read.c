@@ -429,7 +429,7 @@ int cfile_test_read_from_file(
 /* Tests reading a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_file_read(
+int cfile_test_read(
      libcstring_system_character_t *source,
      libcerror_error_t **error )
 {
@@ -533,7 +533,7 @@ on_error:
 /* Tests reading a file with a block size
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_file_read_with_block_size(
+int cfile_test_read_with_block_size(
      libcstring_system_character_t *source,
      size_t block_size,
      libcerror_error_t **error )
@@ -670,11 +670,11 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_TEST_READ_VERBOSE )
 	libcfile_notify_set_verbose(
 	 1 );
-	libcfile_notify_set_file(
+	libcfile_notify_set_stream(
 	 stderr,
 	 NULL );
 #endif
-	if( cfile_test_file_read(
+	if( cfile_test_read(
 	     source,
 	     &error ) != 1 )
 	{
@@ -684,7 +684,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( cfile_test_file_read_with_block_size(
+	if( cfile_test_read_with_block_size(
 	     source,
 	     512,
 	     &error ) != 1 )

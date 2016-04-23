@@ -118,7 +118,7 @@ int cfile_test_seek_offset(
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_seek(
+int cfile_test_seek_file(
      libcfile_file_t *file,
      size64_t file_size )
 {
@@ -449,7 +449,7 @@ int cfile_test_seek(
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cfile_test_file_seek(
+int cfile_test_seek(
      libcstring_system_character_t *source,
      libcerror_error_t **error )
 {
@@ -498,7 +498,7 @@ int cfile_test_file_seek(
 
 		goto on_error;
 	}
-	result = cfile_test_seek(
+	result = cfile_test_seek_file(
 	          file,
 	          file_size );
 
@@ -660,7 +660,7 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-	if( cfile_test_file_seek(
+	if( cfile_test_seek(
 	     source,
 	     &error ) != 1 )
 	{
