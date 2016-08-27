@@ -119,6 +119,8 @@ stamp-h[1-9]
 /include/libcfile/types.h
 /libcfile/libcfile.rc
 /libcfile/libcfile_definitions.h
+/tests/cfile_test_error
+/tests/cfile_test_file
 /tests/cfile_test_get_version
 /tests/cfile_test_read
 /tests/cfile_test_seek

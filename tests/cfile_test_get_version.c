@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -28,6 +27,7 @@
 
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
+#include "cfile_test_macros.h"
 #include "cfile_test_unused.h"
 
 /* Tests retrieving the library version
@@ -46,11 +46,15 @@ int cfile_test_get_version(
 	          LIBCFILE_VERSION_STRING,
 	          9 );
 
-	if( result != 0 )
-	{
-		return( 0 );
-	}
+	CFILE_TEST_ASSERT_EQUAL(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
+
+on_error:
+	return( 0 );
 }
 
 /* The main program
@@ -68,10 +72,13 @@ int main(
 	CFILE_TEST_UNREFERENCED_PARAMETER( argc )
 	CFILE_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( cfile_test_get_version() != 1 )
-	{
-		return( EXIT_FAILURE );
-	}
+	CFILE_TEST_RUN(
+	 "libcfile_get_version",
+	 cfile_test_get_version() )
+
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 

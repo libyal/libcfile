@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="cfile_test_get_version"
-	ProjectGUID="{3497FEEC-0AEB-4B98-B6F4-5CA1FFE05297}"
-	RootNamespace="cfile_test_get_version"
+	Name="cfile_test_file"
+	ProjectGUID="{0FC5ADA5-82AD-4905-BF38-F44C130DC4D8}"
+	RootNamespace="cfile_test_file"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\cfile_test_get_version.c"
+				RelativePath="..\..\tests\cfile_test_file.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\cfile_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -195,6 +199,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\cfile_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\cfile_test_memory.h"
 				>
 			</File>
 			<File

@@ -1,6 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cfile_test_error", "cfile_test_error\cfile_test_error.vcproj", "{9C6F609D-3965-4D15-BCF3-C4D416BFB632}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E3DC2B3-5FC5-43C0-BBB6-BEF3C8C3DD51} = {8E3DC2B3-5FC5-43C0-BBB6-BEF3C8C3DD51}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cfile_test_file", "cfile_test_file\cfile_test_file.vcproj", "{0FC5ADA5-82AD-4905-BF38-F44C130DC4D8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E3DC2B3-5FC5-43C0-BBB6-BEF3C8C3DD51} = {8E3DC2B3-5FC5-43C0-BBB6-BEF3C8C3DD51}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cfile_test_get_version", "cfile_test_get_version\cfile_test_get_version.vcproj", "{3497FEEC-0AEB-4B98-B6F4-5CA1FFE05297}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8E3DC2B3-5FC5-43C0-BBB6-BEF3C8C3DD51} = {8E3DC2B3-5FC5-43C0-BBB6-BEF3C8C3DD51}
@@ -68,6 +80,14 @@ Global
 		VSDebug|Win32 = VSDebug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C6F609D-3965-4D15-BCF3-C4D416BFB632}.Release|Win32.ActiveCfg = Release|Win32
+		{9C6F609D-3965-4D15-BCF3-C4D416BFB632}.Release|Win32.Build.0 = Release|Win32
+		{9C6F609D-3965-4D15-BCF3-C4D416BFB632}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{9C6F609D-3965-4D15-BCF3-C4D416BFB632}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{0FC5ADA5-82AD-4905-BF38-F44C130DC4D8}.Release|Win32.ActiveCfg = Release|Win32
+		{0FC5ADA5-82AD-4905-BF38-F44C130DC4D8}.Release|Win32.Build.0 = Release|Win32
+		{0FC5ADA5-82AD-4905-BF38-F44C130DC4D8}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{0FC5ADA5-82AD-4905-BF38-F44C130DC4D8}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{3497FEEC-0AEB-4B98-B6F4-5CA1FFE05297}.Release|Win32.ActiveCfg = Release|Win32
 		{3497FEEC-0AEB-4B98-B6F4-5CA1FFE05297}.Release|Win32.Build.0 = Release|Win32
 		{3497FEEC-0AEB-4B98-B6F4-5CA1FFE05297}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
