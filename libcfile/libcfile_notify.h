@@ -1,5 +1,5 @@
 /*
- * Notification function
+ * Notification functions
  *
  * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *

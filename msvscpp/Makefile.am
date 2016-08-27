@@ -2,6 +2,7 @@ MSVSCPP_FILES = \
 	cfile_test_error/cfile_test_error.vcproj \
 	cfile_test_file/cfile_test_file.vcproj \
 	cfile_test_get_version/cfile_test_get_version.vcproj \
+	cfile_test_notify/cfile_test_notify.vcproj \
 	cfile_test_read/cfile_test_read.vcproj \
 	cfile_test_seek/cfile_test_seek.vcproj \
 	cfile_test_write/cfile_test_write.vcproj \

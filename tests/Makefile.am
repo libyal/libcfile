@@ -27,6 +27,7 @@ check_PROGRAMS = \
 	cfile_test_error \
 	cfile_test_file \
 	cfile_test_get_version \
+	cfile_test_notify \
 	cfile_test_read \
 	cfile_test_seek \
 	cfile_test_write
@@ -62,6 +63,17 @@ cfile_test_get_version_SOURCES = \
 	cfile_test_unused.h
 
 cfile_test_get_version_LDADD = \
+	../libcfile/libcfile.la \
+	@LIBCSTRING_LIBADD@
+
+cfile_test_notify_SOURCES = \
+	cfile_test_notify.c \
+	cfile_test_libcstring.h \
+	cfile_test_libcfile.h \
+	cfile_test_macros.h \
+	cfile_test_unused.h
+
+cfile_test_notify_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCSTRING_LIBADD@
 
