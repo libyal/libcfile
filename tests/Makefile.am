@@ -70,6 +70,7 @@ cfile_test_get_version_LDADD = \
 
 cfile_test_notify_SOURCES = \
 	cfile_test_notify.c \
+	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_libcstring.h \
 	cfile_test_macros.h \
@@ -77,6 +78,7 @@ cfile_test_notify_SOURCES = \
 
 cfile_test_notify_LDADD = \
 	../libcfile/libcfile.la \
+	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
 cfile_test_read_SOURCES = \

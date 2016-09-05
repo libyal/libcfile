@@ -258,6 +258,26 @@ int main(
 	 "libcfile_file_free",
 	 cfile_test_file_free() )
 
+	/* TODO: add test for libcfile_file_open */
+	/* TODO: add test for libcfile_file_open_with_error_code */
+	/* TODO: add test for libcfile_file_open_wide */
+	/* TODO: add test for libcfile_file_open_wide_with_error_code */
+	/* TODO: add test for libcfile_file_close */
+	/* TODO: add test for libcfile_file_read_buffer */
+	/* TODO: add test for libcfile_file_read_buffer_with_error_code */
+	/* TODO: add test for libcfile_file_write_buffer */
+	/* TODO: add test for libcfile_file_write_buffer_with_error_code */
+	/* TODO: add test for libcfile_file_seek_offset */
+	/* TODO: add test for libcfile_file_resize */
+	/* TODO: add test for libcfile_file_is_open */
+	/* TODO: add test for libcfile_file_get_offset */
+	/* TODO: add test for libcfile_file_get_size */
+	/* TODO: add test for libcfile_file_is_device */
+	/* TODO: add test for libcfile_file_io_control_read */
+	/* TODO: add test for libcfile_file_io_control_read_with_error_code */
+	/* TODO: add test for libcfile_file_set_access_behavior */
+	/* TODO: add test for libcfile_file_set_block_size */
+
 	return( EXIT_SUCCESS );
 
 on_error:
