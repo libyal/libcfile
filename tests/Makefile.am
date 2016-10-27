@@ -3,6 +3,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCLOCALE_CPPFLAGS@ \
+	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_DLL_IMPORT@
 
 TESTS = \
@@ -47,13 +49,17 @@ cfile_test_file_SOURCES = \
 	cfile_test_file.c \
 	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
+	cfile_test_libclocale.h \
 	cfile_test_libcstring.h \
+	cfile_test_libuna.h \
 	cfile_test_macros.h \
 	cfile_test_memory.c cfile_test_memory.h \
 	cfile_test_unused.h
 
 cfile_test_file_LDADD = \
 	../libcfile/libcfile.la \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
