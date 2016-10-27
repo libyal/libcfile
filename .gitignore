@@ -121,10 +121,10 @@ stamp-h[1-9]
 /libcfile/libcfile_definitions.h
 /tests/cfile_test_error
 /tests/cfile_test_file
-/tests/cfile_test_get_version
 /tests/cfile_test_notify
 /tests/cfile_test_read
 /tests/cfile_test_seek
+/tests/cfile_test_support
 /tests/cfile_test_write
 /tests/tmp*
 

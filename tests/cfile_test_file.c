@@ -32,6 +32,10 @@
 #include "cfile_test_memory.h"
 #include "cfile_test_unused.h"
 
+/* Define to make cfile_test_file generate verbose output
+#define CFILE_TEST_FILE_VERBOSE
+ */
+
 /* Tests the libcfile_file_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -239,16 +243,27 @@ on_error:
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
-     int argc CFILE_TEST_ATTRIBUTE_UNUSED,
-     wchar_t * const argv[] CFILE_TEST_ATTRIBUTE_UNUSED )
+     int argc,
+     wchar_t * const argv[] )
 #else
 int main(
-     int argc CFILE_TEST_ATTRIBUTE_UNUSED,
-     char * const argv[] CFILE_TEST_ATTRIBUTE_UNUSED )
+     int argc,
+     char * const argv[] )
 #endif
 {
-	CFILE_TEST_UNREFERENCED_PARAMETER( argc )
-	CFILE_TEST_UNREFERENCED_PARAMETER( argv )
+	libcstring_system_character_t *source = NULL;
+
+	if( argc >= 2 )
+	{
+		source = argv[ 1 ];
+	}
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_TEST_FILE_VERBOSE )
+	libcfile_notify_set_verbose(
+	 1 );
+	libcfile_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_initialize",
@@ -258,6 +273,8 @@ int main(
 	 "libcfile_file_free",
 	 cfile_test_file_free() )
 
+	if( source != NULL )
+	{
 	/* TODO: add test for libcfile_file_open */
 	/* TODO: add test for libcfile_file_open_with_error_code */
 	/* TODO: add test for libcfile_file_open_wide */
@@ -265,9 +282,10 @@ int main(
 	/* TODO: add test for libcfile_file_close */
 	/* TODO: add test for libcfile_file_read_buffer */
 	/* TODO: add test for libcfile_file_read_buffer_with_error_code */
+	/* TODO: add test for libcfile_file_seek_offset */
+	}
 	/* TODO: add test for libcfile_file_write_buffer */
 	/* TODO: add test for libcfile_file_write_buffer_with_error_code */
-	/* TODO: add test for libcfile_file_seek_offset */
 	/* TODO: add test for libcfile_file_resize */
 	/* TODO: add test for libcfile_file_is_open */
 	/* TODO: add test for libcfile_file_get_offset */

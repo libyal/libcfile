@@ -46,6 +46,20 @@
 		goto on_error; \
 	}
 
+#define CFILE_TEST_ASSERT_LESS_THAN_UINT32( name, value, expected_value ) \
+	if( value >= expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s != %" PRIu32 "\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
+#define CFILE_TEST_ASSERT_EQUAL_INT64( name, value, expected_value ) \
+	if( value != expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s != %" PRIi64 "\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
 #define CFILE_TEST_ASSERT_EQUAL_UINT64( name, value, expected_value ) \
 	if( value != expected_value ) \
 	{ \
@@ -53,10 +67,24 @@
 		goto on_error; \
 	}
 
+#define CFILE_TEST_ASSERT_LESS_THAN_UINT64( name, value, expected_value ) \
+	if( value >= expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s >= %" PRIu64 "\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
 #define CFILE_TEST_ASSERT_IS_NOT_NULL( name, value ) \
 	if( value == NULL ) \
 	{ \
 		fprintf( stdout, "%s:%d %s == NULL\n", __FILE__, __LINE__, name ); \
+		goto on_error; \
+	}
+
+#define CFILE_TEST_ASSERT_EQUAL_SSIZE( name, value, expected_value ) \
+	if( value != expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s != %" PRIzd "\n", __FILE__, __LINE__, name, expected_value ); \
 		goto on_error; \
 	}
 
@@ -73,6 +101,17 @@
 		fprintf( stdout, "Unable to run test: %s\n", name ); \
 		goto on_error; \
 	}
+
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+#define CFILE_TEST_RUN_WITH_ARGS( name, function, ... ) \
+	if( function( __VA_ARGS__ ) != 1 ) \
+	{ \
+		fprintf( stdout, "Unable to run test: %s\n", name ); \
+		goto on_error; \
+	}
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* !defined( _CFILE_TEST_MACROS_H ) */
 
