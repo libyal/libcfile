@@ -105,19 +105,19 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_notify_set_verbose",
-	 cfile_test_notify_set_verbose() )
+	 cfile_test_notify_set_verbose )
 
 	CFILE_TEST_RUN(
 	 "libcfile_notify_set_stream",
-	 cfile_test_notify_set_stream() )
+	 cfile_test_notify_set_stream )
 
 	CFILE_TEST_RUN(
 	 "libcfile_notify_stream_open",
-	 cfile_test_notify_stream_open() )
+	 cfile_test_notify_stream_open )
 
 	CFILE_TEST_RUN(
 	 "libcfile_notify_stream_close",
-	 cfile_test_notify_stream_close() )
+	 cfile_test_notify_stream_close )
 
 	return( EXIT_SUCCESS );
 

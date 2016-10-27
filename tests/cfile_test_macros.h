@@ -22,20 +22,52 @@
 #if !defined( _CFILE_TEST_MACROS_H )
 #define _CFILE_TEST_MACROS_H
 
+#include <common.h>
 #include <file_stream.h>
 
-/* TODO: deprecated replace by CFILE_TEST_ASSERT_EQUAL_INT */
-#define CFILE_TEST_ASSERT_EQUAL( name, value, expected_value ) \
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
+#endif
+
+#define CFILE_TEST_ASSERT_EQUAL_INT( name, value, expected_value ) \
 	if( value != expected_value ) \
 	{ \
 		fprintf( stdout, "%s:%d %s != %d\n", __FILE__, __LINE__, name, expected_value ); \
 		goto on_error; \
 	}
 
-#define CFILE_TEST_ASSERT_EQUAL_INT( name, value, expected_value ) \
+#define CFILE_TEST_ASSERT_NOT_EQUAL_INT( name, value, expected_value ) \
+	if( value == expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s == %d\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
+#define CFILE_TEST_ASSERT_GREATER_THAN_INT( name, value, expected_value ) \
+	if( value <= expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s <= %d\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
+#define CFILE_TEST_ASSERT_LESS_THAN_INT( name, value, expected_value ) \
+	if( value >= expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s >= %d\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
+#define CFILE_TEST_ASSERT_EQUAL_SSIZE( name, value, expected_value ) \
 	if( value != expected_value ) \
 	{ \
-		fprintf( stdout, "%s:%d %s != %d\n", __FILE__, __LINE__, name, expected_value ); \
+		fprintf( stdout, "%s:%d %s != %" PRIzd "\n", __FILE__, __LINE__, name, expected_value ); \
+		goto on_error; \
+	}
+
+#define CFILE_TEST_ASSERT_EQUAL_INT32( name, value, expected_value ) \
+	if( value != expected_value ) \
+	{ \
+		fprintf( stdout, "%s:%d %s != %" PRIi32 "\n", __FILE__, __LINE__, name, expected_value ); \
 		goto on_error; \
 	}
 
@@ -49,7 +81,7 @@
 #define CFILE_TEST_ASSERT_LESS_THAN_UINT32( name, value, expected_value ) \
 	if( value >= expected_value ) \
 	{ \
-		fprintf( stdout, "%s:%d %s != %" PRIu32 "\n", __FILE__, __LINE__, name, expected_value ); \
+		fprintf( stdout, "%s:%d %s >= %" PRIu32 "\n", __FILE__, __LINE__, name, expected_value ); \
 		goto on_error; \
 	}
 
@@ -81,13 +113,6 @@
 		goto on_error; \
 	}
 
-#define CFILE_TEST_ASSERT_EQUAL_SSIZE( name, value, expected_value ) \
-	if( value != expected_value ) \
-	{ \
-		fprintf( stdout, "%s:%d %s != %" PRIzd "\n", __FILE__, __LINE__, name, expected_value ); \
-		goto on_error; \
-	}
-
 #define CFILE_TEST_ASSERT_IS_NULL( name, value ) \
 	if( value != NULL ) \
 	{ \
@@ -96,7 +121,7 @@
 	}
 
 #define CFILE_TEST_RUN( name, function ) \
-	if( function != 1 ) \
+	if( function() != 1 ) \
 	{ \
 		fprintf( stdout, "Unable to run test: %s\n", name ); \
 		goto on_error; \
@@ -112,6 +137,9 @@
 	}
 
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+
+#define CFILE_TEST_FPRINT_ERROR( error ) \
+	libcerror_error_backtrace_fprint( error, stdout );
 
 #endif /* !defined( _CFILE_TEST_MACROS_H ) */
 

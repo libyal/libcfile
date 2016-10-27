@@ -52,7 +52,7 @@ int cfile_test_file_initialize(
 	          &file,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL(
+	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 1 );
@@ -69,7 +69,7 @@ int cfile_test_file_initialize(
 	          &file,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL(
+	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 1 );
@@ -88,7 +88,7 @@ int cfile_test_file_initialize(
 	          NULL,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL(
+	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 -1 );
@@ -106,7 +106,7 @@ int cfile_test_file_initialize(
 	          &file,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL(
+	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 -1 );
@@ -136,7 +136,7 @@ int cfile_test_file_initialize(
 	}
 	else
 	{
-		CFILE_TEST_ASSERT_EQUAL(
+		CFILE_TEST_ASSERT_EQUAL_INT(
 		 "result",
 		 result,
 		 -1 );
@@ -166,7 +166,7 @@ int cfile_test_file_initialize(
 	}
 	else
 	{
-		CFILE_TEST_ASSERT_EQUAL(
+		CFILE_TEST_ASSERT_EQUAL_INT(
 		 "result",
 		 result,
 		 -1 );
@@ -216,7 +216,7 @@ int cfile_test_file_free(
 	          NULL,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL(
+	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 -1 );
@@ -267,11 +267,11 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_initialize",
-	 cfile_test_file_initialize() )
+	 cfile_test_file_initialize )
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_free",
-	 cfile_test_file_free() )
+	 cfile_test_file_free )
 
 	if( source != NULL )
 	{

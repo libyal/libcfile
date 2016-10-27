@@ -123,23 +123,23 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_error_free",
-	 cfile_test_error_free() )
+	 cfile_test_error_free );
 
 	CFILE_TEST_RUN(
 	 "libcfile_error_fprint",
-	 cfile_test_error_fprint() )
+	 cfile_test_error_fprint );
 
 	CFILE_TEST_RUN(
 	 "libcfile_error_sprint",
-	 cfile_test_error_sprint() )
+	 cfile_test_error_sprint );
 
 	CFILE_TEST_RUN(
 	 "libcfile_error_backtrace_fprint",
-	 cfile_test_error_backtrace_fprint() )
+	 cfile_test_error_backtrace_fprint );
 
 	CFILE_TEST_RUN(
 	 "libcfile_error_backtrace_sprint",
-	 cfile_test_error_backtrace_sprint() )
+	 cfile_test_error_backtrace_sprint );
 
 	return( EXIT_SUCCESS );
 
