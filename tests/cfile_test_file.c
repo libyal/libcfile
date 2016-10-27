@@ -904,6 +904,120 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcfile_file_open_with_error_code functions
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_open_with_error_code(
+     const libcstring_system_character_t *source )
+{
+	char narrow_source[ 256 ];
+
+	libcerror_error_t *error = NULL;
+	libcfile_file_t *file    = NULL;
+	uint32_t error_code      = 0;
+	int result               = 0;
+
+	/* Initialize test
+	 */
+	result = cfile_test_file_get_narrow_source(
+	          source,
+	          narrow_source,
+	          256,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_initialize(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "file",
+         file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open
+	 */
+	result = libcfile_file_open_with_error_code(
+	          file,
+	          narrow_source,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_free(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "file",
+         file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file != NULL )
+	{
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Tests the libcfile_file_open_wide functions
@@ -1018,7 +1132,210 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcfile_file_open_wide_with_error_code functions
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_open_wide_with_error_code(
+     const libcstring_system_character_t *source )
+{
+	wchar_t wide_source[ 256 ];
+
+	libcerror_error_t *error = NULL;
+	libcfile_file_t *file    = NULL;
+	uint32_t error_code      = 0;
+	int result               = 0;
+
+	/* Initialize test
+	 */
+	result = cfile_test_file_get_wide_source(
+	          source,
+	          wide_source,
+	          256,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_initialize(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "file",
+         file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open
+	 */
+	result = libcfile_file_open_wide_with_error_code(
+	          file,
+	          wide_source,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_free(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "file",
+         file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file != NULL )
+	{
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+/* Tests the libcfile_file_close function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_close(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libcfile_file_close(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_is_open function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_is_open(
+     libcfile_file_t *file )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = libcfile_file_is_open(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_is_open(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
 
 /* Tests the libcfile_file_get_offset function
  * Returns 1 if successful or 0 if not
@@ -1162,6 +1479,57 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcfile_file_is_device function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_is_device(
+     libcfile_file_t *file )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = libcfile_file_is_device(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_is_device(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -1177,7 +1545,6 @@ int main(
 	libcerror_error_t *error              = NULL;
 	libcstring_system_character_t *source = NULL;
 	libcfile_file_t *file                 = NULL;
-	libcstring_system_integer_t option    = 0;
 	int result                            = 0;
 
 	if( argc >= 2 )
@@ -1208,7 +1575,10 @@ int main(
 		 cfile_test_file_open,
 		 source );
 
-		/* TODO: add test for libcfile_file_open_with_error_code */
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_open_with_error_code",
+		 cfile_test_file_open_with_error_code,
+		 source );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
@@ -1217,7 +1587,10 @@ int main(
 		 cfile_test_file_open_wide,
 		 source );
 
-		/* TODO: add test for libcfile_file_open_wide_with_error_code */
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_open_wide_with_error_code",
+		 cfile_test_file_open_wide_with_error_code,
+		 source );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
@@ -1227,7 +1600,9 @@ int main(
 
 #endif /* defined( LIBCFILE_HAVE_BFIO ) */
 
-		/* TODO add test for libcfile_file_close */
+		CFILE_TEST_RUN(
+		 "libcfile_file_close",
+		 cfile_test_file_close );
 
 		/* Initialize test
 		 */
@@ -1256,7 +1631,11 @@ int main(
 		/* TODO: add test for libcfile_file_write_buffer */
 		/* TODO: add test for libcfile_file_write_buffer_with_error_code */
 		/* TODO: add test for libcfile_file_resize */
-		/* TODO: add test for libcfile_file_is_open */
+
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_is_open",
+		 cfile_test_file_is_open,
+		 file );
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_get_offset",
@@ -1268,7 +1647,11 @@ int main(
 		 cfile_test_file_get_size,
 		 file );
 
-		/* TODO: add test for libcfile_file_is_device */
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_is_device",
+		 cfile_test_file_is_device,
+		 file );
+
 		/* TODO: add test for libcfile_file_io_control_read */
 		/* TODO: add test for libcfile_file_io_control_read_with_error_code */
 		/* TODO: add test for libcfile_file_set_access_behavior */

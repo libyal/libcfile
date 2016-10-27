@@ -341,6 +341,14 @@ int libcfile_file_get_size(
      size64_t *size,
      libcfile_error_t **error );
 
+/* Determines if a file is a device
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBCFILE_EXTERN \
+int libcfile_file_is_device(
+     libcfile_file_t *file,
+     libcfile_error_t **error );
+
 /* Read data from a device file using IO control
  * Returns 1 if successful or -1 on error
  */
