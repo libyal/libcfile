@@ -38,5 +38,5 @@
 #endif
 #endif
 
-#endif
+#endif /* !defined( _LIBCFILE_FEATURES_H ) */
 

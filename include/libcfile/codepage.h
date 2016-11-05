@@ -118,5 +118,5 @@ enum LIBCFILE_CODEPAGES
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCFILE_CODEPAGE_H ) */
 

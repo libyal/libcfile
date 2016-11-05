@@ -39,7 +39,7 @@ enum LIBCFILE_ERROR_DOMAINS
 	LIBCFILE_ERROR_DOMAIN_INPUT			= (int) 'i',
 	LIBCFILE_ERROR_DOMAIN_MEMORY			= (int) 'm',
 	LIBCFILE_ERROR_DOMAIN_OUTPUT			= (int) 'o',
-	LIBCFILE_ERROR_DOMAIN_RUNTIME			= (int) 'r',
+	LIBCFILE_ERROR_DOMAIN_RUNTIME			= (int) 'r'
 };
 
 /* The argument error codes
@@ -208,6 +208,17 @@ enum LIBCFILE_MEMORY_ERROR
 	LIBCFILE_MEMORY_ERROR_SET_FAILED		= 3
 };
 
+/* The output error codes
+ */
+enum LIBCFILE_OUTPUT_ERROR
+{
+	LIBCFILE_OUTPUT_ERROR_GENERIC			= 0,
+
+	/* There is insuficient space to write the output
+	 */
+	LIBCFILE_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
+};
+
 /* The runtime error codes
  * to signify errors regarding runtime processing
  */
@@ -276,16 +287,5 @@ enum LIBCFILE_RUNTIME_ERROR
 	LIBCFILE_RUNTIME_ERROR_ABORT_REQUESTED		= 15
 };
 
-/* The output error codes
- */
-enum LIBCFILE_OUTPUT_ERROR
-{
-	LIBCFILE_OUTPUT_ERROR_GENERIC			= 0,
-
-	/* There is insuficient space to write the output
-	 */
-	LIBCFILE_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
-};
-
-#endif
+#endif /* !defined( _LIBCFILE_ERROR_H ) */
 

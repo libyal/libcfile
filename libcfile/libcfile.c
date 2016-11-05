@@ -51,7 +51,7 @@ BOOL WINAPI DllMain(
 		case DLL_PROCESS_ATTACH:
 			DisableThreadLibraryCalls(
 			 hinstDLL );
-		break;
+			break;
 
 		case DLL_THREAD_ATTACH:
 			break;
@@ -74,7 +74,7 @@ int libcfile_is_dll(
 	return( 1 );
 }
 
-#endif /* defined( WINAPI ) && defined( HAVE_DLLMAIN )*/
+#endif /* defined( WINAPI ) && defined( HAVE_DLLMAIN ) */
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
