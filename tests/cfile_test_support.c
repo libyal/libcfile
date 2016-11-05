@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #endif
 
+#include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libcstring.h"
 #include "cfile_test_macros.h"
@@ -57,6 +58,138 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcfile_file_exists function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_exists(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = libcfile_file_exists(
+	          "cfile_test_support",
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_exists(
+	          "bogus",
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_exists(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Tests the libcfile_file_exists_wide function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_exists_wide(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = libcfile_file_exists_wide(
+	          L"cfile_test_support",
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_exists_wide(
+	          L"bogus",
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_exists_wide(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -75,6 +208,23 @@ int main(
 	CFILE_TEST_RUN(
 	 "libcfile_get_version",
 	 cfile_test_get_version );
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_exists",
+	 cfile_test_file_exists );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_exists_wide",
+	 cfile_test_file_exists_wide );
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+	/* TODO add tests for libcfile_file_remove */
+	/* TODO add tests for libcfile_file_remove_with_error_code */
+	/* TODO add tests for libcfile_file_remove_wide */
+	/* TODO add tests for libcfile_file_remove_wide_with_error_code */
 
 	return( EXIT_SUCCESS );
 

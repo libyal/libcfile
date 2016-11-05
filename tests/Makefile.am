@@ -100,6 +100,7 @@ cfile_test_seek_LDADD = \
 	@LIBCSTRING_LIBADD@
 
 cfile_test_support_SOURCES = \
+	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_libcstring.h \
 	cfile_test_macros.h \
@@ -108,6 +109,7 @@ cfile_test_support_SOURCES = \
 
 cfile_test_support_LDADD = \
 	../libcfile/libcfile.la \
+	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
 cfile_test_write_SOURCES = \
