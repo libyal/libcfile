@@ -1,4 +1,4 @@
-.Dd October 27, 2016
+.Dd November  6, 2016
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -12,6 +12,10 @@
 Support functions
 .Ft const char *
 .Fn libcfile_get_version "void"
+.Ft int
+.Fn libcfile_get_codepage "int *codepage, libcfile_error_t **error"
+.Ft int
+.Fn libcfile_set_codepage "int codepage, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_exists "const char *filename, libcfile_error_t **error"
 .Ft int

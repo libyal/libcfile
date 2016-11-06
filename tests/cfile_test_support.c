@@ -60,6 +60,109 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcfile_get_codepage function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_get_codepage(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int codepage             = 0;
+	int result               = 0;
+
+	result = libcfile_get_codepage(
+	          &codepage,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_get_codepage(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_set_codepage function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_set_codepage(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = libcfile_set_codepage(
+	          0,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_set_codepage(
+	          -1,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libcfile_file_exists function
  * Returns 1 if successful or 0 if not
  */
@@ -210,6 +313,14 @@ int main(
 	CFILE_TEST_RUN(
 	 "libcfile_get_version",
 	 cfile_test_get_version );
+
+	CFILE_TEST_RUN(
+	 "libcfile_get_codepage",
+	 cfile_test_get_codepage );
+
+	CFILE_TEST_RUN(
+	 "libcfile_set_codepage",
+	 cfile_test_set_codepage );
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_exists",
