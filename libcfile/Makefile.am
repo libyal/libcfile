@@ -20,6 +20,7 @@ libcfile_la_SOURCES = \
 	libcfile_libuna.h \
 	libcfile_notify.c libcfile_notify.h \
 	libcfile_support.c libcfile_support.h \
+	libcfile_system_string.c libcfile_system_string.h \
 	libcfile_types.h \
 	libcfile_unused.h
 

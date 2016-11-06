@@ -90,9 +90,8 @@ typedef size_t u64;
 #include "libcfile_definitions.h"
 #include "libcfile_file.h"
 #include "libcfile_libcerror.h"
-#include "libcfile_libclocale.h"
 #include "libcfile_libcnotify.h"
-#include "libcfile_libuna.h"
+#include "libcfile_system_string.h"
 #include "libcfile_types.h"
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
@@ -1121,45 +1120,11 @@ int libcfile_file_open_wide_with_error_code(
 	filename_size = 1 + wide_string_length(
 	                     filename );
 
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_size_from_utf32(
-		          (libuna_utf32_character_t *) filename,
-		          filename_size,
-		          &narrow_filename_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_size_from_utf16(
-		          (libuna_utf16_character_t *) filename,
-		          filename_size,
-		          &narrow_filename_size,
-		          error );
-#else
-#error Unsupported size of wchar_t
-#endif /* SIZEOF_WCHAR_T */
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_size_from_utf32(
-		          (libuna_utf32_character_t *) filename,
-		          filename_size,
-		          libclocale_codepage,
-		          &narrow_filename_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_size_from_utf16(
-		          (libuna_utf16_character_t *) filename,
-		          filename_size,
-		          libclocale_codepage,
-		          &narrow_filename_size,
-		          error );
-#else
-#error Unsupported size of wchar_t
-#endif /* SIZEOF_WCHAR_T */
-	}
-	if( result != 1 )
+	if( libcfile_system_string_size_from_wide_string(
+	     filename,
+	     filename_size,
+	     &narrow_filename_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1184,49 +1149,12 @@ int libcfile_file_open_wide_with_error_code(
 
 		goto on_error;
 	}
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_copy_from_utf32(
-		          (libuna_utf8_character_t *) narrow_filename,
-		          narrow_filename_size,
-		          (libuna_utf32_character_t *) filename,
-		          filename_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_copy_from_utf16(
-		          (libuna_utf8_character_t *) narrow_filename,
-		          narrow_filename_size,
-		          (libuna_utf16_character_t *) filename,
-		          filename_size,
-		          error );
-#else
-#error Unsupported size of wchar_t
-#endif /* SIZEOF_WCHAR_T */
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_copy_from_utf32(
-		          (uint8_t *) narrow_filename,
-		          narrow_filename_size,
-		          libclocale_codepage,
-		          (libuna_utf32_character_t *) filename,
-		          filename_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_copy_from_utf16(
-		          (uint8_t *) narrow_filename,
-		          narrow_filename_size,
-		          libclocale_codepage,
-		          (libuna_utf16_character_t *) filename,
-		          filename_size,
-		          error );
-#else
-#error Unsupported size of wchar_t
-#endif /* SIZEOF_WCHAR_T */
-	}
-	if( result != 1 )
+	if( libcfile_system_string_copy_from_wide_string(
+	     narrow_filename,
+	     narrow_filename_size,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

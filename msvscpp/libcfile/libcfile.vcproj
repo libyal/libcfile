@@ -189,6 +189,10 @@
 				RelativePath="..\..\libcfile\libcfile_support.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libcfile\libcfile_system_string.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -233,6 +237,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcfile\libcfile_support.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcfile\libcfile_system_string.h"
 				>
 			</File>
 			<File
