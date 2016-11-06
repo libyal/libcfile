@@ -1288,6 +1288,301 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcfile_file_seek_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_seek_offset(
+     libcfile_file_t *file )
+{
+	libcerror_error_t *error = NULL;
+	off64_t result           = 0;
+
+	result = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "result",
+	 result,
+	 (int64_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_CUR,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "result",
+	 result,
+	 (int64_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_END,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "result",
+	 result,
+	 (int64_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_seek_offset(
+	          NULL,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "result",
+	 result,
+	 (int64_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_seek_offset(
+	          file,
+	          -1,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "result",
+	 result,
+	 (int64_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          -1,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "result",
+	 result,
+	 (int64_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_read_buffer function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_read_buffer(
+     libcfile_file_t *file )
+{
+	uint8_t buffer[ 4 ];
+
+	libcerror_error_t *error = NULL;
+	ssize_t result           = 0;
+
+	result = libcfile_file_read_buffer(
+	          file,
+	          buffer,
+	          0,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_read_buffer(
+	          NULL,
+	          buffer,
+	          0,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_read_buffer_with_error_code function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_read_buffer_with_error_code(
+     libcfile_file_t *file )
+{
+	uint8_t buffer[ 4 ];
+
+	libcerror_error_t *error = NULL;
+	ssize_t result           = 0;
+	uint32_t error_code      = 0;
+
+	result = libcfile_file_read_buffer_with_error_code(
+	          file,
+	          buffer,
+	          0,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_read_buffer_with_error_code(
+	          NULL,
+	          buffer,
+	          0,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_read_buffer_with_error_code(
+	          file,
+	          NULL,
+	          0,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_read_buffer_with_error_code(
+	          file,
+	          buffer,
+	          (size_t) SSIZE_MAX + 1,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_read_buffer_with_error_code(
+	          file,
+	          buffer,
+	          0,
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "result",
+	 result,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libcfile_file_is_open function
  * Returns 1 if successful or 0 if not
  */
@@ -1626,9 +1921,20 @@ int main(
 	         "error",
 	         error );
 
-		/* TODO: add test for libcfile_file_read_buffer */
-		/* TODO: add test for libcfile_file_read_buffer_with_error_code */
-		/* TODO: add test for libcfile_file_seek_offset */
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_seek_offset",
+		 cfile_test_file_seek_offset,
+		 file );
+
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_read_buffer",
+		 cfile_test_file_read_buffer,
+		 file );
+
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_read_buffer_with_error_code",
+		 cfile_test_file_read_buffer_with_error_code,
+		 file );
 
 		/* TODO: add test for libcfile_file_write_buffer */
 		/* TODO: add test for libcfile_file_write_buffer_with_error_code */
