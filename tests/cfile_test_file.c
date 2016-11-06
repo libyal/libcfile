@@ -1294,48 +1294,220 @@ on_error:
 int cfile_test_file_seek_offset(
      libcfile_file_t *file )
 {
-	libcerror_error_t *error = NULL;
-	off64_t result           = 0;
+	libcerror_error_t *error     = NULL;
+	libcfile_file_t *closed_file = NULL;
+	size64_t file_size           = 0;
+	off64_t offset               = 0;
+	off64_t seek_offset          = 0;
+	int result                   = 0;
 
-	result = libcfile_file_seek_offset(
+	/* Initialize test
+	 */
+	result = libcfile_file_get_size(
 	          file,
-	          0,
-	          SEEK_SET,
+	          &file_size,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL_INT64(
+	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 (int64_t) 0 );
+	 1 );
 
         CFILE_TEST_ASSERT_IS_NULL(
          "error",
          error );
 
-	result = libcfile_file_seek_offset(
+	/* Test seek offset with offset: 0 and whence: SEEK_SET
+	 */
+	seek_offset = 0;
+
+	offset = libcfile_file_seek_offset(
+	          file,
+	          seek_offset,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test seek offset with offset: <file_size> and whence: SEEK_SET
+	 */
+	seek_offset = (off64_t) file_size;
+
+	offset = libcfile_file_seek_offset(
+	          file,
+	          seek_offset,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test seek offset with offset: <file_size / 5> and whence: SEEK_SET
+	 */
+	seek_offset = (off64_t) ( file_size / 5 );
+
+	offset = libcfile_file_seek_offset(
+	          file,
+	          seek_offset,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test seek offset with offset: <file_size / 5> and whence: SEEK_CUR
+	 */
+	offset = libcfile_file_seek_offset(
+	          file,
+	          seek_offset,
+	          SEEK_CUR,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset + seek_offset );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test seek offset with offset: <-1 * (file_size / 5)> and whence: SEEK_CUR
+	 */
+	offset = libcfile_file_seek_offset(
+	          file,
+	          -1 * seek_offset,
+	          SEEK_CUR,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test seek offset with offset: <file_size + 987> and whence: SEEK_SET
+	 */
+	seek_offset = (off64_t) ( file_size + 987 );
+
+	offset = libcfile_file_seek_offset(
+	          file,
+	          seek_offset,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test seek offset with offset: 0 and whence: SEEK_CUR
+	 */
+	offset = libcfile_file_seek_offset(
 	          file,
 	          0,
 	          SEEK_CUR,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT64(
-	 "result",
-	 result,
-	 (int64_t) 0 );
+	 "offset",
+	 offset,
+	 (int64_t) seek_offset );
 
         CFILE_TEST_ASSERT_IS_NULL(
          "error",
          error );
 
-	result = libcfile_file_seek_offset(
+	/* Test seek offset with offset: 0 and whence: SEEK_END
+	 */
+	offset = libcfile_file_seek_offset(
 	          file,
 	          0,
 	          SEEK_END,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT64(
-	 "result",
-	 result,
+	 "offset",
+	 offset,
+	 (int64_t) file_size );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test seek offset with offset: <-1 * (file_size / 4)> and whence: SEEK_END
+	 */
+	seek_offset = (off64_t) ( file_size / 4 );
+
+	offset = libcfile_file_seek_offset(
+	          file,
+	          -1 * seek_offset,
+	          SEEK_END,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) file_size - seek_offset );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test seek offset with offset: 542 and whence: SEEK_END
+	 */
+	offset = libcfile_file_seek_offset(
+	          file,
+	          542,
+	          SEEK_END,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) file_size + 542 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test seek offset with offset: <-1 * file_size> and whence: SEEK_END
+	 */
+	offset = libcfile_file_seek_offset(
+	          file,
+	          -1 * file_size,
+	          SEEK_END,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
 	 (int64_t) 0 );
 
         CFILE_TEST_ASSERT_IS_NULL(
@@ -1344,15 +1516,15 @@ int cfile_test_file_seek_offset(
 
 	/* Test error cases
 	 */
-	result = libcfile_file_seek_offset(
+	offset = libcfile_file_seek_offset(
 	          NULL,
 	          0,
 	          SEEK_SET,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT64(
-	 "result",
-	 result,
+	 "offset",
+	 offset,
 	 (int64_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1362,15 +1534,17 @@ int cfile_test_file_seek_offset(
 	libcerror_error_free(
 	 &error );
 
-	result = libcfile_file_seek_offset(
+	/* Test seek offset with offset: -987 and whence: SEEK_SET
+	 */
+	offset = libcfile_file_seek_offset(
 	          file,
-	          -1,
+	          -987,
 	          SEEK_SET,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT64(
-	 "result",
-	 result,
+	 "offset",
+	 offset,
 	 (int64_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1380,15 +1554,17 @@ int cfile_test_file_seek_offset(
 	libcerror_error_free(
 	 &error );
 
-	result = libcfile_file_seek_offset(
+	/* Test seek offset with offset: <1 * (file_size + 542)> and whence: SEEK_END
+	 */
+	offset = libcfile_file_seek_offset(
 	          file,
-	          0,
-	          -1,
+	          -1 * (file_size + 542),
+	          SEEK_END,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT64(
-	 "result",
-	 result,
+	 "offset",
+	 offset,
 	 (int64_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1397,6 +1573,84 @@ int cfile_test_file_seek_offset(
 
 	libcerror_error_free(
 	 &error );
+
+	/* Test seek offset with offset: 0 and whence: UNKNOWN (88)
+	 */
+	offset = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          88,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "closed_file",
+         closed_file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test seek offset on a close file
+	 */
+	offset = libcfile_file_seek_offset(
+	          closed_file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_free(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "closed_file",
+         closed_file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	return( 1 );
 
@@ -1405,6 +1659,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( closed_file != NULL )
+	{
+		libcfile_file_free(
+		 &closed_file,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -1418,17 +1678,17 @@ int cfile_test_file_read_buffer(
 	uint8_t buffer[ 4 ];
 
 	libcerror_error_t *error = NULL;
-	ssize_t result           = 0;
+	ssize_t read_count       = 0;
 
-	result = libcfile_file_read_buffer(
-	          file,
-	          buffer,
-	          0,
-	          &error );
+	read_count = libcfile_file_read_buffer(
+	              file,
+	              buffer,
+	              0,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) 0 );
 
         CFILE_TEST_ASSERT_IS_NULL(
@@ -1437,15 +1697,15 @@ int cfile_test_file_read_buffer(
 
 	/* Test error cases
 	 */
-	result = libcfile_file_read_buffer(
-	          NULL,
-	          buffer,
-	          0,
-	          &error );
+	read_count = libcfile_file_read_buffer(
+	              NULL,
+	              buffer,
+	              0,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1474,20 +1734,22 @@ int cfile_test_file_read_buffer_with_error_code(
 {
 	uint8_t buffer[ 4 ];
 
-	libcerror_error_t *error = NULL;
-	ssize_t result           = 0;
-	uint32_t error_code      = 0;
+	libcerror_error_t *error     = NULL;
+	libcfile_file_t *closed_file = NULL;
+	ssize_t read_count           = 0;
+	uint32_t error_code          = 0;
+	int result                   = 0;
 
-	result = libcfile_file_read_buffer_with_error_code(
-	          file,
-	          buffer,
-	          0,
-	          &error_code,
-	          &error );
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) 0 );
 
         CFILE_TEST_ASSERT_IS_NULL(
@@ -1496,16 +1758,16 @@ int cfile_test_file_read_buffer_with_error_code(
 
 	/* Test error cases
 	 */
-	result = libcfile_file_read_buffer_with_error_code(
-	          NULL,
-	          buffer,
-	          0,
-	          &error_code,
-	          &error );
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              NULL,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1515,16 +1777,16 @@ int cfile_test_file_read_buffer_with_error_code(
 	libcerror_error_free(
 	 &error );
 
-	result = libcfile_file_read_buffer_with_error_code(
-	          file,
-	          NULL,
-	          0,
-	          &error_code,
-	          &error );
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              NULL,
+	              0,
+	              &error_code,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1534,16 +1796,16 @@ int cfile_test_file_read_buffer_with_error_code(
 	libcerror_error_free(
 	 &error );
 
-	result = libcfile_file_read_buffer_with_error_code(
-	          file,
-	          buffer,
-	          (size_t) SSIZE_MAX + 1,
-	          &error_code,
-	          &error );
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              (size_t) SSIZE_MAX + 1,
+	              &error_code,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1553,16 +1815,16 @@ int cfile_test_file_read_buffer_with_error_code(
 	libcerror_error_free(
 	 &error );
 
-	result = libcfile_file_read_buffer_with_error_code(
-	          file,
-	          buffer,
-	          0,
-	          NULL,
-	          &error );
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              0,
+	              NULL,
+	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "result",
-	 result,
+	 "read_count",
+	 read_count,
 	 (ssize_t) -1 );
 
         CFILE_TEST_ASSERT_IS_NOT_NULL(
@@ -1571,6 +1833,65 @@ int cfile_test_file_read_buffer_with_error_code(
 
 	libcerror_error_free(
 	 &error );
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "closed_file",
+         closed_file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test read buffer with error code on a close file
+	 */
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_free(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "closed_file",
+         closed_file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	return( 1 );
 
@@ -1579,6 +1900,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( closed_file != NULL )
+	{
+		libcfile_file_free(
+		 &closed_file,
+		 NULL );
 	}
 	return( 0 );
 }

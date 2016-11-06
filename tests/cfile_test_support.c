@@ -173,7 +173,7 @@ int cfile_test_file_exists(
 	int result               = 0;
 
 	result = libcfile_file_exists(
-	          "cfile_test_support",
+	          "Makefile.am",
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -239,7 +239,7 @@ int cfile_test_file_exists_wide(
 	int result               = 0;
 
 	result = libcfile_file_exists_wide(
-	          L"cfile_test_support",
+	          L"Makefile.am",
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(

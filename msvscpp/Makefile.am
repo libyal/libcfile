@@ -3,7 +3,6 @@ MSVSCPP_FILES = \
 	cfile_test_file/cfile_test_file.vcproj \
 	cfile_test_notify/cfile_test_notify.vcproj \
 	cfile_test_read/cfile_test_read.vcproj \
-	cfile_test_seek/cfile_test_seek.vcproj \
 	cfile_test_support/cfile_test_support.vcproj \
 	cfile_test_write/cfile_test_write.vcproj \
 	libcerror/libcerror.vcproj \

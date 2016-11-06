@@ -29,7 +29,6 @@ check_PROGRAMS = \
 	cfile_test_file \
 	cfile_test_notify \
 	cfile_test_read \
-	cfile_test_seek \
 	cfile_test_support \
 	cfile_test_write
 
@@ -76,15 +75,6 @@ cfile_test_read_SOURCES = \
 	cfile_test_unused.h
 
 cfile_test_read_LDADD = \
-	../libcfile/libcfile.la \
-	@LIBCERROR_LIBADD@
-
-cfile_test_seek_SOURCES = \
-	cfile_test_libcerror.h \
-	cfile_test_libcfile.h \
-	cfile_test_seek.c
-
-cfile_test_seek_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@
 
