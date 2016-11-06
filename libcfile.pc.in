@@ -7,6 +7,6 @@ Name: libcfile
 Description: Library to support cross-platform C file functions
 Version: @VERSION@
 Libs: -L${libdir} -lcfile
-Libs.private: @ax_libcerror_pc_libs_private@ @ax_libclocale_pc_libs_private@ @ax_libcnotify_pc_libs_private@ @ax_libcstring_pc_libs_private@ @ax_libuna_pc_libs_private@
+Libs.private: @ax_libcerror_pc_libs_private@ @ax_libclocale_pc_libs_private@ @ax_libcnotify_pc_libs_private@ @ax_libuna_pc_libs_private@
 Cflags: -I${includedir}
 

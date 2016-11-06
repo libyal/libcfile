@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -28,7 +29,6 @@
 
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
-#include "cfile_test_libcstring.h"
 #include "cfile_test_unused.h"
 
 /* Define to make cfile_test_seek generate verbose output
@@ -450,7 +450,7 @@ int cfile_test_seek_file(
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_seek(
-     libcstring_system_character_t *source,
+     system_character_t *source,
      libcerror_error_t **error )
 {
 	libcfile_file_t *file = NULL;
@@ -467,7 +467,7 @@ int cfile_test_seek(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
 	     file,
 	     source,
@@ -549,7 +549,7 @@ on_error:
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_seek_file_no_open(
-     libcstring_system_character_t *source CFILE_TEST_ATTRIBUTE_UNUSED,
+     system_character_t *source CFILE_TEST_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	libcfile_file_t *file = NULL;
@@ -634,14 +634,14 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error              = NULL;
-	libcstring_system_character_t *source = NULL;
+	libcerror_error_t *error   = NULL;
+	system_character_t *source = NULL;
 
 	if( argc != 2 )
 	{

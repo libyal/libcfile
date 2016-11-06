@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -28,7 +29,6 @@
 
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
-#include "cfile_test_libcstring.h"
 #include "cfile_test_macros.h"
 #include "cfile_test_unused.h"
 
@@ -297,7 +297,7 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int cfile_test_read(
-     libcstring_system_character_t *source )
+     system_character_t *source )
 {
 	libcerror_error_t *error = NULL;
 	libcfile_file_t *file    = NULL;
@@ -314,7 +314,7 @@ int cfile_test_read(
 	 result,
 	 1 );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libcfile_file_open_wide(
 	          file,
 	          source,
@@ -387,7 +387,7 @@ on_error:
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int cfile_test_read_with_block_size(
-     libcstring_system_character_t *source )
+     system_character_t *source )
 {
 	libcerror_error_t *error = NULL;
 	libcfile_file_t *file    = NULL;
@@ -404,7 +404,7 @@ int cfile_test_read_with_block_size(
 	 result,
 	 1 );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libcfile_file_open_wide(
 	          file,
 	          source,
@@ -485,7 +485,7 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc,
      wchar_t * const argv[] )
@@ -495,7 +495,7 @@ int main(
      char * const argv[] )
 #endif
 {
-	libcstring_system_character_t *source = NULL;
+	system_character_t *source = NULL;
 
 	if( argc < 2 )
 	{

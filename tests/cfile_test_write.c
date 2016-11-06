@@ -20,7 +20,12 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -30,12 +35,11 @@
 
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
-#include "cfile_test_libcstring.h"
 
 #define CFILE_TEST_BUFFER_SIZE		4096
 
 int cfile_test_file_write(
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      size_t data_size,
      libcerror_error_t **error )
 {
@@ -53,7 +57,7 @@ int cfile_test_file_write(
 	 "Testing writing file size: %" PRIzd "\t",
 	 data_size );
 
-	filename_length = libcstring_system_string_length(
+	filename_length = system_string_length(
 	                   filename );
 
 	/* Initialization
@@ -71,7 +75,7 @@ int cfile_test_file_write(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
 	     file,
 	     filename,
@@ -271,15 +275,15 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcstring_system_character_t *filename = NULL;
-	libcerror_error_t *error                = NULL;
-	size_t file_size                        = 0;
+	system_character_t *filename = NULL;
+	libcerror_error_t *error     = NULL;
+	size_t file_size             = 0;
 
 	if( argc < 2 )
 	{
@@ -299,7 +303,7 @@ int main( int argc, char * const argv[] )
 	}
 	filename = argv[ 1 ];
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	file_size = (size_t) _wtoi( argv[ 2 ] );
 #else
 	file_size = (size_t) atoi( argv[ 2 ] );

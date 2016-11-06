@@ -38,6 +38,16 @@ LIBCFILE_EXTERN \
 const char *libcfile_get_version(
              void );
 
+LIBCFILE_EXTERN \
+int libcfile_get_codepage(
+     int *codepage,
+     libcerror_error_t **error );
+
+LIBCFILE_EXTERN \
+int libcfile_set_codepage(
+     int codepage,
+     libcerror_error_t **error );
+
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )

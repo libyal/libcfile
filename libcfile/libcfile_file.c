@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_SYS_STAT_H )
 #include <sys/stat.h>
@@ -89,7 +92,6 @@ typedef size_t u64;
 #include "libcfile_libcerror.h"
 #include "libcfile_libclocale.h"
 #include "libcfile_libcnotify.h"
-#include "libcfile_libcstring.h"
 #include "libcfile_libuna.h"
 #include "libcfile_types.h"
 
@@ -110,7 +112,7 @@ BOOL libcfile_CloseHandle(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -299,7 +301,7 @@ HANDLE libcfile_CreateFileA(
 		return( INVALID_HANDLE_VALUE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -475,7 +477,7 @@ int libcfile_file_open_with_error_code(
 
 		return( -1 );
 	}
-	filename_length = libcstring_narrow_string_length(
+	filename_length = narrow_string_length(
 	                   filename );
 
 	if( filename_length > 4 )
@@ -532,7 +534,7 @@ int libcfile_file_open_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: access denied to file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -544,7 +546,7 @@ int libcfile_file_open_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: no such file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -556,7 +558,7 @@ int libcfile_file_open_with_error_code(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
 				 *error_code,
-				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to open file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -685,7 +687,7 @@ int libcfile_file_open_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: access denied to file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -696,7 +698,7 @@ int libcfile_file_open_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: no such file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -708,7 +710,7 @@ int libcfile_file_open_with_error_code(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
 				 *error_code,
-				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to open file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -751,7 +753,7 @@ HANDLE libcfile_CreateFileW(
 		return( INVALID_HANDLE_VALUE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -927,7 +929,7 @@ int libcfile_file_open_wide_with_error_code(
 
 		return( -1 );
 	}
-	filename_length = libcstring_wide_string_length(
+	filename_length = wide_string_length(
 	                   filename );
 
 	if( filename_length > 4 )
@@ -984,7 +986,7 @@ int libcfile_file_open_wide_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: access denied to file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -996,7 +998,7 @@ int libcfile_file_open_wide_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: no such file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -1008,7 +1010,7 @@ int libcfile_file_open_wide_with_error_code(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
 				 *error_code,
-				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to open file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -1116,7 +1118,7 @@ int libcfile_file_open_wide_with_error_code(
 
 		return( -1 );
 	}
-	filename_size = 1 + libcstring_wide_string_length(
+	filename_size = 1 + wide_string_length(
 	                     filename );
 
 	if( libclocale_codepage == 0 )
@@ -1168,7 +1170,7 @@ int libcfile_file_open_wide_with_error_code(
 
 		goto on_error;
 	}
-	narrow_filename = libcstring_narrow_string_allocate(
+	narrow_filename = narrow_string_allocate(
 	                   narrow_filename_size );
 
 	if( narrow_filename == NULL )
@@ -1263,7 +1265,7 @@ int libcfile_file_open_wide_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: access denied to file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -1274,7 +1276,7 @@ int libcfile_file_open_wide_with_error_code(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: no such file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -1286,7 +1288,7 @@ int libcfile_file_open_wide_with_error_code(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
 				 *error_code,
-				 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to open file: %" PRIs_SYSTEM ".",
 				 function,
 				 filename );
 
@@ -1522,7 +1524,7 @@ BOOL libcfile_GetOverlappedResult(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -1582,7 +1584,7 @@ BOOL libcfile_ReadFile(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -2502,7 +2504,7 @@ BOOL libcfile_WriteFile(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -2793,7 +2795,7 @@ BOOL libcfile_SetFilePointerEx(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -3152,7 +3154,7 @@ BOOL libcfile_SetEndOfFile(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -3462,7 +3464,7 @@ BOOL libcfile_GetFileSizeEx(
 		return( FALSE );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
@@ -4161,7 +4163,7 @@ DWORD libcfile_GetFileType(
 		return( FILE_TYPE_UNKNOWN );
 	}
 	library_handle = LoadLibrary(
-	                  _LIBCSTRING_SYSTEM_STRING( "kernel32.dll" ) );
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
 
 	if( library_handle == NULL )
 	{
