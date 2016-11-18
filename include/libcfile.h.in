@@ -418,5 +418,5 @@ int libcfile_file_set_block_size(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCFILE_H ) */
 

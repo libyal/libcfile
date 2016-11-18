@@ -1039,7 +1039,6 @@ int libcfile_file_open_wide_with_error_code(
 	size_t filename_size                    = 0;
 	size_t narrow_filename_size             = 0;
 	int file_io_flags                       = 0;
-	int result                              = 0;
 
 	if( file == NULL )
 	{

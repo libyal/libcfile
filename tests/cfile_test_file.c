@@ -1613,7 +1613,7 @@ int cfile_test_file_seek_offset(
          "error",
          error );
 
-	/* Test seek offset on a close file
+	/* Test seek offset on a closed file
 	 */
 	offset = libcfile_file_seek_offset(
 	          closed_file,
@@ -1853,10 +1853,10 @@ int cfile_test_file_read_buffer_with_error_code(
          "error",
          error );
 
-	/* Test read buffer with error code on a close file
+	/* Test read buffer with error code on a closed file
 	 */
 	read_count = libcfile_file_read_buffer_with_error_code(
-	              file,
+	              closed_file,
 	              buffer,
 	              0,
 	              &error_code,
