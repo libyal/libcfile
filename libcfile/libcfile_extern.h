@@ -38,9 +38,9 @@
 #include <libcfile/extern.h>
 
 #else
-#define LIBCFILE_EXTERN	extern
+#define LIBCFILE_EXTERN	/* extern */
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
 #endif /* !defined( _LIBCFILE_INTERNAL_EXTERN_H ) */
 
