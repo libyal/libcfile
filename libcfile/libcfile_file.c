@@ -4527,7 +4527,7 @@ ssize_t libcfile_file_io_control_read_with_error_code(
 
 /* On some versions of Linux the FADVISE definions seem to be missing from fcntl.h
  */
-#if defined( HAVE_POSIX_FADVISE )
+#if defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI )
 
 #if !defined( POSIX_FADV_NORMAL )
 #define POSIX_FADV_NORMAL		0
@@ -4541,7 +4541,7 @@ ssize_t libcfile_file_io_control_read_with_error_code(
 #define POSIX_FADV_SEQUENTIAL		2
 #endif
 
-#endif /* #if defined( HAVE_POSIX_FADVISE ) */
+#endif /* #if defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI ) */
 
 /* Sets the expected access behavior so the system can optimize the access
  * Returns 1 if successful or -1 on error
@@ -4554,7 +4554,7 @@ int libcfile_file_set_access_behavior(
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_set_access_behavior";
 
-#if defined( HAVE_POSIX_FADVISE )
+#if defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI )
 	int advice                              = POSIX_FADV_NORMAL;
 	int result                              = 0;
 #endif
@@ -4611,7 +4611,7 @@ int libcfile_file_set_access_behavior(
 
 		return( -1 );
 	}
-#if defined( HAVE_POSIX_FADVISE )
+#if defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI )
 	if( access_behavior == LIBCFILE_ACCESS_BEHAVIOR_NORMAL )
 	{
 		advice = POSIX_FADV_NORMAL;
@@ -4647,7 +4647,7 @@ int libcfile_file_set_access_behavior(
 
 		return( -1 );
 	}
-#endif
+#endif /* defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI ) */
 	return( 1 );
 }
 
