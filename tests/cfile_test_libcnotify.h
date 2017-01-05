@@ -1,5 +1,5 @@
 /*
- * The internal libcerror header
+ * The internal libcnotify header
  *
  * Copyright (C) 2008-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,32 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCFILE_LIBCERROR_H )
-#define _LIBCFILE_LIBCERROR_H
+#if !defined( _CFILE_TEST_LIBCNOTIFY_H )
+#define _CFILE_TEST_LIBCNOTIFY_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBCERROR for local use of libcerror
+/* Define HAVE_LOCAL_LIBCNOTIFY for local use of libcnotify
  */
-#if defined( HAVE_LOCAL_LIBCERROR )
+#if defined( HAVE_LOCAL_LIBCNOTIFY )
 
-#include <libcerror_definitions.h>
-#include <libcerror_error.h>
-#include <libcerror_system.h>
-#include <libcerror_types.h>
+#include <libcnotify_definitions.h>
+#include <libcnotify_print.h>
+#include <libcnotify_stream.h>
+#include <libcnotify_verbose.h>
 
 #else
 
-/* If libtool DLL support is enabled set LIBCERROR_DLL_IMPORT
- * before including libcerror.h
+/* If libtool DLL support is enabled set LIBCNOTIFY_DLL_IMPORT
+ * before including libcnotify.h
  */
 #if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBCERROR_DLL_IMPORT
+#define LIBCNOTIFY_DLL_IMPORT
 #endif
 
-#include <libcerror.h>
+#include <libcnotify.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCERROR ) */
+#endif /* defined( HAVE_LOCAL_LIBCNOTIFY ) */
 
-#endif /* !defined( _LIBCFILE_LIBCERROR_H ) */
+#endif /* !defined( _CFILE_TEST_LIBCNOTIFY_H ) */
 

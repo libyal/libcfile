@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
+	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_DLL_IMPORT@
 
@@ -28,7 +29,6 @@ check_PROGRAMS = \
 	cfile_test_error \
 	cfile_test_file \
 	cfile_test_notify \
-	cfile_test_read \
 	cfile_test_support \
 	cfile_test_write
 
@@ -43,40 +43,30 @@ cfile_test_error_LDADD = \
 
 cfile_test_file_SOURCES = \
 	cfile_test_file.c \
+	cfile_test_getopt.c cfile_test_getopt.h \
 	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_libclocale.h \
+	cfile_test_libcnotify.h \
 	cfile_test_libuna.h \
 	cfile_test_macros.h \
-	cfile_test_memory.c cfile_test_memory.h \
-	cfile_test_unused.h
+	cfile_test_memory.c cfile_test_memory.h
 
 cfile_test_file_LDADD = \
-	../libcfile/libcfile.la \
 	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@
 
 cfile_test_notify_SOURCES = \
-	cfile_test_notify.c \
-	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_macros.h \
+	cfile_test_notify.c \
 	cfile_test_unused.h
 
 cfile_test_notify_LDADD = \
-	../libcfile/libcfile.la \
-	@LIBCERROR_LIBADD@
-
-cfile_test_read_SOURCES = \
-	cfile_test_libcerror.h \
-	cfile_test_libcfile.h \
-	cfile_test_read.c \
-	cfile_test_unused.h
-
-cfile_test_read_LDADD = \
-	../libcfile/libcfile.la \
-	@LIBCERROR_LIBADD@
+	../libcfile/libcfile.la
 
 cfile_test_support_SOURCES = \
 	cfile_test_libcerror.h \

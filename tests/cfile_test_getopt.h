@@ -1,5 +1,5 @@
 /*
- * Error functions
+ * GetOpt functions
  *
  * Copyright (C) 2008-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,56 +19,50 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCFILE_INTERNAL_ERROR_H )
-#define _LIBCFILE_INTERNAL_ERROR_H
+#if !defined( _CFILE_TEST_GETOPT_H )
+#define _CFILE_TEST_GETOPT_H
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
 
-#if !defined( HAVE_LOCAL_LIBCFILE )
-#include <libcfile/error.h>
+/* unistd.h is included here to export getopt, optarg, optind and optopt
+ */
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
 #endif
-
-#include "libcfile_extern.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if !defined( HAVE_LOCAL_LIBCFILE )
+#if defined( HAVE_GETOPT )
+#define cfile_test_getopt( argument_count, argument_values, options_string ) \
+	getopt( argument_count, argument_values, options_string )
 
-LIBCFILE_EXTERN \
-void libcfile_error_free(
-      libcfile_error_t **error );
+#else
 
-LIBCFILE_EXTERN \
-int libcfile_error_fprint(
-     libcfile_error_t *error,
-     FILE *stream );
+#if !defined( __CYGWIN__ )
+extern int optind;
+extern system_character_t *optarg;
+extern system_integer_t optopt;
 
-LIBCFILE_EXTERN \
-int libcfile_error_sprint(
-     libcfile_error_t *error,
-     char *string,
-     size_t size );
+#else
+int optind;
+system_character_t *optarg;
+system_integer_t optopt;
 
-LIBCFILE_EXTERN \
-int libcfile_error_backtrace_fprint(
-     libcfile_error_t *error,
-     FILE *stream );
+#endif /* !defined( __CYGWIN__ ) */
 
-LIBCFILE_EXTERN \
-int libcfile_error_backtrace_sprint(
-     libcfile_error_t *error,
-     char *string,
-     size_t size );
+system_integer_t cfile_test_getopt(
+                  int argument_count,
+                  system_character_t * const argument_values[],
+                  const system_character_t *options_string );
 
-#endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
+#endif /* defined( HAVE_GETOPT ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBCFILE_INTERNAL_ERROR_H ) */
+#endif /* !defined( _CFILE_TEST_GETOPT_H ) */
 

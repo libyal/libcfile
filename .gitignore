@@ -123,7 +123,6 @@ stamp-h[1-9]
 /tests/cfile_test_error
 /tests/cfile_test_file
 /tests/cfile_test_notify
-/tests/cfile_test_read
 /tests/cfile_test_seek
 /tests/cfile_test_support
 /tests/cfile_test_write

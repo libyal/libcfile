@@ -1,7 +1,7 @@
 /*
- * Library file type testing program
+ * Library file type test program
  *
- * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #endif
 
+#include "cfile_test_getopt.h"
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
 #include "cfile_test_libclocale.h"
@@ -255,8 +256,8 @@ int cfile_test_file_get_wide_source(
      libcerror_error_t **error )
 {
 	static char *function   = "cfile_test_file_get_wide_source";
-	size_t wide_source_size = 0;
 	size_t source_length    = 0;
+	size_t wide_source_size = 0;
 
 #if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	int result              = 0;
@@ -583,11 +584,17 @@ int cfile_test_file_close_source(
 int cfile_test_file_initialize(
      void )
 {
-	libcerror_error_t *error = NULL;
-	libcfile_file_t *file    = NULL;
-	int result               = 0;
+	libcerror_error_t *error        = NULL;
+	libcfile_file_t *file           = NULL;
+	int result                      = 0;
 
-	/* Test libcfile_file_initialize
+#if defined( HAVE_CFILE_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 1;
+	int number_of_memset_fail_tests = 1;
+	int test_number                 = 0;
+#endif
+
+	/* Test regular cases
 	 */
 	result = libcfile_file_initialize(
 	          &file,
@@ -663,79 +670,89 @@ int cfile_test_file_initialize(
 
 #if defined( HAVE_CFILE_TEST_MEMORY )
 
-	/* Test libcfile_file_initialize with malloc failing
-	 */
-	cfile_test_malloc_attempts_before_fail = 0;
-
-	result = libcfile_file_initialize(
-	          &file,
-	          &error );
-
-	if( cfile_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		cfile_test_malloc_attempts_before_fail = -1;
+		/* Test libcfile_file_initialize with malloc failing
+		 */
+		cfile_test_malloc_attempts_before_fail = test_number;
 
-		if( file != NULL )
+		result = libcfile_file_initialize(
+		          &file,
+		          &error );
+
+		if( cfile_test_malloc_attempts_before_fail != -1 )
 		{
-			libcfile_file_free(
-			 &file,
-			 NULL );
+			cfile_test_malloc_attempts_before_fail = -1;
+
+			if( file != NULL )
+			{
+				libcfile_file_free(
+				 &file,
+				 NULL );
+			}
+		}
+		else
+		{
+			CFILE_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			CFILE_TEST_ASSERT_IS_NULL(
+			 "file",
+			 file );
+
+			CFILE_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
 	{
-		CFILE_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libcfile_file_initialize with memset failing
+		 */
+		cfile_test_memset_attempts_before_fail = test_number;
 
-		CFILE_TEST_ASSERT_IS_NULL(
-		 "file",
-		 file );
+		result = libcfile_file_initialize(
+		          &file,
+		          &error );
 
-		CFILE_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libcfile_file_initialize with memset failing
-	 */
-	cfile_test_memset_attempts_before_fail = 0;
-
-	result = libcfile_file_initialize(
-	          &file,
-	          &error );
-
-	if( cfile_test_memset_attempts_before_fail != -1 )
-	{
-		cfile_test_memset_attempts_before_fail = -1;
-
-		if( file != NULL )
+		if( cfile_test_memset_attempts_before_fail != -1 )
 		{
-			libcfile_file_free(
-			 &file,
-			 NULL );
+			cfile_test_memset_attempts_before_fail = -1;
+
+			if( file != NULL )
+			{
+				libcfile_file_free(
+				 &file,
+				 NULL );
+			}
 		}
-	}
-	else
-	{
-		CFILE_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		else
+		{
+			CFILE_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
 
-		CFILE_TEST_ASSERT_IS_NULL(
-		 "file",
-		 file );
+			CFILE_TEST_ASSERT_IS_NULL(
+			 "file",
+			 file );
 
-		CFILE_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+			CFILE_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
 
-		libcerror_error_free(
-		 &error );
+			libcerror_error_free(
+			 &error );
+		}
 	}
 #endif /* defined( HAVE_CFILE_TEST_MEMORY ) */
 
@@ -857,6 +874,26 @@ int cfile_test_file_open(
          "error",
          error );
 
+	/* Test error cases
+	 */
+	result = libcfile_file_open(
+	          file,
+	          narrow_source,
+	          LIBCFILE_OPEN_READ,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libcfile_file_close(
@@ -970,6 +1007,27 @@ int cfile_test_file_open_with_error_code(
         CFILE_TEST_ASSERT_IS_NULL(
          "error",
          error );
+
+	/* Test error cases
+	 */
+	result = libcfile_file_open_with_error_code(
+	          file,
+	          narrow_source,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
 
 	/* Clean up
 	 */
@@ -1085,6 +1143,26 @@ int cfile_test_file_open_wide(
          "error",
          error );
 
+	/* Test error cases
+	 */
+	result = libcfile_file_open_wide(
+	          file,
+	          wide_source,
+	          LIBCFILE_OPEN_READ,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libcfile_file_close(
@@ -1199,6 +1277,27 @@ int cfile_test_file_open_wide_with_error_code(
          "error",
          error );
 
+	/* Test error cases
+	 */
+	result = libcfile_file_open_wide_with_error_code(
+	          file,
+	          wide_source,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libcfile_file_close(
@@ -1284,6 +1383,388 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_open and libcfile_file_close functions
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_open_close(
+     const system_character_t *source )
+{
+	libcerror_error_t *error = NULL;
+	libcfile_file_t *file    = NULL;
+	int result               = 0;
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "file",
+         file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open and close
+	 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libcfile_file_open_wide(
+	          file,
+	          source,
+	          LIBCFILE_OPEN_READ,
+	          &error );
+#else
+	result = libcfile_file_open(
+	          file,
+	          source,
+	          LIBCFILE_OPEN_READ,
+	          &error );
+#endif
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open and close a second time to validate clean up on close
+	 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libcfile_file_open_wide(
+	          file,
+	          source,
+	          LIBCFILE_OPEN_READ,
+	          &error );
+#else
+	result = libcfile_file_open(
+	          file,
+	          source,
+	          LIBCFILE_OPEN_READ,
+	          &error );
+#endif
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_free(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "file",
+         file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file != NULL )
+	{
+		libcfile_file_free(
+		 &file,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_read_buffer function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_read_buffer(
+     libcfile_file_t *file )
+{
+	uint8_t buffer[ 4 ];
+
+	libcerror_error_t *error = NULL;
+	ssize_t read_count       = 0;
+
+	read_count = libcfile_file_read_buffer(
+	              file,
+	              buffer,
+	              0,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	read_count = libcfile_file_read_buffer(
+	              NULL,
+	              buffer,
+	              0,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_read_buffer_with_error_code function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_read_buffer_with_error_code(
+     libcfile_file_t *file )
+{
+	uint8_t buffer[ 4 ];
+
+	libcerror_error_t *error     = NULL;
+	libcfile_file_t *closed_file = NULL;
+	ssize_t read_count           = 0;
+	uint32_t error_code          = 0;
+	int result                   = 0;
+
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 0 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              NULL,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              NULL,
+	              0,
+	              &error_code,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              (size_t) SSIZE_MAX + 1,
+	              &error_code,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              0,
+	              NULL,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "closed_file",
+         closed_file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test read buffer with error code on a closed file
+	 */
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              closed_file,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+        CFILE_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_free(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "closed_file",
+         closed_file );
+
+        CFILE_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( closed_file != NULL )
+	{
+		libcfile_file_free(
+		 &closed_file,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -1669,247 +2150,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libcfile_file_read_buffer function
- * Returns 1 if successful or 0 if not
- */
-int cfile_test_file_read_buffer(
-     libcfile_file_t *file )
-{
-	uint8_t buffer[ 4 ];
-
-	libcerror_error_t *error = NULL;
-	ssize_t read_count       = 0;
-
-	read_count = libcfile_file_read_buffer(
-	              file,
-	              buffer,
-	              0,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) 0 );
-
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
-
-	/* Test error cases
-	 */
-	read_count = libcfile_file_read_buffer(
-	              NULL,
-	              buffer,
-	              0,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libcfile_file_read_buffer_with_error_code function
- * Returns 1 if successful or 0 if not
- */
-int cfile_test_file_read_buffer_with_error_code(
-     libcfile_file_t *file )
-{
-	uint8_t buffer[ 4 ];
-
-	libcerror_error_t *error     = NULL;
-	libcfile_file_t *closed_file = NULL;
-	ssize_t read_count           = 0;
-	uint32_t error_code          = 0;
-	int result                   = 0;
-
-	read_count = libcfile_file_read_buffer_with_error_code(
-	              file,
-	              buffer,
-	              0,
-	              &error_code,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) 0 );
-
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
-
-	/* Test error cases
-	 */
-	read_count = libcfile_file_read_buffer_with_error_code(
-	              NULL,
-	              buffer,
-	              0,
-	              &error_code,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	read_count = libcfile_file_read_buffer_with_error_code(
-	              file,
-	              NULL,
-	              0,
-	              &error_code,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	read_count = libcfile_file_read_buffer_with_error_code(
-	              file,
-	              buffer,
-	              (size_t) SSIZE_MAX + 1,
-	              &error_code,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	read_count = libcfile_file_read_buffer_with_error_code(
-	              file,
-	              buffer,
-	              0,
-	              NULL,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Initialize test
-	 */
-	result = libcfile_file_initialize(
-	          &closed_file,
-	          &error );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "closed_file",
-         closed_file );
-
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
-
-	/* Test read buffer with error code on a closed file
-	 */
-	read_count = libcfile_file_read_buffer_with_error_code(
-	              closed_file,
-	              buffer,
-	              0,
-	              &error_code,
-	              &error );
-
-	CFILE_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libcfile_file_free(
-	          &closed_file,
-	          &error );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-        CFILE_TEST_ASSERT_IS_NULL(
-         "closed_file",
-         closed_file );
-
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( closed_file != NULL )
-	{
-		libcfile_file_free(
-		 &closed_file,
-		 NULL );
-	}
-	return( 0 );
-}
-
 /* Tests the libcfile_file_is_open function
  * Returns 1 if successful or 0 if not
  */
@@ -2167,13 +2407,31 @@ int main(
 #endif
 {
 	libcerror_error_t *error   = NULL;
-	system_character_t *source = NULL;
 	libcfile_file_t *file      = NULL;
+	system_character_t *source = NULL;
+	system_integer_t option    = 0;
 	int result                 = 0;
 
-	if( argc >= 2 )
+	while( ( option = cfile_test_getopt(
+	                   argc,
+	                   argv,
+	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
 	{
-		source = argv[ 1 ];
+		switch( option )
+		{
+			case (system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
+				 argv[ optind - 1 ] );
+
+				return( EXIT_FAILURE );
+		}
+	}
+	if( optind < argc )
+	{
+		source = argv[ optind ];
 	}
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( CFILE_TEST_FILE_VERBOSE )
 	libcfile_notify_set_verbose(
@@ -2227,6 +2485,11 @@ int main(
 		CFILE_TEST_RUN(
 		 "libcfile_file_close",
 		 cfile_test_file_close );
+
+		CFILE_TEST_RUN_WITH_ARGS(
+		 "libcfile_file_open_close",
+		 cfile_test_file_open_close,
+		 source );
 
 		/* Initialize test
 		 */
