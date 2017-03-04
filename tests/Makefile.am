@@ -8,13 +8,11 @@ AM_CPPFLAGS = \
 	@LIBCFILE_DLL_IMPORT@
 
 TESTS = \
-	test_api_functions.sh \
-	test_api_types.sh \
+	test_library.sh \
 	test_write_functions.sh
 
 check_SCRIPTS = \
-	test_api_functions.sh \
-	test_api_types.sh \
+	test_library.sh \
 	test_runner.sh \
 	test_write_functions.sh
 
