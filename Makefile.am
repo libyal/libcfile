@@ -19,10 +19,9 @@ DPKG_FILES = \
 	dpkg/compat \
 	dpkg/control \
 	dpkg/copyright \
-	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libcfile-dev.docs \
-	dpkg/libcfile.docs \
+	dpkg/libcfile-dev.install \
+	dpkg/libcfile.install \
 	dpkg/source/format
 
 GETTEXT_FILES = \
