@@ -1,7 +1,10 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20170806
+# Version: 20170825
+#
+# When CHECK_WITH_ASAN is set to a non-empty value the test executable
+# is run with asan, otherwise it is run without.
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -366,6 +369,7 @@ read_option_file()
 # Runs the test with optional arguments.
 #
 # Globals:
+#   CHECK_WITH_ASAN
 #   CHECK_WITH_GDB
 #   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
@@ -417,7 +421,34 @@ run_test_with_arguments()
 	fi
 	local RESULT=0;
 
-	if test -n "${CHECK_WITH_GDB}";
+	if test -n "${CHECK_WITH_ASAN}";
+	then
+		assert_availability_binary ldconfig;
+
+		local LIBASAN=`ldconfig -p | grep libasan | sed 's/^.* => //'`;
+
+		if ! test -f ${LIBASAN};
+		then
+			echo "Missing library: ${BINARY}";
+			echo "";
+
+			exit ${EXIT_FAILURE};
+		fi
+
+		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
+		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
+		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
+
+		if test ${IS_PYTHON_SCRIPT} -eq 0;
+		then
+			LSAN_OPTIONS=suppressions="lsan.suppressions" LD_PRELOAD="${LIBASAN}" LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]};
+			RESULT=$?;
+		else
+			LSAN_OPTIONS=suppressions="lsan.suppressions" LD_PRELOAD="${LIBASAN}" LD_LIBRARY_PATH="${LIBRARY_PATH}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]};
+			RESULT=$?;
+		fi
+
+	elif test -n "${CHECK_WITH_GDB}";
 	then
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
@@ -618,6 +649,7 @@ run_test_with_arguments()
 # Runs the test with an input file and optional arguments.
 #
 # Globals:
+#   CHECK_WITH_ASAN
 #   CHECK_WITH_GDB
 #   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
@@ -669,7 +701,34 @@ run_test_with_input_and_arguments()
 	fi
 	local RESULT=0;
 
-	if test -n "${CHECK_WITH_GDB}";
+	if test -n "${CHECK_WITH_ASAN}";
+	then
+		assert_availability_binary ldconfig;
+
+		local LIBASAN=`ldconfig -p | grep libasan | sed 's/^.* => //'`;
+
+		if ! test -f ${LIBASAN};
+		then
+			echo "Missing library: ${BINARY}";
+			echo "";
+
+			exit ${EXIT_FAILURE};
+		fi
+
+		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
+		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
+		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
+
+		if test ${IS_PYTHON_SCRIPT} -eq 0;
+		then
+			LSAN_OPTIONS=suppressions="lsan.suppressions" LD_PRELOAD="${LIBASAN}" LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}";
+			RESULT=$?;
+		else
+			LSAN_OPTIONS=suppressions="lsan.suppressions" LD_PRELOAD="${LIBASAN}" LD_LIBRARY_PATH="${LIBRARY_PATH}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}";
+			RESULT=$?;
+		fi
+
+	elif test -n "${CHECK_WITH_GDB}";
 	then
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
@@ -1024,10 +1083,6 @@ run_test_on_input_file_with_options()
 }
 
 # Runs the test on the input directory.
-#
-# Globals:
-#   CHECK_WITH_GDB
-#   CHECK_WITH_VALGRIND
 #
 # Arguments:
 #   a string containing the name of the test profile
