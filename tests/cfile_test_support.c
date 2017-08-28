@@ -79,9 +79,9 @@ int cfile_test_get_codepage(
 	 result,
 	 1 );
 
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -94,9 +94,9 @@ int cfile_test_get_codepage(
 	 result,
 	 -1 );
 
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -130,9 +130,9 @@ int cfile_test_set_codepage(
 	 result,
 	 1 );
 
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -145,9 +145,9 @@ int cfile_test_set_codepage(
 	 result,
 	 -1 );
 
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -181,9 +181,9 @@ int cfile_test_file_exists(
 	 result,
 	 1 );
 
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcfile_file_exists(
 	          "bogus",
@@ -194,9 +194,9 @@ int cfile_test_file_exists(
 	 result,
 	 0 );
 
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -209,9 +209,9 @@ int cfile_test_file_exists(
 	 result,
 	 -1 );
 
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -247,9 +247,9 @@ int cfile_test_file_exists_wide(
 	 result,
 	 1 );
 
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcfile_file_exists_wide(
 	          L"bogus",
@@ -260,9 +260,9 @@ int cfile_test_file_exists_wide(
 	 result,
 	 0 );
 
-        CFILE_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -275,9 +275,9 @@ int cfile_test_file_exists_wide(
 	 result,
 	 -1 );
 
-        CFILE_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
