@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libcfile],
- [20170903],
+ [20170904],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -37,7 +37,6 @@ AM_GNU_GETTEXT_VERSION([0.18.1])
 
 dnl Check for compiler language support
 AC_C_CONST
-AC_C_INLINE
 AC_C_VOLATILE
 
 dnl Check for large file support

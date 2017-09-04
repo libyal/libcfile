@@ -197,10 +197,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libcnotify\libcnotify_types.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcnotify\libcnotify_unused.h"
 				>
 			</File>
