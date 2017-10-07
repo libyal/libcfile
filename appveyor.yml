@@ -35,6 +35,7 @@ environment:
   - TARGET: mingw-w64
 
 install:
+- cmd: git clone https://github.com/codecov/codecov-bash.git ..\codecov-bash
 - cmd: git clone https://github.com/libyal/vstools.git ..\vstools
 
 build_script:
@@ -100,9 +101,7 @@ test_script:
     C:\msys64\usr\bin\bash -e -l -c "cd libcfile && ./runtests.sh" )
 
 after_test:
-- ps: "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12"
-- ps: if ($env:TARGET -eq "mingw") {
-    (new-object net.webclient).DownloadFile('https://codecov.io/bash', 'C:\MinGW\msys\1.0\home\appveyor\libcerror\codecov.sh') }
 - cmd: if [%TARGET%]==[mingw] (
-    C:\MinGW\msys\1.0\bin\bash -e -l -c "cd libcerror && ./codecov.sh" )
+    copy C:\projects\codecov-bash\codecov C:\MinGW\msys\1.0\home\appveyor\libcfile\codecov.sh &&
+    C:\MinGW\msys\1.0\bin\bash -e -l -c "cd libcfile && chmod a+x ./codecov.sh && ./codecov.sh" )
 
