@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script that runs the tests
 #
-# Version: 20170717
+# Version: 20171106
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -260,7 +260,7 @@ then
 	PYTHON2=`which python2 2> /dev/null`;
 
         # Note that "test -x" on Mac OS X will succeed if the argument is not set.
-	if test ! -z ${PYTHON2} && test -x ${PYTHON2};
+	if test -n "${PYTHON2}" && test -x ${PYTHON2};
 	then
 		export PYTHON_VERSION=2;
 
@@ -291,7 +291,7 @@ then
 	PYTHON3=`which python3 2> /dev/null`;
 
         # Note that "test -x" on Mac OS X will succeed if the argument is not set.
-	if test ! -z ${PYTHON3} && test -x ${PYTHON3};
+	if test -n "${PYTHON3}" && test -x ${PYTHON3};
 	then
 		export PYTHON_VERSION=3;
 
