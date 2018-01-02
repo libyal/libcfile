@@ -35,6 +35,8 @@
 
 #include "../libcfile/libcfile_system_string.h"
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+
 /* Tests the libcfile_system_string_size_to_narrow_string function
  * Returns 1 if successful or 0 if not
  */
@@ -915,6 +917,8 @@ on_error:
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -929,6 +933,8 @@ int main(
 {
 	CFILE_TEST_UNREFERENCED_PARAMETER( argc )
 	CFILE_TEST_UNREFERENCED_PARAMETER( argv )
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_size_to_narrow_string",
@@ -965,6 +971,8 @@ int main(
 	 cfile_test_system_system_string_copy_from_wide_string );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

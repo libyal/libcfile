@@ -578,6 +578,36 @@ int cfile_test_file_close_source(
 	return( result );
 }
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_CloseHandle function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_CloseHandle(
+     void )
+{
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_CloseHandle(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+
 /* Tests the libcfile_file_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -811,6 +841,42 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_CreateFileA function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_CreateFileA(
+     void )
+{
+	HANDLE result = INVALID_HANDLE_VALUE;
+
+	/* Test error cases
+	 */
+	result = libcfile_CreateFileA(
+	          NULL,
+	          0,
+	          0,
+	          NULL,
+	          0,
+	          0,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 INVALID_HANDLE_VALUE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+
 /* Tests the libcfile_file_open functions
  * Returns 1 if successful or 0 if not
  */
@@ -1029,6 +1095,82 @@ int cfile_test_file_open_with_error_code(
 	libcerror_error_free(
 	 &error );
 
+	result = libcfile_file_open_with_error_code(
+	          NULL,
+	          narrow_source,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_with_error_code(
+	          file,
+	          NULL,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_with_error_code(
+	          file,
+	          narrow_source,
+	          -1,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_with_error_code(
+	          file,
+	          narrow_source,
+	          LIBCFILE_OPEN_READ,
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libcfile_file_close(
@@ -1079,6 +1221,42 @@ on_error:
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_CreateFileW function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_CreateFileW(
+     void )
+{
+	HANDLE result = INVALID_HANDLE_VALUE;
+
+	/* Test error cases
+	 */
+	result = libcfile_CreateFileW(
+	          NULL,
+	          0,
+	          0,
+	          NULL,
+	          0,
+	          0,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 INVALID_HANDLE_VALUE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
 /* Tests the libcfile_file_open_wide functions
  * Returns 1 if successful or 0 if not
@@ -1284,6 +1462,82 @@ int cfile_test_file_open_wide_with_error_code(
 	          wide_source,
 	          LIBCFILE_OPEN_READ,
 	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_wide_with_error_code(
+	          NULL,
+	          wide_source,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_wide_with_error_code(
+	          file,
+	          NULL,
+	          LIBCFILE_OPEN_READ,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_wide_with_error_code(
+	          file,
+	          wide_source,
+	          -1,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_open_wide_with_error_code(
+	          file,
+	          wide_source,
+	          LIBCFILE_OPEN_READ,
+	          NULL,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -1584,6 +1838,74 @@ on_error:
 	}
 	return( 0 );
 }
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_GetOverlappedResult function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_GetOverlappedResult(
+     void )
+{
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_GetOverlappedResult(
+	          NULL,
+	          NULL,
+	          NULL,
+	          0 );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+/* Tests the libcfile_ReadFile function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_ReadFile(
+     void )
+{
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_ReadFile(
+	          NULL,
+	          NULL,
+	          0,
+	          NULL,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( WINAPI )
+
+/* TODO: add test for libcfile_internal_file_read_buffer_at_offset_with_error_code */
+
+#endif /* defined( WINAPI ) */
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
 /* Tests the libcfile_file_read_buffer_with_error_code function
  * Returns 1 if successful or 0 if not
@@ -2441,6 +2763,16 @@ int main(
 	 NULL );
 #endif
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+	CFILE_TEST_RUN(
+	 "libcfile_CloseHandle",
+	 cfile_test_libcfile_CloseHandle );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+
 	CFILE_TEST_RUN(
 	 "libcfile_file_initialize",
 	 cfile_test_file_initialize );
@@ -2452,6 +2784,16 @@ int main(
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( source != NULL )
 	{
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+		CFILE_TEST_RUN(
+		 "libcfile_CreateFileA",
+		 cfile_test_libcfile_CreateFileA );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_open",
 		 cfile_test_file_open,
@@ -2463,6 +2805,16 @@ int main(
 		 source );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+		CFILE_TEST_RUN(
+		 "libcfile_CreateFileW",
+		 cfile_test_libcfile_CreateFileW );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_open_wide",
@@ -2520,6 +2872,26 @@ int main(
 		 "libcfile_file_read_buffer",
 		 cfile_test_file_read_buffer,
 		 file );
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+		CFILE_TEST_RUN(
+		 "libcfile_GetOverlappedResult",
+		 cfile_test_libcfile_GetOverlappedResult );
+
+		CFILE_TEST_RUN(
+		 "libcfile_ReadFile",
+		 cfile_test_libcfile_ReadFile );
+
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( WINAPI )
+
+		/* TODO: add test for libcfile_internal_file_read_buffer_at_offset_with_error_code */
+
+#endif /* defined( WINAPI ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_read_buffer_with_error_code",
