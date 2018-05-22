@@ -57,13 +57,13 @@ build_script:
     msbuild /verbosity:quiet vs2013\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
 - cmd: if [%TARGET%]==[vs2015] (
     set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2015 --with-dokany msvscpp\libcfile.sln &&
+    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2015 msvscpp\libcfile.sln &&
     msbuild /verbosity:quiet vs2015\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
 - cmd: if [%TARGET%]==[vs2017] (
     set PYTHONPATH=..\vstools &&
     C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --extend-with-x64 --no-python-dll --output-format 2017 --with-dokany msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2017\libcfile.sln /property:Platform=Win32 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" &&
-    msbuild /verbosity:quiet vs2017\libcfile.sln /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
+    msbuild /verbosity:quiet vs2017\libcfile.sln /property:Platform=Win32 /property:PlatformToolset=v141 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" &&
+    msbuild /verbosity:quiet vs2017\libcfile.sln /property:Platform=x64 /property:PlatformToolset=v141 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
 - cmd: if [%TARGET%]==[cygwin] (
     xcopy /i /q /s C:\projects\libcfile C:\cygwin\home\appveyor\libcfile &&
     C:\cygwin\bin\bash -e -l -c "cd libcfile && ./synclibs.sh --use-head && ./autogen.sh" )
@@ -79,7 +79,7 @@ build_script:
 
 test_script:
 - cmd: rem Run tests
-- ps: if ($env:TARGET -eq "vs2008" -or $env:TARGET -eq "vs2010" -or $env:TARGET -eq "vs2012" -or $env:TARGET -eq "vs2013" -or $env:TARGET -eq "vs2015" -or $env:TARGET -eq "vs2017") {
+- ps: If ($env:TARGET -eq "vs2008" -or $env:TARGET -eq "vs2010" -or $env:TARGET -eq "vs2012" -or $env:TARGET -eq "vs2013" -or $env:TARGET -eq "vs2015" -or $env:TARGET -eq "vs2017") {
     .\runtests.ps1 }
 - cmd: if [%TARGET%]==[cygwin] (
     C:\cygwin\bin\bash -e -l -c "cd libcfile && ./runtests.sh" )
