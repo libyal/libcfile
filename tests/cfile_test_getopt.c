@@ -47,48 +47,60 @@ system_character_t *optarg = NULL;
  */
 system_integer_t optopt = 0;
 
+/* The next option in a group
+ */
+system_character_t *next_option = NULL;
+
 /* Get the program options
  * Function for platforms that do not have the getopt function
  * Returns the option character processed, or -1 on error,
  * ? if the option was not in the options string, : if the option argument was missing
  */
 system_integer_t cfile_test_getopt(
-	          int argument_count,
-	          system_character_t * const argument_values[],
-	          const system_character_t *options_string )
+                  int argument_count,
+                  system_character_t * const argument_values[],
+                  const system_character_t *options_string )
 {
 	system_character_t *argument_value = NULL;
 	system_character_t *option_value   = NULL;
 	static char *function              = "cfile_test_getopt";
 	size_t options_string_length       = 0;
 
-	if( optind >= argument_count )
+	if( next_option != NULL )
+	{
+		argument_value = next_option;
+		next_option    = NULL;
+	}
+	else if( optind >= argument_count )
 	{
 		return( (system_integer_t) -1 );
 	}
-	argument_value = argument_values[ optind ];
-
-	/* Check if the argument value is not an empty string
-	 */
-	if( *argument_value == 0 )
+	else
 	{
-		return( (system_integer_t) -1 );
-	}
-	/* Check if the first character is a option marker '-'
-	 */
-	if( *argument_value != (system_character_t) '-' )
-	{
-		return( (system_integer_t) -1 );
-	}
-	argument_value++;
+		argument_value = argument_values[ optind ];
 
-	/* Check if long options are provided '--'
-	 */
-	if( *argument_value == (system_character_t) '-' )
-	{
-		optind++;
+		/* Check if the argument value is not an empty string
+		 */
+		if( *argument_value == (system_character_t) '\0' )
+		{
+			return( (system_integer_t) -1 );
+		}
+		/* Check if the first character is a option marker '-'
+		 */
+		if( *argument_value != (system_character_t) '-' )
+		{
+			return( (system_integer_t) -1 );
+		}
+		argument_value++;
 
-		return( (system_integer_t) -1 );
+		/* Check if long options are provided '--'
+		 */
+		if( *argument_value == (system_character_t) '-' )
+		{
+			optind++;
+
+			return( (system_integer_t) -1 );
+		}
 	}
 	options_string_length = system_string_length(
 	                         options_string );
@@ -132,6 +144,12 @@ system_integer_t cfile_test_getopt(
 		if( *argument_value == (system_character_t) '\0' )
 		{
 			optind++;
+		}
+		else
+		{
+			/* Multiple options are grouped
+			 */
+			next_option = argument_value;
 		}
 	}
 	/* Check if the argument is right after the option flag with no space in between

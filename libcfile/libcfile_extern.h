@@ -37,8 +37,11 @@
 
 #include <libcfile/extern.h>
 
+#define LIBCFILE_EXTERN_VARIABLE	LIBCFILE_EXTERN
+
 #else
-#define LIBCFILE_EXTERN	/* extern */
+#define LIBCFILE_EXTERN		/* extern */
+#define LIBCFILE_EXTERN_VARIABLE	extern
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
