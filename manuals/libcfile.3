@@ -1,4 +1,4 @@
-.Dd January  5, 2017
+.Dd July 21, 2018
 .Dt libcfile 3
 .Os libcfile
 .Sh NAME
@@ -84,9 +84,9 @@ File functions
 .Fn libcfile_file_get_size "libcfile_file_t *file, size64_t *size, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_is_device "libcfile_file_t *file, libcfile_error_t **error"
-.Ft int
+.Ft ssize_t
 .Fn libcfile_file_io_control_read "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, libcfile_error_t **error"
-.Ft int
+.Ft ssize_t
 .Fn libcfile_file_io_control_read_with_error_code "libcfile_file_t *file, uint32_t control_code, uint8_t *control_data, size_t control_data_size, uint8_t *data, size_t data_size, uint32_t *error_code, libcfile_error_t **error"
 .Ft int
 .Fn libcfile_file_set_access_behavior "libcfile_file_t *file, int access_behavior, libcfile_error_t **error"

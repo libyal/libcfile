@@ -38,6 +38,8 @@
 #include "cfile_test_macros.h"
 #include "cfile_test_memory.h"
 
+#include "../libcfile/libcfile_file.h"
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
 #error Unsupported size of wchar_t
 #endif
@@ -578,8 +580,7 @@ int cfile_test_file_close_source(
 	return( result );
 }
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 /* Tests the libcfile_CloseHandle function
  * Returns 1 if successful or 0 if not
@@ -587,7 +588,23 @@ int cfile_test_file_close_source(
 int cfile_test_libcfile_CloseHandle(
      void )
 {
-	BOOL result = FALSE;
+	HANDLE library_handle = NULL;
+	BOOL result           = FALSE;
+
+	/* Test regular cases
+	 */
+#ifdef TODO
+	library_handle = LoadLibrary(
+	                  _SYSTEM_STRING( "kernel32.dll" ) );
+
+	result = libcfile_CloseHandle(
+	          library_handle );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 TRUE );
+#endif
 
 	/* Test error cases
 	 */
@@ -605,8 +622,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_initialize function
  * Returns 1 if successful or 0 if not
@@ -684,6 +700,8 @@ int cfile_test_file_initialize(
 	          &file,
 	          &error );
 
+	file = NULL;
+
 	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -695,8 +713,6 @@ int cfile_test_file_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	file = NULL;
 
 #if defined( HAVE_CFILE_TEST_MEMORY )
 
@@ -841,8 +857,7 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 /* Tests the libcfile_CreateFileA function
  * Returns 1 if successful or 0 if not
@@ -874,8 +889,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_open functions
  * Returns 1 if successful or 0 if not
@@ -1222,8 +1236,7 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 /* Tests the libcfile_CreateFileW function
  * Returns 1 if successful or 0 if not
@@ -1255,8 +1268,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_open_wide functions
  * Returns 1 if successful or 0 if not
@@ -2763,15 +2775,13 @@ int main(
 	 NULL );
 #endif
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 	CFILE_TEST_RUN(
 	 "libcfile_CloseHandle",
 	 cfile_test_libcfile_CloseHandle );
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_initialize",
@@ -2784,15 +2794,13 @@ int main(
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( source != NULL )
 	{
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 		CFILE_TEST_RUN(
 		 "libcfile_CreateFileA",
 		 cfile_test_libcfile_CreateFileA );
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_open",
@@ -2806,15 +2814,13 @@ int main(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 		CFILE_TEST_RUN(
 		 "libcfile_CreateFileW",
 		 cfile_test_libcfile_CreateFileW );
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_open_wide",

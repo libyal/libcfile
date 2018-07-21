@@ -370,31 +370,31 @@ int libcfile_file_is_device(
      libcfile_error_t **error );
 
 /* Read data from a device file using IO control
- * Returns 1 if successful or -1 on error
+ * Returns the number of bytes read if successful or -1 on error
  */
 LIBCFILE_EXTERN \
-int libcfile_file_io_control_read(
-     libcfile_file_t *file,
-     uint32_t control_code,
-     uint8_t *control_data,
-     size_t control_data_size,
-     uint8_t *data,
-     size_t data_size,
-     libcfile_error_t **error );
+ssize_t libcfile_file_io_control_read(
+         libcfile_file_t *file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         libcfile_error_t **error );
 
 /* Read data from a device file using IO control
- * Returns 1 if successful or -1 on error
+ * Returns the number of bytes read if successful or -1 on error
  */
 LIBCFILE_EXTERN \
-int libcfile_file_io_control_read_with_error_code(
-     libcfile_file_t *file,
-     uint32_t control_code,
-     uint8_t *control_data,
-     size_t control_data_size,
-     uint8_t *data,
-     size_t data_size,
-     uint32_t *error_code,
-     libcfile_error_t **error );
+ssize_t libcfile_file_io_control_read_with_error_code(
+         libcfile_file_t *file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         uint32_t *error_code,
+         libcfile_error_t **error );
 
 /* Sets the expected access behavior so the system can optimize the access
  * Returns 1 if successful or -1 on error
