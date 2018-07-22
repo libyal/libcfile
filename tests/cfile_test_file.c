@@ -2259,6 +2259,12 @@ int cfile_test_file_read_buffer_with_error_code(
 	uint32_t error_code          = 0;
 	int result                   = 0;
 
+#if defined( WINAPI )
+	HANDLE file_handle           = INVALID_HANDLE_VALUE
+#else
+	int file_descriptor          = -1;
+#endif
+
 	/* Initialize test
 	 */
 	result = libcfile_file_get_size(
@@ -2305,6 +2311,41 @@ int cfile_test_file_read_buffer_with_error_code(
 	              0,
 	              &error_code,
 	              &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( WINAPI )
+	file_handle = ( (libcfile_internal_file_t *) file )->handle;
+
+	( (libcfile_internal_file_t *) file )->handle = INVALID_HANDLE_VALUE
+#else
+	file_descriptor = ( (libcfile_internal_file_t *) file )->descriptor;
+
+	( (libcfile_internal_file_t *) file )->descriptor = -1;
+#endif
+
+	read_count = libcfile_file_read_buffer_with_error_code(
+	              file,
+	              buffer,
+	              0,
+	              &error_code,
+	              &error );
+
+#if defined( WINAPI )
+	( (libcfile_internal_file_t *) file )->handle = file_handle;
+#else
+	( (libcfile_internal_file_t *) file )->descriptor = file_descriptor;
+#endif
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
