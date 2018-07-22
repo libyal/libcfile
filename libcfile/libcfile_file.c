@@ -1480,7 +1480,7 @@ BOOL libcfile_GetOverlappedResult(
 	return( result );
 }
 
-#endif
+#endif /* if defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
 

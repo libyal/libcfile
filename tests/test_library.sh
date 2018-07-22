@@ -44,11 +44,26 @@ run_test_with_input()
 		TEST_EXECUTABLE="${TEST_EXECUTABLE}.exe";
 	fi
 
+	if ! test -d "input";
+	then
+		echo "Test input directory: input not found.";
+
+		return ${EXIT_IGNORE};
+	fi
+	local RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
+	then
+		echo "No files or directories found in the test input directory: input";
+
+		return ${EXIT_IGNORE};
+	fi
+
 	local TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "libcfile");
 
 	local IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
-	local RESULT=${EXIT_SUCCESS};
+	RESULT=${EXIT_SUCCESS};
 
 	for TEST_SET_INPUT_DIRECTORY in input/*;
 	do
