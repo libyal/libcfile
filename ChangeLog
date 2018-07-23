@@ -4,17 +4,14 @@ TODO
 * add fallback versions of
   - GetLastError
 * add libcfile_codepage.h and codepage functions
-* improve tests ?
-  - add open close
-  - add write when opened with read ?
-  - add IO control tests ?
-  - add test to retrieve size from device ?
 * what about disk full on write errno = ENOSPC
 
 Tests:
-* add file open close
-* add file exists test
-* add file remove test
+* move creation of temporary filename (mkstemp) into helper function
+* add open close
+* add write when opened with read ?
+* add IO control tests ?
+* add test to retrieve size from device ?
 
 Notes:
 * WINAPI ReadFile
@@ -22,181 +19,7 @@ Notes:
   multiple of sector size. Any other value will result in error 0x57
   (ERROR_INVALID_PARAMETER).
 
-20160827
-* worked on tests
-
-20160409
-* worked on tests
-* added remove file function
-* worked on fallback functions
-* remove stream functions
-
-20160105
-* 2016 update
-
-20150729
-* worked on tests
-
-20150104
-* corrections in include header
-* updated man page: libcfile.3
-
-20150101
-* 2015 update
-
-20141229
-* updated dpkg files
-
-20141015
-* changes for deployment
-
-20141011
-* worked on utility scripts
-* code clean up
-
-20140915
-* changes for project site move
-
-20140624
-* updated msvscpp files
-
-20140527
-* code clean up
-
-20140525
-* worked on non-blocking Windows device file support
-
-20140503
-* worked on block-based read to support Windows device files
-
-20140502
-* worked on block-based read to support Windows device files
-
-20140501
-* worked on dynamic late binding functions
-* worked on block-based read to support Windows device files
-
-20140428
-* small changes
-* Fix for devices that don't support fadvice
-
-20140105
-* 2014 update
-* updated dependencies
-
-20130809
-* updated dependencies
-* bug fix for file access behavior
-
-20130609
-* fix in .pc.in file
-
-20130509
-* updated dependencies
-* removed WINAPI CRT function fallbacks
-
-20130414
-* changes to ioctl detection in configure
-
-20130413
-* updated dependencies
-
-20130404
-* textual changes
-* updated dependencies
-
-20130329
-* worked on IO control read function
-* changes for Windows CRT functions
-* added posix_fadvise support
-
-20130328
-* worked on IO control read function
-* changed close to ignore a file that is already closed
-* added libcnotify
-
-20130327
-* added file open, read and write _with_error_code functions
-* improved size detection for device files
-* added IO control read function
-
-20130210
-* added FILE_SHARE_WRITE to open read CreateFile calls
-
-20130113
-* updated msvscpp files
-
-20130103
-* changes to .gitignore
-* 2013 update
-
-20121225
-* added .gitignore
-* added msvscpp files
-
-20121103
-* code clean up
-* bug fixes in error handling
-
-20120919
-* applied updates
-
-20120905
-* change for WINAPI
-
-20120904
-* applied updates
-
-20120903
-* change for WINAPI
-
-20120825
-* applied updates
-
-20120630
-* applied updates
-
-20120624
-* fixed typo in error output
-
-20120610
-* Changes for WINAPI
-
-20120526
-* added tests for stream
-* updated man page
-* added file stream get size function
-
-20120524
-* worked on file stream support
-* code clean up
-
-20120523
-* worked on file stream support
-
-20120507
-* email and project site change
-
-20120425
-* fixes for pkg-config detection of libraries
-
-20120409
-* updated dependencies
-
-20120408
-* updated dependencies
-
-20120407
-* updated dependencies
-
-20120406
-* merged with libbfio file code
-* worked on tests
-
-20120405
-* merged with libbfio file code
-* worked on include header
-
 20120403
 * Worked on stand-alone version
+* see `git log' for more recent change log
 

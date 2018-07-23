@@ -402,52 +402,48 @@ on_error:
 int cfile_test_file_remove(
      void )
 {
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	char narrow_temporary_filename[ 18 ] = {
+	char temporary_filename[ 18 ] = {
 		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
 
-	int mkstemp_file_descriptor = -1;
-#endif
-
-	libcerror_error_t *error    = NULL;
-	int result                  = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+	int with_temporary_file  = 0;
 
 	/* Test regular cases
 	 */
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	/* Use mkstemp to get a fairly unique filename for testing
-	 */
-	mkstemp_file_descriptor = mkstemp(
-	                           narrow_temporary_filename );
-
-	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
-	 "mkstemp_file_descriptor",
-	 mkstemp_file_descriptor,
-	 -1 );
-
-	result = close(
-	          mkstemp_file_descriptor );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
-	result = libcfile_file_remove(
-	          narrow_temporary_filename,
+	result = cfile_test_get_temporary_filename(
+	          temporary_filename,
+	          18,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL_INT(
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+	with_temporary_file = result;
 
+	if( with_temporary_file != 0 )
+	{
+		result = libcfile_file_remove(
+		          temporary_filename,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		with_temporary_file = 0;
+	}
 	/* Test error cases
 	 */
 	result = libcfile_file_remove(
@@ -474,6 +470,12 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( with_temporary_file != 0 )
+	{
+		libcfile_file_remove(
+		 temporary_filename,
+		 NULL );
+	}
 	return( 0 );
 }
 
@@ -483,54 +485,50 @@ on_error:
 int cfile_test_file_remove_with_error_code(
      void )
 {
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	int mkstemp_file_descriptor = -1;
-#endif
-
-	char narrow_temporary_filename[ 18 ] = {
+	char temporary_filename[ 18 ] = {
 		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
 
-	libcerror_error_t *error    = NULL;
-	uint32_t error_code         = 0;
-	int result                  = 0;
+	libcerror_error_t *error = NULL;
+	uint32_t error_code      = 0;
+	int result               = 0;
+	int with_temporary_file  = 0;
 
 	/* Test regular cases
 	 */
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	/* Use mkstemp to get a fairly unique filename for testing
-	 */
-	mkstemp_file_descriptor = mkstemp(
-	                           narrow_temporary_filename );
-
-	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
-	 "mkstemp_file_descriptor",
-	 mkstemp_file_descriptor,
-	 -1 );
-
-	result = close(
-	          mkstemp_file_descriptor );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
-	result = libcfile_file_remove_with_error_code(
-	          narrow_temporary_filename,
-	          &error_code,
+	result = cfile_test_get_temporary_filename(
+	          temporary_filename,
+	          18,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL_INT(
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+	with_temporary_file = result;
 
+	if( with_temporary_file != 0 )
+	{
+		result = libcfile_file_remove_with_error_code(
+		          temporary_filename,
+		          &error_code,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		with_temporary_file = 0;
+	}
 	/* Test error cases
 	 */
 	result = libcfile_file_remove_with_error_code(
@@ -551,7 +549,7 @@ int cfile_test_file_remove_with_error_code(
 	 &error );
 
 	result = libcfile_file_remove_with_error_code(
-	          narrow_temporary_filename,
+	          temporary_filename,
 	          NULL,
 	          &error );
 
@@ -574,6 +572,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( with_temporary_file != 0 )
+	{
+		libcfile_file_remove(
+		 temporary_filename,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -614,62 +618,48 @@ on_error:
 int cfile_test_file_remove_wide(
      void )
 {
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	char narrow_temporary_filename[ 18 ] = {
+	wchar_t temporary_filename[ 18 ] = {
 		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
 
-	int filename_index          = 0;
-	int mkstemp_file_descriptor = -1;
-
-	wchar_t wide_temporary_filename[ 18 ];
-#endif
-
-	libcerror_error_t *error    = NULL;
-	int file_descriptor         = 0;
-	int result                  = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+	int with_temporary_file  = 0;
 
 	/* Test regular cases
 	 */
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	/* Use mkstemp to get a fairly unique filename for testing
-	 */
-	mkstemp_file_descriptor = mkstemp(
-	                           narrow_temporary_filename );
-
-	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
-	 "mkstemp_file_descriptor",
-	 mkstemp_file_descriptor,
-	 -1 );
-
-	result = close(
-	          mkstemp_file_descriptor );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
-	for( filename_index = 0;
-	     filename_index < 18;
-	     filename_index++ )
-	{
-		wide_temporary_filename[ filename_index ] = (wchar_t) narrow_temporary_filename[ filename_index ];
-	}
-	result = libcfile_file_remove_wide(
-	          wide_temporary_filename,
+	result = cfile_test_get_temporary_filename_wide(
+	          temporary_filename,
+	          18,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL_INT(
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+	with_temporary_file = result;
 
+	if( with_temporary_file != 0 )
+	{
+		result = libcfile_file_remove_wide(
+		          temporary_filename,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		with_temporary_file = 0;
+	}
 	/* Test error cases
 	 */
 	result = libcfile_file_remove_wide(
@@ -695,6 +685,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( with_temporary_file != 0 )
+	{
+		libcfile_file_remove_wide(
+		 temporary_filename,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -705,64 +701,50 @@ on_error:
 int cfile_test_file_remove_wide_with_error_code(
      void )
 {
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	char narrow_temporary_filename[ 18 ] = {
+	wchar_t temporary_filename[ 18 ] = {
 		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
 
-	int filename_index          = 0;
-	int mkstemp_file_descriptor = -1;
-#endif
-
-	wchar_t wide_temporary_filename[ 18 ];
-
-	libcerror_error_t *error    = NULL;
-	uint32_t error_code         = 0;
-	int file_descriptor         = 0;
-	int result                  = 0;
+	libcerror_error_t *error = NULL;
+	uint32_t error_code      = 0;
+	int result               = 0;
+	int with_temporary_file  = 0;
 
 	/* Test regular cases
 	 */
-#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
-	/* Use mkstemp to get a fairly unique filename for testing
-	 */
-	mkstemp_file_descriptor = mkstemp(
-	                           narrow_temporary_filename );
-
-	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
-	 "mkstemp_file_descriptor",
-	 mkstemp_file_descriptor,
-	 -1 );
-
-	result = close(
-	          mkstemp_file_descriptor );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
-	for( filename_index = 0;
-	     filename_index < 18;
-	     filename_index++ )
-	{
-		wide_temporary_filename[ filename_index ] = (wchar_t) narrow_temporary_filename[ filename_index ];
-	}
-	result = libcfile_file_remove_wide_with_error_code(
-	          wide_temporary_filename,
-	          &error_code,
+	result = cfile_test_get_temporary_filename_wide(
+	          temporary_filename,
+	          18,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL_INT(
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+	with_temporary_file = result;
 
+	if( with_temporary_file != 0 )
+	{
+		result = libcfile_file_remove_wide_with_error_code(
+		          temporary_filename,
+		          &error_code,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		with_temporary_file = 0;
+	}
 	/* Test error cases
 	 */
 	result = libcfile_file_remove_wide_with_error_code(
@@ -783,7 +765,7 @@ int cfile_test_file_remove_wide_with_error_code(
 	 &error );
 
 	result = libcfile_file_remove_wide_with_error_code(
-	          wide_temporary_filename,
+	          temporary_filename,
 	          NULL,
 	          &error );
 
@@ -806,6 +788,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( with_temporary_file != 0 )
+	{
+		libcfile_file_remove_wide(
+		 temporary_filename,
+		 NULL );
 	}
 	return( 0 );
 }

@@ -68,6 +68,7 @@ cfile_test_notify_LDADD = \
 	@LIBCERROR_LIBADD@
 
 cfile_test_support_SOURCES = \
+	cfile_test_functions.c cfile_test_functions.h \
 	cfile_test_libcerror.h \
 	cfile_test_libcfile.h \
 	cfile_test_macros.h \
@@ -75,6 +76,8 @@ cfile_test_support_SOURCES = \
 	cfile_test_unused.h
 
 cfile_test_support_LDADD = \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@
 
