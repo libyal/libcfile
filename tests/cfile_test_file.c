@@ -30,11 +30,14 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
+#include "cfile_test_functions.h"
 #include "cfile_test_getopt.h"
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
-#include "cfile_test_libclocale.h"
-#include "cfile_test_libuna.h"
 #include "cfile_test_macros.h"
 #include "cfile_test_memory.h"
 
@@ -47,406 +50,6 @@
 /* Define to make cfile_test_file generate verbose output
 #define CFILE_TEST_FILE_VERBOSE
  */
-
-/* Retrieves source as a narrow string
- * Returns 1 if successful or -1 on error
- */
-int cfile_test_file_get_narrow_source(
-     const system_character_t *source,
-     char *narrow_string,
-     size_t narrow_string_size,
-     libcerror_error_t **error )
-{
-	static char *function     = "cfile_test_file_get_narrow_source";
-	size_t narrow_source_size = 0;
-	size_t source_length      = 0;
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result                = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid narrow string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine narrow string size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	narrow_source_size = source_length + 1;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( narrow_string_size < narrow_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: narrow string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_copy_from_utf32(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_copy_from_utf16(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_copy_from_utf32(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_copy_from_utf16(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	if( system_string_copy(
-	     narrow_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	narrow_string[ source_length ] = 0;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves source as a wide string
- * Returns 1 if successful or -1 on error
- */
-int cfile_test_file_get_wide_source(
-     const system_character_t *source,
-     wchar_t *wide_string,
-     size_t wide_string_size,
-     libcerror_error_t **error )
-{
-	static char *function   = "cfile_test_file_get_wide_source";
-	size_t source_length    = 0;
-	size_t wide_source_size = 0;
-
-#if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result              = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid wide string.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid wide string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wide_source_size = source_length + 1;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine wide string size.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( wide_string_size < wide_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: wide string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( system_string_copy(
-	     wide_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-	wide_string[ source_length ] = 0;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_utf8(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_utf8(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_byte_stream(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_byte_stream(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Creates and opens a source file
  * Returns 1 if successful or -1 on error
@@ -904,7 +507,7 @@ int cfile_test_file_open(
 
 	/* Initialize test
 	 */
-	result = cfile_test_file_get_narrow_source(
+	result = cfile_test_get_narrow_source(
 	          source,
 	          narrow_source,
 	          256,
@@ -1037,7 +640,7 @@ int cfile_test_file_open_with_error_code(
 
 	/* Initialize test
 	 */
-	result = cfile_test_file_get_narrow_source(
+	result = cfile_test_get_narrow_source(
 	          source,
 	          narrow_source,
 	          256,
@@ -1300,7 +903,7 @@ int cfile_test_file_open_wide(
 
 	/* Initialize test
 	 */
-	result = cfile_test_file_get_wide_source(
+	result = cfile_test_get_wide_source(
 	          source,
 	          wide_source,
 	          256,
@@ -1433,7 +1036,7 @@ int cfile_test_file_open_wide_with_error_code(
 
 	/* Initialize test
 	 */
-	result = cfile_test_file_get_wide_source(
+	result = cfile_test_get_wide_source(
 	          source,
 	          wide_source,
 	          256,
@@ -1836,20 +1439,58 @@ int cfile_test_file_read_buffer(
 	uint8_t buffer[ 32 ];
 
 	libcerror_error_t *error = NULL;
+	size64_t file_size       = 0;
 	ssize_t read_count       = 0;
+	off64_t offset           = 0;
+	int result               = 0;
+
+	/* Initialize test
+	 */
+	result = libcfile_file_get_size(
+	          file,
+	          &file_size,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( file_size < 32 )
+	{
+		return( 1 );
+	}
+	offset = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
 	read_count = libcfile_file_read_buffer(
 	              file,
 	              buffer,
-	              0,
+	              32,
 	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
-	 (ssize_t) 0 );
+	 (ssize_t) 32 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1860,7 +1501,7 @@ int cfile_test_file_read_buffer(
 	read_count = libcfile_file_read_buffer(
 	              NULL,
 	              buffer,
-	              0,
+	              32,
 	              &error );
 
 	CFILE_TEST_ASSERT_EQUAL_SSIZE(
@@ -1886,8 +1527,7 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 /* Tests the libcfile_GetOverlappedResult function
  * Returns 1 if successful or 0 if not
@@ -1897,9 +1537,8 @@ int cfile_test_libcfile_GetOverlappedResult(
 {
 	OVERLAPPED overlapped;
 
-	HANDLE file_handle = INVALID_HANDLE_VALUE;
-	DWORD read_count   = 0;
-	BOOL result        = FALSE;
+	DWORD read_count = 0;
+	BOOL result      = FALSE;
 
 	/* Test error cases
 	 */
@@ -1914,10 +1553,8 @@ int cfile_test_libcfile_GetOverlappedResult(
 	 result,
 	 FALSE );
 
-	file_handle = (HANDLE) 0x12345678;
-
 	result = libcfile_GetOverlappedResult(
-	          file_handle,
+	          (HANDLE) 0x12345678,
 	          NULL,
 	          &read_count,
 	          FALSE );
@@ -1928,7 +1565,7 @@ int cfile_test_libcfile_GetOverlappedResult(
 	 FALSE );
 
 	result = libcfile_GetOverlappedResult(
-	          file_handle,
+	          (HANDLE) 0x12345678,
 	          &overlapped,
 	          NULL,
 	          FALSE );
@@ -1943,6 +1580,10 @@ int cfile_test_libcfile_GetOverlappedResult(
 on_error:
 	return( 0 );
 }
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
 /* Tests the libcfile_ReadFile function
  * Returns 1 if successful or 0 if not
@@ -1952,9 +1593,8 @@ int cfile_test_libcfile_ReadFile(
 {
 	uint8_t buffer[ 32 ];
 
-	HANDLE file_handle = INVALID_HANDLE_VALUE;
-	DWORD read_count   = 0;
-	BOOL result        = FALSE;
+	DWORD read_count = 0;
+	BOOL result      = FALSE;
 
 	/* Test error cases
 	 */
@@ -1970,10 +1610,8 @@ int cfile_test_libcfile_ReadFile(
 	 result,
 	 FALSE );
 
-	file_handle = (HANDLE) 0x12345678;
-
 	result = libcfile_ReadFile(
-	          file_handle,
+	          (HANDLE) 0x12345678,
 	          NULL,
 	          32,
 	          &read_count,
@@ -1985,7 +1623,7 @@ int cfile_test_libcfile_ReadFile(
 	 FALSE );
 
 	result = libcfile_ReadFile(
-	          file_handle,
+	          (HANDLE) 0x12345678,
 	          (VOID *) buffer,
 	          32,
 	          NULL,
@@ -2002,9 +1640,9 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
-#if defined( WINAPI )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI )
 
 /* Tests the libcfile_internal_file_read_buffer_at_offset_with_error_code function
  * Returns 1 if successful or 0 if not
@@ -2018,6 +1656,7 @@ int cfile_test_internal_file_read_buffer_at_offset_with_error_code(
 	libcfile_file_t *closed_file = NULL;
 	size64_t file_size           = 0;
 	ssize_t read_count           = 0;
+	off64_t offset               = 0;
 	uint32_t error_code          = 0;
 	int result                   = 0;
 
@@ -2041,6 +1680,21 @@ int cfile_test_internal_file_read_buffer_at_offset_with_error_code(
 	{
 		return( 1 );
 	}
+	offset = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 	read_count = libcfile_internal_file_read_buffer_at_offset_with_error_code(
@@ -2239,9 +1893,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( WINAPI ) */
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) */
 
 /* Tests the libcfile_file_read_buffer_with_error_code function
  * Returns 1 if successful or 0 if not
@@ -2255,6 +1907,7 @@ int cfile_test_file_read_buffer_with_error_code(
 	libcfile_file_t *closed_file = NULL;
 	size64_t file_size           = 0;
 	ssize_t read_count           = 0;
+	off64_t offset               = 0;
 	uint32_t error_code          = 0;
 	int result                   = 0;
 
@@ -2284,6 +1937,21 @@ int cfile_test_file_read_buffer_with_error_code(
 	{
 		return( 1 );
 	}
+	offset = libcfile_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 	read_count = libcfile_file_read_buffer_with_error_code(
@@ -2490,6 +2158,636 @@ on_error:
 	}
 	return( 0 );
 }
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_WriteFile function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_WriteFile(
+     void )
+{
+	uint8_t buffer[ 32 ];
+
+	DWORD write_count = 0;
+	BOOL result       = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_WriteFile(
+	          NULL,
+	          (VOID *) buffer,
+	          32,
+	          &write_count,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	result = libcfile_WriteFile(
+	          (HANDLE) 0x12345678,
+	          NULL,
+	          32,
+	          &write_count,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	result = libcfile_WriteFile(
+	          (HANDLE) 0x12345678,
+	          (VOID *) buffer,
+	          32,
+	          NULL,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+/* Tests the libcfile_file_write_buffer function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_write_buffer(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	int mkstemp_file_descriptor = -1;
+#endif
+
+	uint8_t buffer[ 32 ] = {
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5' };
+
+	libcerror_error_t *error    = NULL;
+	libcfile_file_t *file       = NULL;
+	ssize_t write_count         = 0;
+	int result                  = 0;
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = libcfile_file_open(
+	          file,
+	          narrow_temporary_filename,
+	          LIBCFILE_OPEN_WRITE,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	write_count = libcfile_file_write_buffer(
+	               file,
+	               buffer,
+	               32,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 32 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	write_count = libcfile_file_write_buffer(
+	               NULL,
+	               buffer,
+	               32,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcfile_file_remove(
+	          narrow_temporary_filename,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	result = libcfile_file_free(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file != NULL )
+	{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+		libcfile_file_remove(
+		 narrow_temporary_filename,
+		 NULL );
+#endif
+
+		libcfile_file_free(
+		 &file,
+		 NULL );
+
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_write_buffer_with_error_code function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_write_buffer_with_error_code(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	int mkstemp_file_descriptor  = -1;
+#endif
+
+	uint8_t buffer[ 32 ] = {
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5' };
+
+	libcerror_error_t *error     = NULL;
+	libcfile_file_t *closed_file = NULL;
+	libcfile_file_t *file        = NULL;
+	ssize_t write_count          = 0;
+	uint32_t error_code          = 0;
+	int result                   = 0;
+
+#if defined( WINAPI )
+	HANDLE file_handle           = INVALID_HANDLE_VALUE;
+#else
+	int file_descriptor          = -1;
+#endif
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = libcfile_file_open(
+	          file,
+	          narrow_temporary_filename,
+	          LIBCFILE_OPEN_WRITE,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               file,
+	               buffer,
+	               32,
+	               &error_code,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 32 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               NULL,
+	               buffer,
+	               0,
+	               &error_code,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( WINAPI )
+	file_handle = ( (libcfile_internal_file_t *) file )->handle;
+
+	( (libcfile_internal_file_t *) file )->handle = INVALID_HANDLE_VALUE;
+#else
+	file_descriptor = ( (libcfile_internal_file_t *) file )->descriptor;
+
+	( (libcfile_internal_file_t *) file )->descriptor = -1;
+#endif
+
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               file,
+	               buffer,
+	               0,
+	               &error_code,
+	               &error );
+
+#if defined( WINAPI )
+	( (libcfile_internal_file_t *) file )->handle = file_handle;
+#else
+	( (libcfile_internal_file_t *) file )->descriptor = file_descriptor;
+#endif
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               file,
+	               NULL,
+	               0,
+	               &error_code,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               file,
+	               buffer,
+	               (size_t) SSIZE_MAX + 1,
+	               &error_code,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               file,
+	               buffer,
+	               0,
+	               NULL,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "closed_file",
+	 closed_file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test write buffer with error code on a closed file
+	 */
+	write_count = libcfile_file_write_buffer_with_error_code(
+	               closed_file,
+	               buffer,
+	               0,
+	               &error_code,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcfile_file_free(
+	          &closed_file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "closed_file",
+	 closed_file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcfile_file_remove(
+	          narrow_temporary_filename,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	result = libcfile_file_free(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( closed_file != NULL )
+	{
+		libcfile_file_free(
+		 &closed_file,
+		 NULL );
+	}
+	if( file != NULL )
+	{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+		libcfile_file_remove(
+		 narrow_temporary_filename,
+		 NULL );
+#endif
+
+		libcfile_file_free(
+		 &file,
+		 NULL );
+
+	}
+	return( 0 );
+}
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_SetEndOfFile function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_SetEndOfFile(
+     void )
+{
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_SetEndOfFile(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_seek_offset function
  * Returns 1 if successful or 0 if not
@@ -2872,6 +3170,277 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_SetFilePointerEx function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_SetFilePointerEx(
+     void )
+{
+	LARGE_INTEGER distance_to_move_large_integer;
+	LARGE_INTEGER new_file_pointer_large_integer;
+
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
+	distance_to_move_large_integer.QuadPart = 0;
+#else
+	distance_to_move_large_integer.LowPart  = 0;
+	distance_to_move_large_integer.HighPart = 0;
+#endif
+
+	result = libcfile_SetFilePointerEx(
+	          NULL,
+	          distance_to_move_large_integer,
+	          &new_file_pointer_large_integer,
+	          FILE_BEGIN );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	result = libcfile_SetFilePointerEx(
+	          (HANDLE) 0x12345678,
+	          distance_to_move_large_integer,
+	          NULL,
+	          FILE_BEGIN );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+/* Tests the libcfile_file_resize function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_resize(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	int mkstemp_file_descriptor = -1;
+#endif
+
+	uint8_t buffer[ 32 ] = {
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5' };
+
+	libcerror_error_t *error    = NULL;
+	libcfile_file_t *file       = NULL;
+	ssize_t write_count         = 0;
+	int result                  = 0;
+
+	/* Initialize test
+	 */
+	result = libcfile_file_initialize(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = libcfile_file_open(
+	          file,
+	          narrow_temporary_filename,
+	          LIBCFILE_OPEN_WRITE,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_count = libcfile_file_write_buffer(
+	               file,
+	               buffer,
+	               32,
+	               &error );
+
+	CFILE_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 32 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	result = libcfile_file_resize(
+	          file,
+	          16,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	result = libcfile_file_resize(
+	          NULL,
+	          16,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_resize(
+	          file,
+	          (size64_t) INT64_MAX + 1,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	result = libcfile_file_close(
+	          file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcfile_file_remove(
+	          narrow_temporary_filename,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	result = libcfile_file_free(
+	          &file,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file != NULL )
+	{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+		libcfile_file_remove(
+		 narrow_temporary_filename,
+		 NULL );
+#endif
+
+		libcfile_file_free(
+		 &file,
+		 NULL );
+
+	}
+	return( 0 );
+}
+
 /* Tests the libcfile_file_is_open function
  * Returns 1 if successful or 0 if not
  */
@@ -2924,6 +3493,46 @@ on_error:
 	}
 	return( 0 );
 }
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_GetFileSizeEx function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_GetFileSizeEx(
+     void )
+{
+	LARGE_INTEGER file_size_large_integer;
+
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_GetFileSizeEx(
+	          NULL,
+	          &file_size_large_integer );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	result = libcfile_GetFileSizeEx(
+	          (HANDLE) 0x12345678,
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_get_offset function
  * Returns 1 if successful or 0 if not
@@ -3070,6 +3679,36 @@ on_error:
 	}
 	return( 0 );
 }
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_GetFileType function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_GetFileType(
+     void )
+{
+	LARGE_INTEGER file_size_large_integer;
+
+	DWORD result = FILE_TYPE_UNKNOWN;
+
+	/* Test error cases
+	 */
+	result = libcfile_GetFileType(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FILE_TYPE_UNKNOWN );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_is_device function
  * Returns 1 if successful or 0 if not
@@ -3815,17 +4454,65 @@ int main(
 	 "libcfile_file_free",
 	 cfile_test_file_free );
 
-#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
-	if( source != NULL )
-	{
 #if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
 
-		CFILE_TEST_RUN(
-		 "libcfile_CreateFileA",
-		 cfile_test_libcfile_CreateFileA );
+	CFILE_TEST_RUN(
+	 "libcfile_CreateFileA",
+	 cfile_test_libcfile_CreateFileA );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+	CFILE_TEST_RUN(
+	 "libcfile_CreateFileW",
+	 cfile_test_libcfile_CreateFileW );
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+	CFILE_TEST_RUN(
+	 "libcfile_GetOverlappedResult",
+	 cfile_test_libcfile_GetOverlappedResult );
+
+	CFILE_TEST_RUN(
+	 "libcfile_ReadFile",
+	 cfile_test_libcfile_ReadFile );
+
+	CFILE_TEST_RUN(
+	 "libcfile_WriteFile",
+	 cfile_test_libcfile_WriteFile );
+
+	CFILE_TEST_RUN(
+	 "libcfile_SetFilePointerEx",
+	 cfile_test_libcfile_SetFilePointerEx );
+
+	CFILE_TEST_RUN(
+	 "libcfile_SetEndOfFile",
+	 cfile_test_libcfile_SetEndOfFile );
+
+	CFILE_TEST_RUN(
+	 "libcfile_GetFileSizeEx",
+	 cfile_test_libcfile_GetFileSizeEx );
+
+	CFILE_TEST_RUN(
+	 "libcfile_GetFileType",
+	 cfile_test_libcfile_GetFileType );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
+	CFILE_TEST_RUN(
+	 "libcfile_file_write_buffer",
+	 cfile_test_file_write_buffer );
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_write_buffer_with_error_code",
+	 cfile_test_file_write_buffer_with_error_code );
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_resize",
+	 cfile_test_file_resize );
+
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+	if( source != NULL )
+	{
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_open",
 		 cfile_test_file_open,
@@ -3837,14 +4524,6 @@ int main(
 		 source );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-		CFILE_TEST_RUN(
-		 "libcfile_CreateFileW",
-		 cfile_test_libcfile_CreateFileW );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_open_wide",
@@ -3929,37 +4608,19 @@ int main(
 		 cfile_test_file_read_buffer,
 		 file );
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-		CFILE_TEST_RUN(
-		 "libcfile_GetOverlappedResult",
-		 cfile_test_libcfile_GetOverlappedResult );
-
-		CFILE_TEST_RUN(
-		 "libcfile_ReadFile",
-		 cfile_test_libcfile_ReadFile );
-
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
-#if defined( WINAPI )
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI )
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_internal_file_read_buffer_at_offset_with_error_code",
 		 cfile_test_internal_file_read_buffer_at_offset_with_error_code,
 		 file );
 
-#endif /* defined( WINAPI ) */
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_read_buffer_with_error_code",
 		 cfile_test_file_read_buffer_with_error_code,
 		 file );
-
-		/* TODO: add test for libcfile_file_write_buffer */
-		/* TODO: add test for libcfile_file_write_buffer_with_error_code */
-		/* TODO: add test for libcfile_file_resize */
 
 		CFILE_TEST_RUN_WITH_ARGS(
 		 "libcfile_file_is_open",

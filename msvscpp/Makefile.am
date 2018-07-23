@@ -4,7 +4,6 @@ MSVSCPP_FILES = \
 	cfile_test_notify/cfile_test_notify.vcproj \
 	cfile_test_support/cfile_test_support.vcproj \
 	cfile_test_system_string/cfile_test_system_string.vcproj \
-	cfile_test_write/cfile_test_write.vcproj \
 	libcerror/libcerror.vcproj \
 	libcfile/libcfile.vcproj \
 	libclocale/libclocale.vcproj \

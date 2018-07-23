@@ -2802,7 +2802,7 @@ BOOL libcfile_SetFilePointerEx(
 	return( result );
 }
 
-#endif
+#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 #if defined( WINAPI )
 

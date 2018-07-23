@@ -28,10 +28,17 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
+#include "cfile_test_functions.h"
 #include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
 #include "cfile_test_macros.h"
 #include "cfile_test_unused.h"
+
+#include "../libcfile/libcfile_support.h"
 
 /* Tests the libcfile_get_version function
  * Returns 1 if successful or 0 if not
@@ -42,6 +49,8 @@ int cfile_test_get_version(
 	const char *version_string = NULL;
 	int result                 = 0;
 
+	/* Test regular cases
+	 */
 	version_string = libcfile_get_version();
 
 	result = narrow_string_compare(
@@ -70,6 +79,8 @@ int cfile_test_get_codepage(
 	int codepage             = 0;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = libcfile_get_codepage(
 	          &codepage,
 	          &error );
@@ -121,6 +132,8 @@ int cfile_test_set_codepage(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = libcfile_set_codepage(
 	          0,
 	          &error );
@@ -163,6 +176,34 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_GetFileAttributesA function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_GetFileAttributesA(
+     void )
+{
+	DWORD result = 0;
+
+	/* Test error cases
+	 */
+	result = libcfile_GetFileAttributesA(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_UINT32(
+	 "result",
+	 (uint32_t) result,
+	 (uint32_t) INVALID_FILE_ATTRIBUTES );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
 /* Tests the libcfile_file_exists function
  * Returns 1 if successful or 0 if not
  */
@@ -172,6 +213,8 @@ int cfile_test_file_exists(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = libcfile_file_exists(
 	          "Makefile.am",
 	          &error );
@@ -229,6 +272,34 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_GetFileAttributesW function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_GetFileAttributesW(
+     void )
+{
+	DWORD result = 0;
+
+	/* Test error cases
+	 */
+	result = libcfile_GetFileAttributesW(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_UINT32(
+	 "result",
+	 (uint32_t) result,
+	 (uint32_t) INVALID_FILE_ATTRIBUTES );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
 /* Tests the libcfile_file_exists_wide function
  * Returns 1 if successful or 0 if not
  */
@@ -238,6 +309,8 @@ int cfile_test_file_exists_wide(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = libcfile_file_exists_wide(
 	          L"Makefile.am",
 	          &error );
@@ -267,6 +340,450 @@ int cfile_test_file_exists_wide(
 	/* Test error cases
 	 */
 	result = libcfile_file_exists_wide(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_DeleteFileA function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_DeleteFileA(
+     void )
+{
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_DeleteFileA(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+/* Tests the libcfile_file_remove function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_remove(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	int mkstemp_file_descriptor = -1;
+#endif
+
+	libcerror_error_t *error    = NULL;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = libcfile_file_remove(
+	          narrow_temporary_filename,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	result = libcfile_file_remove(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_remove_with_error_code function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_remove_with_error_code(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	int mkstemp_file_descriptor = -1;
+#endif
+
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	libcerror_error_t *error    = NULL;
+	uint32_t error_code         = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = libcfile_file_remove_with_error_code(
+	          narrow_temporary_filename,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	result = libcfile_file_remove_with_error_code(
+	          NULL,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_remove_with_error_code(
+	          narrow_temporary_filename,
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+/* Tests the libcfile_DeleteFileW function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_libcfile_DeleteFileW(
+     void )
+{
+	BOOL result = FALSE;
+
+	/* Test error cases
+	 */
+	result = libcfile_DeleteFileW(
+	          NULL );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+/* Tests the libcfile_file_remove_wide function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_remove_wide(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	int filename_index          = 0;
+	int mkstemp_file_descriptor = -1;
+
+	wchar_t wide_temporary_filename[ 18 ];
+#endif
+
+	libcerror_error_t *error    = NULL;
+	int file_descriptor         = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	for( filename_index = 0;
+	     filename_index < 18;
+	     filename_index++ )
+	{
+		wide_temporary_filename[ filename_index ] = (wchar_t) narrow_temporary_filename[ filename_index ];
+	}
+	result = libcfile_file_remove_wide(
+	          wide_temporary_filename,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	result = libcfile_file_remove_wide(
+	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcfile_file_remove_wide_with_error_code function
+ * Returns 1 if successful or 0 if not
+ */
+int cfile_test_file_remove_wide_with_error_code(
+     void )
+{
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	char narrow_temporary_filename[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	int filename_index          = 0;
+	int mkstemp_file_descriptor = -1;
+#endif
+
+	wchar_t wide_temporary_filename[ 18 ];
+
+	libcerror_error_t *error    = NULL;
+	uint32_t error_code         = 0;
+	int file_descriptor         = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE )
+	/* Use mkstemp to get a fairly unique filename for testing
+	 */
+	mkstemp_file_descriptor = mkstemp(
+	                           narrow_temporary_filename );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "mkstemp_file_descriptor",
+	 mkstemp_file_descriptor,
+	 -1 );
+
+	result = close(
+	          mkstemp_file_descriptor );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	for( filename_index = 0;
+	     filename_index < 18;
+	     filename_index++ )
+	{
+		wide_temporary_filename[ filename_index ] = (wchar_t) narrow_temporary_filename[ filename_index ];
+	}
+	result = libcfile_file_remove_wide_with_error_code(
+	          wide_temporary_filename,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_MKSTEMP ) && defined( HAVE_CLOSE ) */
+
+	/* Test error cases
+	 */
+	result = libcfile_file_remove_wide_with_error_code(
+	          NULL,
+	          &error_code,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcfile_file_remove_wide_with_error_code(
+	          wide_temporary_filename,
 	          NULL,
 	          &error );
 
@@ -326,7 +843,23 @@ int main(
 	 "libcfile_file_exists",
 	 cfile_test_file_exists );
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+	CFILE_TEST_RUN(
+	 "libcfile_GetFileAttributesA",
+	 cfile_test_libcfile_GetFileAttributesA );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+	CFILE_TEST_RUN(
+	 "libcfile_GetFileAttributesW",
+	 cfile_test_libcfile_GetFileAttributesW );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_exists_wide",
@@ -334,10 +867,41 @@ int main(
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-	/* TODO add tests for libcfile_file_remove */
-	/* TODO add tests for libcfile_file_remove_with_error_code */
-	/* TODO add tests for libcfile_file_remove_wide */
-	/* TODO add tests for libcfile_file_remove_wide_with_error_code */
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+	CFILE_TEST_RUN(
+	 "libcfile_DeleteFileA",
+	 cfile_test_libcfile_DeleteFileA );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_remove",
+	 cfile_test_file_remove );
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_remove_with_error_code",
+	 cfile_test_file_remove_with_error_code );
+
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
+
+	CFILE_TEST_RUN(
+	 "libcfile_DeleteFileW",
+	 cfile_test_libcfile_DeleteFileW );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_remove_wide",
+	 cfile_test_file_remove_wide );
+
+	CFILE_TEST_RUN(
+	 "libcfile_file_remove_wide_with_error_code",
+	 cfile_test_file_remove_wide_with_error_code );
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 	return( EXIT_SUCCESS );
 

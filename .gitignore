@@ -126,7 +126,6 @@ stamp-h[1-9]
 /tests/cfile_test_notify
 /tests/cfile_test_support
 /tests/cfile_test_system_string
-/tests/cfile_test_write
 /tests/input
 /tests/tmp*
 
