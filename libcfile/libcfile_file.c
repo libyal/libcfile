@@ -1577,6 +1577,17 @@ ssize_t libcfile_internal_file_read_buffer_at_offset_with_error_code(
 
 		return( -1 );
 	}
+	if( current_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid current offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	if( buffer == NULL )
 	{
 		libcerror_error_set(

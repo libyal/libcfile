@@ -2260,7 +2260,7 @@ int cfile_test_file_read_buffer_with_error_code(
 	int result                   = 0;
 
 #if defined( WINAPI )
-	HANDLE file_handle           = INVALID_HANDLE_VALUE
+	HANDLE file_handle           = INVALID_HANDLE_VALUE;
 #else
 	int file_descriptor          = -1;
 #endif
@@ -2327,7 +2327,7 @@ int cfile_test_file_read_buffer_with_error_code(
 #if defined( WINAPI )
 	file_handle = ( (libcfile_internal_file_t *) file )->handle;
 
-	( (libcfile_internal_file_t *) file )->handle = INVALID_HANDLE_VALUE
+	( (libcfile_internal_file_t *) file )->handle = INVALID_HANDLE_VALUE;
 #else
 	file_descriptor = ( (libcfile_internal_file_t *) file )->descriptor;
 
