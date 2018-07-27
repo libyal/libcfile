@@ -1,6 +1,6 @@
 dnl Functions for testing
 dnl
-dnl Version: 20180732
+dnl Version: 20180723
 
 dnl Function to detect if tests dependencies are available
 AC_DEFUN([AX_TESTS_CHECK_LOCAL],
