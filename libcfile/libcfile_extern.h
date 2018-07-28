@@ -28,13 +28,6 @@
  */
 #if !defined( HAVE_LOCAL_LIBCFILE )
 
-/* If libtool DLL support is enabled set LIBCFILE_DLL_EXPORT
- * before including libcfile/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBCFILE_DLL_EXPORT
-#endif
-
 #include <libcfile/extern.h>
 
 #define LIBCFILE_EXTERN_VARIABLE	LIBCFILE_EXTERN
