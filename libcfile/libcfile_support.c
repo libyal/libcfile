@@ -896,6 +896,17 @@ int libcfile_file_remove_wide_with_error_code(
 	static char *function = "libcfile_file_remove_wide_with_error_code";
 	BOOL result           = FALSE;
 
+	if( filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
 	if( error_code == NULL )
 	{
 		libcerror_error_set(
