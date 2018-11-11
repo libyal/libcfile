@@ -10,15 +10,15 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libcfile_spec_requires@ @ax_libcerror_spec_requires@ @ax_libclocale_spec_requires@ @ax_libcnotify_spec_requires@ @ax_libuna_spec_requires@
 BuildRequires: gcc @ax_libcerror_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libuna_spec_build_requires@
 
-%description
+%description -n libcfile
 Library to support cross-platform C file functions
 
-%package devel
+%package -n libcfile-devel
 Summary: Header files and libraries for developing applications for libcfile
 Group: Development/Libraries
 Requires: libcfile = %{version}-%{release}
 
-%description devel
+%description -n libcfile-devel
 Header files and libraries for developing applications for libcfile.
 
 %prep
@@ -39,13 +39,13 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
-%files
+%files -n libcfile
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
-%files devel
+%files -n libcfile-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README ChangeLog
