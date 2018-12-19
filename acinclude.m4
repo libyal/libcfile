@@ -1,6 +1,6 @@
 dnl Checks for required headers and functions
 dnl
-dnl Version: 20180407
+dnl Version: 20181117
 
 dnl Function to detect if posix_fadvise is available
 AC_DEFUN([AX_LIBCFILE_CHECK_FUNC_POSIX_FADVISE],
