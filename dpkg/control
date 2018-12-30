@@ -9,6 +9,8 @@ Homepage: https://github.com/libyal/libcfile
 Package: libcfile
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libcfile1
+Replaces: libcfile1
 Suggests: libcfile-dbg
 Description: Library to support cross-platform C file functions
  libcfile is a library to support cross-platform C file functions.
