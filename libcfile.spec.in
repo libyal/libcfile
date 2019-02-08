@@ -13,6 +13,14 @@ BuildRequires: gcc @ax_libcerror_spec_build_requires@ @ax_libclocale_spec_build_
 %description -n libcfile
 Library to support cross-platform C file functions
 
+%package -n libcfile-static
+Summary: Library to support cross-platform C file functions
+Group: Development/Libraries
+Requires: libcfile = %{version}-%{release}
+
+%description -n libcfile-static
+Static library version of libcfile.
+
 %package -n libcfile-devel
 Summary: Header files and libraries for developing applications for libcfile
 Group: Development/Libraries
@@ -45,11 +53,16 @@ rm -rf %{buildroot}
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
+%files -n libcfile-static
+%defattr(644,root,root,755)
+%license COPYING
+%doc AUTHORS README
+%attr(755,root,root) %{_libdir}/*.a
+
 %files -n libcfile-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
-%{_libdir}/*.a
 %{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libcfile.pc

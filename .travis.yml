@@ -90,21 +90,21 @@ matrix:
     dist: xenial
     sudo: required
     group: edge
-  - name: "MacOS with clang"
+  - name: "Mac OS with clang"
     env:
     - CONFIGURE_OPTIONS=""
     - TARGET="macos-clang"
     compiler: clang
     os: osx
     osx_image: xcode8.3
-  - name: "MacOS with gcc"
+  - name: "Mac OS with gcc"
     env:
     - CONFIGURE_OPTIONS=""
     - TARGET="macos-gcc"
     compiler: gcc
     os: osx
     osx_image: xcode8.3
-  - name: "MacOS gcc and pkgbuild"
+  - name: "Mac OS gcc and pkgbuild"
     env:
     - CONFIGURE_OPTIONS="--disable-dependency-tracking --prefix=/usr/local"
     - TARGET="macos-gcc-pkgbuild"
@@ -113,7 +113,7 @@ matrix:
     osx_image: xcode8.3
 before_install:
   - if test ${TRAVIS_OS_NAME} = "linux"; then
-      sudo apt-get update && sudo apt-get --fix-missing -o Dpkg::Options::="--force-confold" upgrade -y --allow-unauthenticated && sudo apt-get install -y autopoint;
+      sudo apt-get update && sudo apt-mark hold mysql-server-5.7 && sudo apt-get --fix-missing -o Dpkg::Options::="--force-confold" upgrade -y --allow-unauthenticated && sudo apt-get install -y autopoint;
     elif test ${TRAVIS_OS_NAME} = "osx"; then
       brew update && brew install gettext gnu-sed && brew link --force gettext;
     fi
@@ -150,5 +150,5 @@ script:
     fi
 after_success:
   - if test ${TARGET} = "linux-gcc-no-optimization"; then
-      curl -o codecov.sh -s https://codecov.io/bash && /bin/bash ./codecov.sh -n ${TARGET} -y .codecov.yml;
+      curl -o codecov.sh -s https://codecov.io/bash && sed 's/ -execdir / -exec /' -i ./codecov.sh && /bin/bash ./codecov.sh -n ${TARGET} -y .codecov.yml;
     fi
