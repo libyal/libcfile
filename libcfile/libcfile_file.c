@@ -384,11 +384,12 @@ int libcfile_file_open_with_error_code(
 {
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_with_error_code";
-	size_t filename_length                  = 0;
 	DWORD file_io_access_flags              = 0;
 	DWORD file_io_creation_flags            = 0;
 	DWORD file_io_shared_flags              = 0;
 	DWORD flags_and_attributes              = 0;
+	size_t filename_length                  = 0;
+	ssize_t read_count                      = 0;
 
 	if( file == NULL )
 	{
@@ -564,6 +565,42 @@ int libcfile_file_open_with_error_code(
 				break;
 		}
 		return( -1 );
+	}
+	if( internal_file->is_device_filename != 0 )
+	{
+		read_count = libcfile_file_io_control_read_with_error_code(
+		              file,
+		              FSCTL_ALLOW_EXTENDED_DASD_IO,
+		              NULL,
+		              0,
+		              NULL,
+		              0,
+		              error_code,
+		              error );
+
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: FSCTL_ALLOW_EXTENDED_DASD_IO.",
+			 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
 	}
 	internal_file->access_flags   = access_flags;
 	internal_file->current_offset = 0;
@@ -836,11 +873,12 @@ int libcfile_file_open_wide_with_error_code(
 {
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_wide_with_error_code";
-	size_t filename_length                  = 0;
 	DWORD file_io_access_flags              = 0;
 	DWORD file_io_creation_flags            = 0;
 	DWORD file_io_shared_flags              = 0;
 	DWORD flags_and_attributes              = 0;
+	size_t filename_length                  = 0;
+	ssize_t read_count                      = 0;
 
 	if( file == NULL )
 	{
@@ -1016,6 +1054,42 @@ int libcfile_file_open_wide_with_error_code(
 				break;
 		}
 		return( -1 );
+	}
+	if( internal_file->is_device_filename != 0 )
+	{
+		read_count = libcfile_file_io_control_read_with_error_code(
+		              file,
+		              FSCTL_ALLOW_EXTENDED_DASD_IO,
+		              NULL,
+		              0,
+		              NULL,
+		              0,
+		              error_code,
+		              error );
+
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: FSCTL_ALLOW_EXTENDED_DASD_IO.",
+			 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
 	}
 	return( 1 );
 }
@@ -1933,23 +2007,6 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		 && ( read_count < 0 ) )
 		{
 			result = 0;
-		}
-		else if( ( internal_file->block_size != 0 )
-		      && ( read_count != (ssize_t) read_size ) )
-		{
-			/* Windows devices sometimes don't allow to read the last block
-			 * this behavior is seen with e.g. \\.\D:
-			 */
-			if( ( internal_file->is_device_filename != 0 )
-			 && ( ( read_size - read_count ) == internal_file->block_size )
-			 && ( (size64_t) internal_file->current_offset == ( internal_file->size - internal_file->block_size ) ) )
-			{
-				result = 1;
-			}
-			else
-			{
-				result = 0;
-			}
 		}
 		else
 		{
