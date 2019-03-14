@@ -17,7 +17,9 @@ check_SCRIPTS = \
 	test_runner.sh
 
 input_FILES = \
-	input/set1/test.raw
+	input/set1/block_size_file \
+	input/set1/empty_file \
+	input/set1/small_file
 
 EXTRA_DIST = \
 	$(check_SCRIPTS) \
