@@ -701,6 +701,11 @@ int libcfile_file_open_with_error_code(
 
 		return( -1 );
 	}
+#if defined( O_CLOEXEC )
+	/* Prevent the file descriptor to remain open across an execve
+	 */
+	file_io_flags |= O_CLOEXEC;
+#endif
 #if defined( HAVE_GLIB_H )
 	internal_file->descriptor = g_open(
 	                             filename,
@@ -1238,6 +1243,11 @@ int libcfile_file_open_wide_with_error_code(
 
 		goto on_error;
 	}
+#if defined( O_CLOEXEC )
+	/* Prevent the file descriptor to remain open across an execve
+	 */
+	file_io_flags |= O_CLOEXEC;
+#endif
 #if defined( HAVE_GLIB_H )
 	internal_file->descriptor = g_open(
 	                             narrow_filename,
