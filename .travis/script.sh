@@ -25,7 +25,7 @@ then
 
 		make install DESTDIR=${PWD}/osx-pkg;
 		mkdir -p ${PWD}/osx-pkg/usr/share/doc/libcfile;
-		cp AUTHORS COPYING NEWS README ${PWD}/osx-pkg/usr/share/doc/libcfile;
+		cp AUTHORS COPYING COPYING.LESSER NEWS README ${PWD}/osx-pkg/usr/share/doc/libcfile;
 
 		pkgbuild --root osx-pkg --identifier com.github.libyal.libcfile --version ${VERSION} --ownership recommended ../libcfile-${VERSION}.pkg;
 	fi
