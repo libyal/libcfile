@@ -86,9 +86,10 @@ install:
     git clone https://github.com/libyal/vstools.git ..\vstools )
 
 build_script:
-- ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild" -or $env:BUILD_ENVIRONMENT -eq "python") {
+- ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild" -or ($env:BUILD_ENVIRONMENT -eq "python" -and $isWindows)) {
     .\synclibs.ps1;
     .\autogen.ps1 }
+- sh: if test ${BUILD_ENVIRONMENT} = "python"; then ./synclibs.sh && ./autogen.sh; fi
 - cmd: if [%TARGET%]==[vs2008] (
     msbuild /verbosity:quiet msvscpp\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
 - cmd: if [%TARGET%]==[vs2010] (
