@@ -290,6 +290,11 @@ int libcfile_file_get_offset(
      off64_t *offset,
      libcerror_error_t **error );
 
+int libcfile_internal_file_get_size(
+     libcfile_internal_file_t *internal_file,
+     size64_t *size,
+     libcerror_error_t **error );
+
 LIBCFILE_EXTERN \
 int libcfile_file_get_size(
      libcfile_file_t *file,
@@ -307,6 +312,16 @@ LIBCFILE_EXTERN \
 int libcfile_file_is_device(
      libcfile_file_t *file,
      libcerror_error_t **error );
+
+ssize_t libcfile_internal_file_io_control_read_with_error_code(
+         libcfile_internal_file_t *internal_file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         uint32_t *error_code,
+         libcerror_error_t **error );
 
 LIBCFILE_EXTERN \
 ssize_t libcfile_file_io_control_read(
@@ -333,6 +348,11 @@ LIBCFILE_EXTERN \
 int libcfile_file_set_access_behavior(
      libcfile_file_t *file,
      int access_behavior,
+     libcerror_error_t **error );
+
+int libcfile_internal_file_set_block_size(
+     libcfile_internal_file_t *internal_file,
+     size_t block_size,
      libcerror_error_t **error );
 
 LIBCFILE_EXTERN \

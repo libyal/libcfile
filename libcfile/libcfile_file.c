@@ -266,11 +266,6 @@ int libcfile_file_free(
 		}
 		*file = NULL;
 
-		if( internal_file->block_data != NULL )
-		{
-			memory_free(
-			 internal_file->block_data );
-		}
 		memory_free(
 		 internal_file );
 	}
@@ -382,6 +377,12 @@ int libcfile_file_open_with_error_code(
      uint32_t *error_code,
      libcerror_error_t **error )
 {
+#if ( WINVER >= 0x0600 )
+	FILE_ALIGNMENT_INFO file_alignment_information;
+
+	BOOL result                             = 0;
+#endif
+
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_with_error_code";
 	DWORD file_io_access_flags              = 0;
@@ -568,8 +569,8 @@ int libcfile_file_open_with_error_code(
 	}
 	if( internal_file->is_device_filename != 0 )
 	{
-		read_count = libcfile_file_io_control_read_with_error_code(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              FSCTL_ALLOW_EXTENDED_DASD_IO,
 		              NULL,
 		              0,
@@ -601,6 +602,71 @@ int libcfile_file_open_with_error_code(
 			libcerror_error_free(
 			 error );
 		}
+#if ( WINVER >= 0x0600 )
+		result = GetFileInformationByHandleEx(
+		          internal_file->handle,
+		          FileAlignmentInfo,
+		          (void *) &file_alignment_information,
+		          (DWORD) sizeof( FILE_ALIGNMENT_INFO ) );
+
+		if( result == FALSE )
+		{
+			*error_code = (uint32_t) GetLastError();
+
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+			 *error_code,
+			 "%s: unable to retrieve file alignment information.",
+			 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
+		else if( file_alignment_information.AlignmentRequirement != 0 )
+		{
+			if( libcfile_internal_file_set_block_size(
+			     internal_file,
+			     (size_t) 512,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set block size.",
+				 function );
+
+				return( -1 );
+			}
+		}
+#endif /* ( WINVER >= 0x0600 ) */
+	}
+	if( libcfile_internal_file_get_size(
+	     internal_file,
+	     &( internal_file->size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		return( -1 );
 	}
 	internal_file->access_flags   = access_flags;
 	internal_file->current_offset = 0;
@@ -876,6 +942,12 @@ int libcfile_file_open_wide_with_error_code(
      uint32_t *error_code,
      libcerror_error_t **error )
 {
+#if ( WINVER >= 0x0600 )
+	FILE_ALIGNMENT_INFO file_alignment_information;
+
+	BOOL result                             = 0;
+#endif
+
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_wide_with_error_code";
 	DWORD file_io_access_flags              = 0;
@@ -1062,8 +1134,8 @@ int libcfile_file_open_wide_with_error_code(
 	}
 	if( internal_file->is_device_filename != 0 )
 	{
-		read_count = libcfile_file_io_control_read_with_error_code(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              FSCTL_ALLOW_EXTENDED_DASD_IO,
 		              NULL,
 		              0,
@@ -1095,7 +1167,75 @@ int libcfile_file_open_wide_with_error_code(
 			libcerror_error_free(
 			 error );
 		}
+#if ( WINVER >= 0x0600 )
+		result = GetFileInformationByHandleEx(
+		          internal_file->handle,
+		          FileAlignmentInfo,
+		          (void *) &file_alignment_information,
+		          (DWORD) sizeof( FILE_ALIGNMENT_INFO ) );
+
+		if( result == FALSE )
+		{
+			*error_code = (uint32_t) GetLastError();
+
+			libcerror_system_set_error(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+			 *error_code,
+			 "%s: unable to retrieve file alignment information.",
+			 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
+		else if( file_alignment_information.AlignmentRequirement != 0 )
+		{
+			if( libcfile_internal_file_set_block_size(
+			     internal_file,
+			     (size_t) 512,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set block size.",
+				 function );
+
+				return( -1 );
+			}
+		}
+#endif /* ( WINVER >= 0x0600 ) */
 	}
+	if( libcfile_internal_file_get_size(
+	     internal_file,
+	     &( internal_file->size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file->access_flags   = access_flags;
+	internal_file->current_offset = 0;
+
 	return( 1 );
 }
 
@@ -3612,22 +3752,21 @@ GET_LENGTH_INFORMATION;
  * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
  * Returns 1 if successful or -1 on error
  */
-int libcfile_file_get_size(
-     libcfile_file_t *file,
+int libcfile_internal_file_get_size(
+     libcfile_internal_file_t *internal_file,
      size64_t *size,
      libcerror_error_t **error )
 {
 	DISK_GEOMETRY disk_geometry;
 	GET_LENGTH_INFORMATION length_information;
 
-	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_get_size";
-	size_t read_count                       = 0;
-	LARGE_INTEGER large_integer_size        = LIBCFILE_LARGE_INTEGER_ZERO;
-	uint32_t error_code                     = 0;
-	int result                              = 0;
+	static char *function            = "libcfile_internal_file_get_size";
+	LARGE_INTEGER large_integer_size = LIBCFILE_LARGE_INTEGER_ZERO;
+	size_t read_count                = 0;
+	uint32_t error_code              = 0;
+	int result                       = 0;
 
-	if( file == NULL )
+	if( internal_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -3638,8 +3777,6 @@ int libcfile_file_get_size(
 
 		return( -1 );
 	}
-	internal_file = (libcfile_internal_file_t *) file;
-
 	if( internal_file->handle == INVALID_HANDLE_VALUE )
 	{
 		libcerror_error_set(
@@ -3663,7 +3800,7 @@ int libcfile_file_get_size(
 		return( -1 );
 	}
 	result = libcfile_file_is_device(
-	          file,
+	          (libcfile_file_t *) internal_file,
 	          error );
 
 	if( result == -1 )
@@ -3679,8 +3816,8 @@ int libcfile_file_get_size(
 	}
 	else if( result != 0 )
 	{
-		read_count = libcfile_file_io_control_read_with_error_code(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              IOCTL_DISK_GET_LENGTH_INFO,
 		              NULL,
 		              0,
@@ -3716,13 +3853,14 @@ int libcfile_file_get_size(
 			{
 				/* A floppy device does not support IOCTL_DISK_GET_LENGTH_INFO
 				 */
-				read_count = libcfile_file_io_control_read(
-				              file,
+				read_count = libcfile_internal_file_io_control_read_with_error_code(
+				              internal_file,
 				              IOCTL_DISK_GET_DRIVE_GEOMETRY,
 				              NULL,
 				              0,
 				              (uint8_t *) &disk_geometry,
 				              sizeof( DISK_GEOMETRY ),
+				              &error_code,
 				              error );
 
 				if( read_count == -1 )
@@ -3760,7 +3898,7 @@ int libcfile_file_get_size(
 		else
 		{
 			*size  = (size64_t) length_information.Length.HighPart << 32;
-			*size += length_information.Length.LowPart;
+			*size += (uint32_t) length_information.Length.LowPart;
 		}
 	}
 	else
@@ -3787,7 +3925,8 @@ int libcfile_file_get_size(
 #if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x520
 		*size = (size64_t) large_integer_size.QuadPart;
 #else
-		*size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
+		*size  = (size64_t) large_integer_size.HighPart << 32;
+		*size += (uint32_t) large_integer_size.LowPart;
 #endif
 	}
 	return( 1 );
@@ -3799,29 +3938,29 @@ int libcfile_file_get_size(
  * This function uses the POSIX fstat function or equivalent
  * Returns 1 if successful or -1 on error
  */
-int libcfile_file_get_size(
-     libcfile_file_t *file,
+int libcfile_internal_file_get_size(
+     libcfile_internal_file_t *internal_file,
      size64_t *size,
      libcerror_error_t **error )
 {
 	struct stat file_statistics;
 
-	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_get_size";
-	off64_t current_offset                  = 0;
-	off64_t offset                          = 0;
-	ssize_t read_count                      = 0;
-	size_t file_statistics_size             = 0;
+	static char *function       = "libcfile_internal_file_get_size";
+	size_t file_statistics_size = 0;
+	ssize_t read_count          = 0;
+	off64_t current_offset      = 0;
+	off64_t offset              = 0;
+	uint32_t error_code         = 0;
 
 #if !defined( DIOCGMEDIASIZE ) && defined( DIOCGDINFO )
 	struct disklabel disk_label;
 #endif
 #if defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE )
-	uint64_t block_count                    = 0;
-	uint32_t bytes_per_sector               = 0;
+	uint64_t block_count        = 0;
+	uint32_t bytes_per_sector   = 0;
 #endif
 
-	if( file == NULL )
+	if( internal_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -3832,8 +3971,6 @@ int libcfile_file_get_size(
 
 		return( -1 );
 	}
-	internal_file = (libcfile_internal_file_t *) file;
-
 	if( internal_file->descriptor == -1 )
 	{
 		libcerror_error_set(
@@ -3889,13 +4026,14 @@ int libcfile_file_get_size(
 	 || S_ISCHR( file_statistics.st_mode ) )
 	{
 #if defined( BLKGETSIZE64 )
-		read_count = libcfile_file_io_control_read(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              (uint32_t) BLKGETSIZE64,
 		              NULL,
 		              0,
 		              (uint8_t *) size,
 		              8,
+		              &error_code,
 		              error );
 
 		if( read_count == -1 )
@@ -3922,13 +4060,14 @@ int libcfile_file_get_size(
 			 error );
 		}
 #elif defined( DIOCGMEDIASIZE )
-		read_count = libcfile_file_io_control_read(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              (uint32_t) DIOCGMEDIASIZE,
 		              NULL,
 		              0,
 		              (uint8_t *) size,
 		              8,
+		              &error_code,
 		              error );
 
 		if( read_count == -1 )
@@ -3955,13 +4094,14 @@ int libcfile_file_get_size(
 			 error );
 		}
 #elif defined( DIOCGDINFO )
-		read_count = libcfile_file_io_control_read(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              (uint32_t) DIOCGDINFO,
 		              NULL,
 		              0,
 		              (uint8_t *) &disk_label,
 		              sizeof( struct disklabel ),
+		              &error_code,
 		              error );
 
 		if( read_count == -1 )
@@ -3992,13 +4132,14 @@ int libcfile_file_get_size(
 			*size = disk_label.d_secperunit * disk_label.d_secsize;
 		}
 #elif defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE )
-		read_count = libcfile_file_io_control_read(
-		              file,
+		read_count = libcfile_internal_file_io_control_read_with_error_code(
+		              internal_file,
 		              (uint32_t) DKIOCGETBLOCKSIZE,
 		              NULL,
 		              0,
 		              (uint8_t *) &bytes_per_sector,
 		              4,
+		              &error_code,
 		              error );
 
 		if( read_count == -1 )
@@ -4026,13 +4167,14 @@ int libcfile_file_get_size(
 		}
 		else
 		{
-			read_count = libcfile_file_io_control_read(
-			              file,
+			read_count = libcfile_internal_file_io_control_read_with_error_code(
+			              internal_file,
 			              (uint32_t) DKIOCGETBLOCKCOUNT,
 			              NULL,
 			              0,
 			              (uint8_t *) &block_count,
 			              4,
+			              &error_code,
 			              error );
 
 			if( read_count == -1 )
@@ -4079,7 +4221,7 @@ int libcfile_file_get_size(
 			/* Try to seek the end of the file and determine the size based on the offset
 			 */
 			if( libcfile_file_get_offset(
-			     file,
+			     (libcfile_file_t *) internal_file,
 			     &current_offset,
 			     error ) != 1  )
 			{
@@ -4093,7 +4235,7 @@ int libcfile_file_get_size(
 				return( -1 );
 			}
 			offset = libcfile_file_seek_offset(
-				  file,
+			          (libcfile_file_t *) internal_file,
 				  0,
 				  SEEK_END,
 				  error );
@@ -4112,7 +4254,7 @@ int libcfile_file_get_size(
 			*size = (size64_t) offset;
 
 			offset = libcfile_file_seek_offset(
-				  file,
+			          (libcfile_file_t *) internal_file,
 				  current_offset,
 				  SEEK_SET,
 				  error );
@@ -4150,6 +4292,46 @@ int libcfile_file_get_size(
 #else
 #error Missing file get size function
 #endif
+
+/* Retrieves the size of the file
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_file_get_size(
+     libcfile_file_t *file,
+     size64_t *size,
+     libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_get_size";
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+	if( size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size.",
+		 function );
+
+		return( -1 );
+	}
+	*size = internal_file->size;
+
+	return( 1 );
+}
 
 #if defined( WINAPI ) && ( WINVER <= 0x0500 )
 
@@ -4352,54 +4534,14 @@ int libcfile_file_is_device(
 #error Missing file is device function
 #endif
 
-/* Read data from a device file using IO control
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libcfile_file_io_control_read(
-         libcfile_file_t *file,
-         uint32_t control_code,
-         uint8_t *control_data,
-         size_t control_data_size,
-         uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error )
-{
-	static char *function = "libcfile_file_io_control_read";
-	ssize_t read_count    = 0;
-	uint32_t error_code   = 0;
-
-	read_count = libcfile_file_io_control_read_with_error_code(
-	              file,
-	              control_code,
-	              control_data,
-	              control_data_size,
-	              data,
-	              data_size,
-	              &error_code,
-	              error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
-		 "%s: unable to to IO control device.",
-		 function );
-
-		return( -1 );
-	}
-	return( read_count );
-}
-
 #if defined( HAVE_IOCTL ) || defined( WINAPI )
 
 /* Read data from a device file using IO control
  * This function uses the POSIX ioctl function or WINAPI DeviceIoControl
  * Returns the number of bytes read if successful or -1 on error
  */
-ssize_t libcfile_file_io_control_read_with_error_code(
-         libcfile_file_t *file,
+ssize_t libcfile_internal_file_io_control_read_with_error_code(
+         libcfile_internal_file_t *internal_file,
          uint32_t control_code,
          uint8_t *control_data,
          size_t control_data_size,
@@ -4408,14 +4550,13 @@ ssize_t libcfile_file_io_control_read_with_error_code(
          uint32_t *error_code,
          libcerror_error_t **error )
 {
-	libcfile_internal_file_t *internal_file = NULL;
-	static char *function                   = "libcfile_file_io_control_read_with_error_code";
+	static char *function = "libcfile_internal_file_io_control_read_with_error_code";
 
 #if defined( WINAPI )
-	DWORD response_count                    = 0;
+	DWORD response_count  = 0;
 #endif
 
-	if( file == NULL )
+	if( internal_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -4426,8 +4567,6 @@ ssize_t libcfile_file_io_control_read_with_error_code(
 
 		return( -1 );
 	}
-	internal_file = (libcfile_internal_file_t *) file;
-
 #if defined( WINAPI )
 	if( internal_file->handle == INVALID_HANDLE_VALUE )
 	{
@@ -4603,6 +4742,114 @@ ssize_t libcfile_file_io_control_read_with_error_code(
 #error Missing file IO control with data function
 #endif
 
+/* Read data from a device file using IO control
+ * Returns the number of bytes read if successful or -1 on error
+ */
+ssize_t libcfile_file_io_control_read(
+         libcfile_file_t *file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_io_control_read";
+	ssize_t read_count                      = 0;
+	uint32_t error_code                     = 0;
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+	read_count = libcfile_internal_file_io_control_read_with_error_code(
+	              internal_file,
+	              control_code,
+	              control_data,
+	              control_data_size,
+	              data,
+	              data_size,
+	              &error_code,
+	              error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 "%s: unable to to IO control device.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
+/* Read data from a device file using IO control
+ * Returns the number of bytes read if successful or -1 on error
+ */
+ssize_t libcfile_file_io_control_read_with_error_code(
+         libcfile_file_t *file,
+         uint32_t control_code,
+         uint8_t *control_data,
+         size_t control_data_size,
+         uint8_t *data,
+         size_t data_size,
+         uint32_t *error_code,
+         libcerror_error_t **error )
+{
+	libcfile_internal_file_t *internal_file = NULL;
+	static char *function                   = "libcfile_file_io_control_read_with_error_code";
+	ssize_t read_count                      = 0;
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libcfile_internal_file_t *) file;
+
+	read_count = libcfile_internal_file_io_control_read_with_error_code(
+	              internal_file,
+	              control_code,
+	              control_data,
+	              control_data_size,
+	              data,
+	              data_size,
+	              error_code,
+	              error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+		 "%s: unable to to IO control device.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
 /* On some versions of Linux the FADVISE definions seem to be missing from fcntl.h
  */
 #if defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI )
@@ -4726,6 +4973,94 @@ int libcfile_file_set_access_behavior(
 		return( -1 );
 	}
 #endif /* defined( HAVE_POSIX_FADVISE ) && !defined( WINAPI ) */
+
+	return( 1 );
+}
+
+/* Sets the block size for the read and seek operations
+ * A block size of 0 represents no block-based operations
+ * The total size must be a multitude of block size
+ * Returns 1 if successful or -1 on error
+ */
+int libcfile_internal_file_set_block_size(
+     libcfile_internal_file_t *internal_file,
+     size_t block_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libcfile_internal_file_set_block_size";
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( WINAPI ) && ( UINT32_MAX < SSIZE_MAX )
+	if( block_size > (size_t) UINT32_MAX )
+#else
+	if( block_size > (size_t) SSIZE_MAX )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid block size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->block_data != NULL )
+	{
+		if( block_size != internal_file->block_size )
+		{
+			memory_free(
+			 internal_file->block_data );
+
+			internal_file->block_data      = NULL;
+			internal_file->block_data_size = 0;
+		}
+	}
+	if( internal_file->block_data == NULL )
+	{
+		if( block_size > 0 )
+		{
+			internal_file->block_data = (uint8_t *) memory_allocate(
+			                                         sizeof( uint8_t ) * block_size );
+
+			if( internal_file == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create block data.",
+				 function );
+
+				return( -1 );
+			}
+			if( memory_set(
+			     internal_file->block_data,
+			     0,
+			     block_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear block data.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		internal_file->block_size = block_size;
+	}
 	return( 1 );
 }
 
@@ -4806,73 +5141,31 @@ int libcfile_file_set_block_size(
 
 		return( -1 );
 	}
-	if( block_size != internal_file->block_size )
+	if( ( block_size != 0 )
+	 && ( ( internal_file->size % block_size ) != 0 ) )
 	{
-		if( libcfile_file_get_size(
-		     file,
-		     &( internal_file->size ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid block size value out of bounds.",
+		 function );
 
-			return( -1 );
-		}
-		if( internal_file->block_data != NULL )
-		{
-			memory_free(
-			 internal_file->block_data );
+		return( -1 );
+	}
+	if( libcfile_internal_file_set_block_size(
+	     internal_file,
+	     block_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set block size.",
+		 function );
 
-			internal_file->block_data      = NULL;
-			internal_file->block_data_size = 0;
-		}
-		if( block_size > 0 )
-		{
-			if( ( internal_file->size % block_size ) != 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid block size value out of bounds.",
-				 function );
-
-				return( -1 );
-			}
-			internal_file->block_data = (uint8_t *) memory_allocate(
-			                                         sizeof( uint8_t ) * block_size );
-
-			if( internal_file == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create file.",
-				 function );
-
-				return( -1 );
-			}
-			if( memory_set(
-			     internal_file->block_data,
-			     0,
-			     block_size ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to clear block data.",
-				 function );
-
-				return( -1 );
-			}
-		}
-		internal_file->block_size = block_size;
+		return( -1 );
 	}
 	return( 1 );
 }
