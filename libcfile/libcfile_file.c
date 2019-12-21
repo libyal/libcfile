@@ -365,6 +365,18 @@ int libcfile_file_open(
 
 #if defined( WINAPI )
 
+#if ( WINVER >= 0x0600 ) && ( WINVER < 0x0602 )
+
+#define FileAlignmentInfo 0x11
+
+typedef struct _FILE_ALIGNMENT_INFO FILE_ALIGNMENT_INFO;
+
+struct _FILE_ALIGNMENT_INFO {
+	ULONG AlignmentRequirement;
+};
+
+#endif
+
 /* Opens a file
  * This function uses the WINAPI function for Windows XP (0x0501) or later,
  * or tries to dynamically call the function for Windows 2000 (0x0500) or earlier
@@ -5033,7 +5045,7 @@ int libcfile_internal_file_set_block_size(
 			internal_file->block_data = (uint8_t *) memory_allocate(
 			                                         sizeof( uint8_t ) * block_size );
 
-			if( internal_file == NULL )
+			if( internal_file->block_data == NULL )
 			{
 				libcerror_error_set(
 				 error,
