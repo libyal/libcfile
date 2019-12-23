@@ -837,6 +837,20 @@ int libcfile_file_open_with_error_code(
 		}
 		return( -1 );
 	}
+	if( libcfile_internal_file_get_size(
+	     internal_file,
+	     &( internal_file->size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		return( -1 );
+	}
 	internal_file->access_flags   = access_flags;
 	internal_file->current_offset = 0;
 
@@ -1457,6 +1471,20 @@ int libcfile_file_open_wide_with_error_code(
 
 				break;
 		}
+		goto on_error;
+	}
+	if( libcfile_internal_file_get_size(
+	     internal_file,
+	     &( internal_file->size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
 		goto on_error;
 	}
 	return( 1 );
@@ -3959,6 +3987,7 @@ int libcfile_internal_file_get_size(
 
 	static char *function       = "libcfile_internal_file_get_size";
 	size_t file_statistics_size = 0;
+	size64_t safe_size          = 0;
 	ssize_t read_count          = 0;
 	off64_t current_offset      = 0;
 	off64_t offset              = 0;
@@ -4043,7 +4072,7 @@ int libcfile_internal_file_get_size(
 		              (uint32_t) BLKGETSIZE64,
 		              NULL,
 		              0,
-		              (uint8_t *) size,
+		              (uint8_t *) &safe_size,
 		              8,
 		              &error_code,
 		              error );
@@ -4077,7 +4106,7 @@ int libcfile_internal_file_get_size(
 		              (uint32_t) DIOCGMEDIASIZE,
 		              NULL,
 		              0,
-		              (uint8_t *) size,
+		              (uint8_t *) &safe_size,
 		              8,
 		              &error_code,
 		              error );
@@ -4141,7 +4170,7 @@ int libcfile_internal_file_get_size(
 		}
 		else
 		{
-			*size = disk_label.d_secperunit * disk_label.d_secsize;
+			safe_size = disk_label.d_secperunit * disk_label.d_secsize;
 		}
 #elif defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE )
 		read_count = libcfile_internal_file_io_control_read_with_error_code(
@@ -4224,7 +4253,7 @@ int libcfile_internal_file_get_size(
 					 block_count );
 				}
 #endif
-				*size = (size64_t) ( block_count * bytes_per_sector );
+				safe_size = (size64_t) ( block_count * bytes_per_sector );
 			}
 		}
 #endif
@@ -4263,7 +4292,7 @@ int libcfile_internal_file_get_size(
 
 				return( -1 );
 			}
-			*size = (size64_t) offset;
+			safe_size = (size64_t) offset;
 
 			offset = libcfile_file_seek_offset(
 			          (libcfile_file_t *) internal_file,
@@ -4290,14 +4319,16 @@ int libcfile_internal_file_get_size(
 			libcnotify_printf(
 			 "%s: device media size: %" PRIu64 "\n",
 			 function,
-			 *size );
+			 safe_size );
 		}
 #endif
 	}
 	else
 	{
-		*size = (size64_t) file_statistics.st_size;
+		safe_size = (size64_t) file_statistics.st_size;
 	}
+	*size = safe_size;
+
 	return( 1 );
 }
 
