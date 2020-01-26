@@ -2079,109 +2079,122 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 	}
 	if( internal_file->block_size != 0 )
 	{
-		if( internal_file->current_offset < 0 )
+		if( internal_file->block_data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid file - current offset value out of bounds.",
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - missing block data.",
 			 function );
 
 			return( -1 );
 		}
-		if( (size64_t) internal_file->current_offset > internal_file->size )
-		{
-			return( 0 );
-		}
-		if( ( (size64_t) internal_file->current_offset + size ) > internal_file->size )
-		{
-			size = (size_t) ( internal_file->size - internal_file->current_offset );
-		}
 	}
-	if( size == 0 )
+	if( internal_file->current_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid file - current offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( size == 0 )
+	 || ( (size64_t) internal_file->current_offset > internal_file->size ) )
 	{
 		return( 0 );
 	}
-	if( ( internal_file->block_data_offset > 0 )
-	 && ( internal_file->block_data_size == 0 ) )
+	if( ( (size64_t) internal_file->current_offset + size ) > internal_file->size )
 	{
-		if( memory_set(
-		     internal_file->block_data,
-		     0,
-		     internal_file->block_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear block data.",
-			 function );
-
-			return( -1 );
-		}
-		read_count = libcfile_internal_file_read_buffer_at_offset_with_error_code(
-		              internal_file,
-		              internal_file->current_offset - internal_file->block_data_offset,
-		              internal_file->block_data,
-		              internal_file->block_size,
-		              error_code,
-		              error );
-
-		if( read_count != (ssize_t) internal_file->block_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: invalid read count: %" PRIzd " returned.",
-			 function,
-			 read_count );
-
-			return( -1 );
-		}
-		internal_file->block_data_size = (size_t) read_count;
+		size = (size_t) ( internal_file->size - internal_file->current_offset );
 	}
-	if( ( internal_file->block_data_offset > 0 )
-	 && ( internal_file->block_data_offset < internal_file->block_data_size ) )
+	if( internal_file->block_size != 0 )
 	{
-		read_size = internal_file->block_data_size - internal_file->block_data_offset;
-
-		if( read_size > size )
+		/* Read a block of data to align with the next block
+		 */
+		if( ( internal_file->block_data_offset > 0 )
+		 && ( internal_file->block_data_size == 0 ) )
 		{
-			read_size = size;
-		}
-		if( memory_copy(
-		     buffer,
-		     &( internal_file->block_data[ internal_file->block_data_offset ] ),
-		     read_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy block data.",
-			 function );
+			if( memory_set(
+			     internal_file->block_data,
+			     0,
+			     internal_file->block_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear block data.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
+			read_count = libcfile_internal_file_read_buffer_at_offset_with_error_code(
+			              internal_file,
+			              internal_file->current_offset - internal_file->block_data_offset,
+			              internal_file->block_data,
+			              internal_file->block_size,
+			              error_code,
+			              error );
+
+			if( read_count != (ssize_t) internal_file->block_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: invalid read count: %" PRIzd " returned.",
+				 function,
+				 read_count );
+
+				return( -1 );
+			}
+			internal_file->block_data_size = (size_t) read_count;
 		}
-		buffer_offset                    += read_size;
-		size                             -= read_size;
-		internal_file->current_offset    += read_size;
-		internal_file->block_data_offset += read_size;
+		if( ( internal_file->block_data_offset > 0 )
+		 && ( internal_file->block_data_offset < internal_file->block_data_size ) )
+		{
+			read_size = internal_file->block_data_size - internal_file->block_data_offset;
+
+			if( read_size > size )
+			{
+				read_size = size;
+			}
+			if( memory_copy(
+			     buffer,
+			     &( internal_file->block_data[ internal_file->block_data_offset ] ),
+			     read_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy block data.",
+				 function );
+
+				return( -1 );
+			}
+			buffer_offset                    += read_size;
+			size                             -= read_size;
+			internal_file->current_offset    += read_size;
+			internal_file->block_data_offset += read_size;
+		}
+		if( size == 0 )
+		{
+			return( (ssize_t) buffer_offset );
+		}
 	}
-	if( size == 0 )
+	read_size = size;
+
+	if( internal_file->block_size != 0 )
 	{
-		return( (ssize_t) buffer_offset );
-	}
-	if( internal_file->block_size == 0 )
-	{
-		read_size = size;
-	}
-	else
-	{
-		read_size_remainder = size % internal_file->block_size;
-		read_size           = size - read_size_remainder;
+		/* Read block aligned
+		 */
+		read_size_remainder = read_size % internal_file->block_size;
+		read_size          -= read_size_remainder;
 	}
 	if( read_size > 0 )
 	{
@@ -2198,86 +2211,34 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		{
 			result = 0;
 		}
+		else if( ( internal_file->block_size != 0 )
+		      && ( read_count != (ssize_t) read_size ) )
+		{
+			result = 0;
+		}
 		else
 		{
 			result = 1;
 		}
-		if( result != 0 )
+		if( result == 0 )
 		{
-			buffer_offset                 += (size_t) read_count;
-			internal_file->current_offset += read_count;
-		}
-		/* Non-buffered Windows devices require the buffer to be aligned.
-		 * The alignment can be determined by GetFileInformationByHandleEx.
-		 * The ReadFile function appears to return ERROR_INVALID_PARAMETER
-		 * in case it fails on alignment.
-		 */
-		else if( *error_code == ERROR_INVALID_PARAMETER )
-		{
-			/* As a fallback read the data using the block data buffer
-			 */
-			while( read_size > 0 )
-			{
-				read_count = libcfile_internal_file_read_buffer_at_offset_with_error_code(
-					      internal_file,
-					      internal_file->current_offset,
-					      internal_file->block_data,
-					      internal_file->block_size,
-					      error_code,
-					      error );
-
-				if( read_count != (ssize_t) internal_file->block_size )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: invalid read count: %" PRIzd " returned.",
-					 function,
-					 read_count );
-
-					return( -1 );
-				}
-				if( memory_copy(
-				     &( buffer[ buffer_offset ] ),
-				     internal_file->block_data,
-				     internal_file->block_size ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-					 "%s: unable to copy block data.",
-					 function );
-
-					return( -1 );
-				}
-				buffer_offset                 += internal_file->block_size;
-				read_size                     -= internal_file->block_size;
-				internal_file->current_offset += internal_file->block_size;
-			}
-		}
-		else
-		{
-			libcerror_error_set(
+			libcerror_system_set_error(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: invalid read count: %" PRIzd " returned.",
-			 function,
-			 read_count );
+			 *error_code,
+			 "%s: unable to read from file.",
+			 function );
 
 			return( -1 );
 		}
+		buffer_offset                 += (size_t) read_count;
+		internal_file->current_offset += read_count;
 	}
+	/* Read the non-aligned remainder
+	 */
 	if( read_size_remainder > 0 )
 	{
-		/* The read was cut short
-		 */
-		if( read_count != (ssize_t) read_size )
-		{
-			return( (ssize_t) buffer_offset );
-		}
 		if( memory_set(
 		     internal_file->block_data,
 		     0,
@@ -2416,108 +2377,121 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 	}
 	if( internal_file->block_size != 0 )
 	{
-		if( internal_file->current_offset < 0 )
+		if( internal_file->block_data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid file - current offset value out of bounds.",
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - missing block data.",
 			 function );
 
 			return( -1 );
 		}
-		if( (size64_t) internal_file->current_offset > internal_file->size )
-		{
-			return( 0 );
-		}
-		if( ( (size64_t) internal_file->current_offset + size ) > internal_file->size )
-		{
-			size = (size_t) ( internal_file->size - internal_file->current_offset );
-		}
 	}
-	if( size == 0 )
+	if( internal_file->current_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid file - current offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( size == 0 )
+	 || ( (size64_t) internal_file->current_offset > internal_file->size ) )
 	{
 		return( 0 );
 	}
-	if( ( internal_file->block_data_offset > 0 )
-	 && ( internal_file->block_data_size == 0 ) )
+	if( ( (size64_t) internal_file->current_offset + size ) > internal_file->size )
 	{
-		if( memory_set(
-		     internal_file->block_data,
-		     0,
-		     internal_file->block_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear block data.",
-			 function );
-
-			return( -1 );
-		}
-		read_count = read(
-		              internal_file->descriptor,
-		              internal_file->block_data,
-		              internal_file->block_size );
-
-		if( read_count != (ssize_t) internal_file->block_size )
-		{
-			*error_code = (uint32_t) errno;
-
-			libcerror_system_set_error(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 *error_code,
-			 "%s: unable to read from file.",
-			 function );
-
-			return( -1 );
-		}
-		internal_file->block_data_size = (size_t) read_count;
+		size = (size_t) ( internal_file->size - internal_file->current_offset );
 	}
-	if( ( internal_file->block_data_offset > 0 )
-	 && ( internal_file->block_data_offset < internal_file->block_data_size ) )
+	if( internal_file->block_size != 0 )
 	{
-		read_size = internal_file->block_data_size - internal_file->block_data_offset;
-
-		if( read_size > size )
+		/* Read a block of data to align with the next block
+		 */
+		if( ( internal_file->block_data_offset > 0 )
+		 && ( internal_file->block_data_size == 0 ) )
 		{
-			read_size = size;
-		}
-		if( memory_copy(
-		     buffer,
-		     &( internal_file->block_data[ internal_file->block_data_offset ] ),
-		     read_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy block data.",
-			 function );
+			if( memory_set(
+			     internal_file->block_data,
+			     0,
+			     internal_file->block_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear block data.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
+			read_count = read(
+			              internal_file->descriptor,
+			              internal_file->block_data,
+			              internal_file->block_size );
+
+			if( read_count != (ssize_t) internal_file->block_size )
+			{
+				*error_code = (uint32_t) errno;
+
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 *error_code,
+				 "%s: unable to read from file.",
+				 function );
+
+				return( -1 );
+			}
+			internal_file->block_data_size = (size_t) read_count;
 		}
-		buffer_offset                    += read_size;
-		size                             -= read_size;
-		internal_file->block_data_offset += read_size;
-		internal_file->current_offset    += read_size;
+		if( ( internal_file->block_data_offset > 0 )
+		 && ( internal_file->block_data_offset < internal_file->block_data_size ) )
+		{
+			read_size = internal_file->block_data_size - internal_file->block_data_offset;
+
+			if( read_size > size )
+			{
+				read_size = size;
+			}
+			if( memory_copy(
+			     buffer,
+			     &( internal_file->block_data[ internal_file->block_data_offset ] ),
+			     read_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy block data.",
+				 function );
+
+				return( -1 );
+			}
+			buffer_offset                    += read_size;
+			size                             -= read_size;
+			internal_file->block_data_offset += read_size;
+			internal_file->current_offset    += read_size;
+		}
+		if( size == 0 )
+		{
+			return( (ssize_t) buffer_offset );
+		}
 	}
-	if( size == 0 )
+	read_size = size;
+
+	if( internal_file->block_size != 0 )
 	{
-		return( (ssize_t) buffer_offset );
-	}
-	if( internal_file->block_size == 0 )
-	{
-		read_size = size;
-	}
-	else
-	{
-		read_size_remainder = size % internal_file->block_size;
-		read_size           = size - read_size_remainder;
+		/* Read block aligned
+		 */
+		read_size_remainder = read_size % internal_file->block_size;
+		read_size          -= read_size_remainder;
 	}
 	if( read_size > 0 )
 	{
@@ -2557,14 +2531,10 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 		buffer_offset                 += (size_t) read_count;
 		internal_file->current_offset += read_count;
 	}
+	/* Read the non-aligned remainder
+	 */
 	if( read_size_remainder > 0 )
 	{
-		/* The read was cut short
-		 */
-		if( read_count != (ssize_t) read_size )
-		{
-			return( (ssize_t) buffer_offset );
-		}
 		if( memory_set(
 		     internal_file->block_data,
 		     0,
