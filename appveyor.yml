@@ -94,33 +94,21 @@ build_script:
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild" -or ($env:BUILD_ENVIRONMENT -eq "python" -and $isWindows)) {
     .\synclibs.ps1;
     .\autogen.ps1 }
-- cmd: if [%TARGET%]==[vs2008] (
-    msbuild /verbosity:quiet msvscpp\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2010] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --no-python-dll --output-format 2010 msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2010\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2012] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --extend-with-x64 --output-format 2012 --python-path "C:\\Python27-x64" msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2012\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2013] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2013 msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2013\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2015] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2015 msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2015\libcfile.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2017] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --extend-with-x64 --no-python-dll --output-format 2017 --with-dokany msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2017\libcfile.sln /property:Platform=Win32 /property:PlatformToolset=v141 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" &&
-    msbuild /verbosity:quiet vs2017\libcfile.sln /property:Platform=x64 /property:PlatformToolset=v141 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2019] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --extend-with-x64 --no-python-dll --output-format 2019 --with-dokany msvscpp\libcfile.sln &&
-    msbuild /verbosity:quiet vs2019\libcfile.sln /property:Platform=x64 /property:PlatformToolset=v142 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
+- ps: If ($env:TARGET -eq "vs2008") {
+    .\build.ps1 -VisualStudioVersion 2008 -VSToolsOptions "" }
+- ps: If ($env:TARGET -eq "vs2010") {
+    .\build.ps1 -VisualStudioVersion 2010 -VSToolsOptions "--no-python-dll" }
+- ps: If ($env:TARGET -eq "vs2012") {
+    .\build.ps1 -VisualStudioVersion 2012 -VSToolsOptions "--extend-with-x64 --python-path C:\\Python27-x64" }
+- ps: If ($env:TARGET -eq "vs2013") {
+    .\build.ps1 -VisualStudioVersion 2013 -VSToolsOptions "" }
+- ps: If ($env:TARGET -eq "vs2015") {
+    .\build.ps1 -VisualStudioVersion 2015 -VSToolsOptions "" }
+- ps: If ($env:TARGET -eq "vs2017") {
+    .\build.ps1 -VisualStudioVersion 2017 -Platform Win32 -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany";
+    .\build.ps1 -VisualStudioVersion 2017 -Platform x64 -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany" }
+- ps: If ($env:TARGET -eq "vs2019") {
+    .\build.ps1 -VisualStudioVersion 2019 -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany" }
 - cmd: if [%BUILD_ENVIRONMENT%]==[cygwin] (
     xcopy /i /q /s C:\projects\libcfile C:\cygwin\home\appveyor\libcfile &&
     C:\cygwin\bin\bash -e -l -c "cd libcfile && ./synclibs.sh --use-head && ./autogen.sh && ./configure ${CONFIGURE_OPTIONS} && make > /dev/null" )
