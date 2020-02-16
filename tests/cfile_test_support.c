@@ -176,34 +176,6 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Tests the libcfile_GetFileAttributesA function
- * Returns 1 if successful or 0 if not
- */
-int cfile_test_libcfile_GetFileAttributesA(
-     void )
-{
-	DWORD result = 0;
-
-	/* Test error cases
-	 */
-	result = libcfile_GetFileAttributesA(
-	          NULL );
-
-	CFILE_TEST_ASSERT_EQUAL_UINT32(
-	 "result",
-	 (uint32_t) result,
-	 (uint32_t) INVALID_FILE_ATTRIBUTES );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
 /* Tests the libcfile_file_exists function
  * Returns 1 if successful or 0 if not
  */
@@ -272,34 +244,6 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Tests the libcfile_GetFileAttributesW function
- * Returns 1 if successful or 0 if not
- */
-int cfile_test_libcfile_GetFileAttributesW(
-     void )
-{
-	DWORD result = 0;
-
-	/* Test error cases
-	 */
-	result = libcfile_GetFileAttributesW(
-	          NULL );
-
-	CFILE_TEST_ASSERT_EQUAL_UINT32(
-	 "result",
-	 (uint32_t) result,
-	 (uint32_t) INVALID_FILE_ATTRIBUTES );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
 /* Tests the libcfile_file_exists_wide function
  * Returns 1 if successful or 0 if not
  */
@@ -367,34 +311,6 @@ on_error:
 }
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Tests the libcfile_DeleteFileA function
- * Returns 1 if successful or 0 if not
- */
-int cfile_test_libcfile_DeleteFileA(
-     void )
-{
-	BOOL result = FALSE;
-
-	/* Test error cases
-	 */
-	result = libcfile_DeleteFileA(
-	          NULL );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 FALSE );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_remove function
  * Returns 1 if successful or 0 if not
@@ -583,34 +499,6 @@ on_error:
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Tests the libcfile_DeleteFileW function
- * Returns 1 if successful or 0 if not
- */
-int cfile_test_libcfile_DeleteFileW(
-     void )
-{
-	BOOL result = FALSE;
-
-	/* Test error cases
-	 */
-	result = libcfile_DeleteFileW(
-	          NULL );
-
-	CFILE_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 FALSE );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Tests the libcfile_file_remove_wide function
  * Returns 1 if successful or 0 if not
@@ -831,37 +719,13 @@ int main(
 	 "libcfile_file_exists",
 	 cfile_test_file_exists );
 
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-	CFILE_TEST_RUN(
-	 "libcfile_GetFileAttributesA",
-	 cfile_test_libcfile_GetFileAttributesA );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-	CFILE_TEST_RUN(
-	 "libcfile_GetFileAttributesW",
-	 cfile_test_libcfile_GetFileAttributesW );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_exists_wide",
 	 cfile_test_file_exists_wide );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-	CFILE_TEST_RUN(
-	 "libcfile_DeleteFileA",
-	 cfile_test_libcfile_DeleteFileA );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 	CFILE_TEST_RUN(
 	 "libcfile_file_remove",
@@ -870,14 +734,6 @@ int main(
 	CFILE_TEST_RUN(
 	 "libcfile_file_remove_with_error_code",
 	 cfile_test_file_remove_with_error_code );
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-	CFILE_TEST_RUN(
-	 "libcfile_DeleteFileW",
-	 cfile_test_libcfile_DeleteFileW );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 

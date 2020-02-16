@@ -43,6 +43,7 @@
 #include "libcfile_libclocale.h"
 #include "libcfile_libuna.h"
 #include "libcfile_support.h"
+#include "libcfile_winapi.h"
 
 #if !defined( HAVE_LOCAL_LIBCFILE )
 
@@ -108,51 +109,6 @@ int libcfile_set_codepage(
 
 #endif /* !defined( HAVE_LOCAL_LIBCFILE ) */
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Cross Windows safe version of GetFileAttributesA
- * Returns the file attributs if successful or INVALID_FILE_ATTRIBUTES on error
- */
-DWORD libcfile_GetFileAttributesA(
-       LPCSTR filename )
-{
-	FARPROC function       = NULL;
-	HMODULE library_handle = NULL;
-	DWORD result           = 0;
-
-	if( filename == NULL )
-	{
-		return( INVALID_FILE_ATTRIBUTES );
-	}
-	library_handle = LoadLibrary(
-	                  _SYSTEM_STRING( "kernel32.dll" ) );
-
-	if( library_handle == NULL )
-	{
-		return( INVALID_FILE_ATTRIBUTES );
-	}
-	function = GetProcAddress(
-		    library_handle,
-		    (LPCSTR) "GetFileAttributesA" );
-
-	if( function != NULL )
-	{
-		result = function(
-			  filename );
-	}
-	/* This call should be after using the function
-	 * in most cases kernel32.dll will still be available after free
-	 */
-	if( FreeLibrary(
-	     library_handle ) != TRUE )
-	{
-		result = INVALID_FILE_ATTRIBUTES;
-	}
-	return( result );
-}
-
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
 #if defined( WINAPI )
 
 /* Determines if a file exists
@@ -164,10 +120,13 @@ int libcfile_file_exists(
      const char *filename,
      libcerror_error_t **error )
 {
-	static char *function = "libcfile_file_exists";
-	int result            = 1;
-	DWORD error_code      = 0;
-	DWORD file_attributes = 0;
+	static char *function  = "libcfile_file_exists";
+	size_t filename_length = 0;
+	DWORD error_code       = 0;
+	DWORD file_attributes  = 0;
+	HANDLE handle          = INVALID_HANDLE_VALUE;
+	int is_device_filename = 0;
+	int result             = 1;
 
 	if( filename == NULL )
 	{
@@ -180,41 +139,143 @@ int libcfile_file_exists(
 
 		return( -1 );
 	}
-#if ( WINVER <= 0x0500 )
-	file_attributes = libcfile_GetFileAttributesA(
-	                   (LPCSTR) filename );
-#else
-	file_attributes = GetFileAttributesA(
-	                   (LPCSTR) filename );
-#endif
-	if( file_attributes == INVALID_FILE_ATTRIBUTES )
+	filename_length = narrow_string_length(
+	                   filename );
+
+	if( filename_length > 4 )
 	{
-		error_code = GetLastError();
-
-		switch( error_code )
+		if( ( filename[ 0 ] == '\\' )
+		 && ( filename[ 1 ] == '\\' )
+		 && ( filename[ 2 ] == '.' )
+		 && ( filename[ 3 ] == '\\' ) )
 		{
-			case ERROR_ACCESS_DENIED:
-				result = 1;
+			/* Ignore \\.\F:\ which is an alternative notation for F:
+			 */
+			if( ( filename_length < 7 )
+			 || ( filename[ 5 ] != ':' )
+			 || ( filename[ 6 ] != '\\' ) )
+			{
+				is_device_filename = 1;
+			}
+		}
+	}
+	if( is_device_filename != 0 )
+	{
+#if ( WINVER <= 0x0500 )
+		handle = libcfile_CreateFileA(
+		          (LPCSTR) filename,
+		          GENERIC_READ,
+		          FILE_SHARE_READ | FILE_SHARE_WRITE,
+		          NULL,
+		          OPEN_EXISTING,
+		          FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+		          NULL );
+#else
+		handle = CreateFileA(
+		          (LPCSTR) filename,
+		          GENERIC_READ,
+		          FILE_SHARE_READ | FILE_SHARE_WRITE,
+		          NULL,
+		          OPEN_EXISTING,
+		          FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+		          NULL );
+#endif
+		if( handle == INVALID_HANDLE_VALUE )
+		{
+			error_code = (uint32_t) GetLastError();
 
-				break;
+			switch( error_code )
+			{
+				case ERROR_ACCESS_DENIED:
+					result = 1;
 
-			case ERROR_FILE_NOT_FOUND:
-			case ERROR_PATH_NOT_FOUND:
-				result = 0;
+					break;
 
-				break;
+				case ERROR_FILE_NOT_FOUND:
+				case ERROR_PATH_NOT_FOUND:
+					result = 0;
 
-			default:
+					break;
+
+				default:
+					libcerror_system_set_error(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_OPEN_FAILED,
+					 error_code,
+					 "%s: unable to open file: %s.",
+					 function,
+					 filename );
+
+					return( -1 );
+			}
+		}
+		else
+		{
+#if ( WINVER <= 0x0500 )
+			result = libcfile_CloseHandle(
+			          handle );
+#else
+			result = CloseHandle(
+			          handle );
+#endif
+			if( result == 0 )
+			{
+				error_code = GetLastError();
+
 				libcerror_system_set_error(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_GENERIC,
+				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 				 error_code,
-				 "%s: unable to determine attributes of file: %s.",
-				 function,
-				 filename );
+				 "%s: unable to close file.",
+				 function );
 
 				return( -1 );
+			}
+			result = 1;
+		}
+	}
+	else
+	{
+		/* Note that GetFileAttributesA does not support Windows device file names.
+		 */
+#if ( WINVER <= 0x0500 )
+		file_attributes = libcfile_GetFileAttributesA(
+		                   (LPCSTR) filename );
+#else
+		file_attributes = GetFileAttributesA(
+		                   (LPCSTR) filename );
+#endif
+		if( file_attributes == INVALID_FILE_ATTRIBUTES )
+		{
+			error_code = GetLastError();
+
+			switch( error_code )
+			{
+				case ERROR_ACCESS_DENIED:
+					result = 1;
+
+					break;
+
+				case ERROR_FILE_NOT_FOUND:
+				case ERROR_PATH_NOT_FOUND:
+					result = 0;
+
+					break;
+
+				default:
+					libcerror_system_set_error(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_GENERIC,
+					 error_code,
+					 "%s: unable to determine attributes of file: %s.",
+					 function,
+					 filename );
+
+					return( -1 );
+			}
 		}
 	}
 	return( result );
@@ -304,51 +365,6 @@ int libcfile_file_exists(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Cross Windows safe version of GetFileAttributesW
- * Returns the file attributs if successful or INVALID_FILE_ATTRIBUTES on error
- */
-DWORD libcfile_GetFileAttributesW(
-       LPCWSTR filename )
-{
-	FARPROC function       = NULL;
-	HMODULE library_handle = NULL;
-	DWORD result           = 0;
-
-	if( filename == NULL )
-	{
-		return( INVALID_FILE_ATTRIBUTES );
-	}
-	library_handle = LoadLibrary(
-	                  _SYSTEM_STRING( "kernel32.dll" ) );
-
-	if( library_handle == NULL )
-	{
-		return( INVALID_FILE_ATTRIBUTES );
-	}
-	function = GetProcAddress(
-		    library_handle,
-		    (LPCSTR) "GetFileAttributesW" );
-
-	if( function != NULL )
-	{
-		result = function(
-			  filename );
-	}
-	/* This call should be after using the function
-	 * in most cases kernel32.dll will still be available after free
-	 */
-	if( FreeLibrary(
-	     library_handle ) != TRUE )
-	{
-		result = INVALID_FILE_ATTRIBUTES;
-	}
-	return( result );
-}
-
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
 #if defined( WINAPI )
 
 /* Determines if a file exists using get file attibutes
@@ -360,10 +376,13 @@ int libcfile_file_exists_wide(
      const wchar_t *filename,
      libcerror_error_t **error )
 {
-	static char *function = "libcfile_file_exists_wide";
-	int result            = 1;
-	DWORD error_code      = 0;
-	DWORD file_attributes = 0;
+	static char *function  = "libcfile_file_exists_wide";
+	size_t filename_length = 0;
+	DWORD error_code       = 0;
+	DWORD file_attributes  = 0;
+	HANDLE handle          = INVALID_HANDLE_VALUE;
+	int is_device_filename = 0;
+	int result             = 1;
 
 	if( filename == NULL )
 	{
@@ -376,41 +395,143 @@ int libcfile_file_exists_wide(
 
 		return( -1 );
 	}
-#if ( WINVER <= 0x0500 )
-	file_attributes = libcfile_GetFileAttributesW(
-	                   (LPCWSTR) filename );
-#else
-	file_attributes = GetFileAttributesW(
-	                   (LPCWSTR) filename );
-#endif
-	if( file_attributes == INVALID_FILE_ATTRIBUTES )
+	filename_length = wide_string_length(
+	                   filename );
+
+	if( filename_length > 4 )
 	{
-		error_code = GetLastError();
-
-		switch( error_code )
+		if( ( filename[ 0 ] == (uint16_t) '\\' )
+		 && ( filename[ 1 ] == (uint16_t) '\\' )
+		 && ( filename[ 2 ] == (uint16_t) '.' )
+		 && ( filename[ 3 ] == (uint16_t) '\\' ) )
 		{
-			case ERROR_ACCESS_DENIED:
-				result = 1;
+			/* Ignore \\.\F:\ which is an alternative notation for F:
+			 */
+			if( ( filename_length < 7 )
+			 || ( filename[ 5 ] != (uint16_t) ':' )
+			 || ( filename[ 6 ] != (uint16_t) '\\' ) )
+			{
+				is_device_filename = 1;
+			}
+		}
+	}
+	if( is_device_filename != 0 )
+	{
+#if ( WINVER <= 0x0500 )
+		handle = libcfile_CreateFileW(
+		          (LPCWSTR) filename,
+		          GENERIC_READ,
+		          FILE_SHARE_READ | FILE_SHARE_WRITE,
+		          NULL,
+		          OPEN_EXISTING,
+		          FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+		          NULL );
+#else
+		handle = CreateFileW(
+		          (LPCWSTR) filename,
+		          GENERIC_READ,
+		          FILE_SHARE_READ | FILE_SHARE_WRITE,
+		          NULL,
+		          OPEN_EXISTING,
+		          FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+		          NULL );
+#endif
+		if( handle == INVALID_HANDLE_VALUE )
+		{
+			error_code = (uint32_t) GetLastError();
 
-				break;
+			switch( error_code )
+			{
+				case ERROR_ACCESS_DENIED:
+					result = 1;
 
-			case ERROR_FILE_NOT_FOUND:
-			case ERROR_PATH_NOT_FOUND:
-				result = 0;
+					break;
 
-				break;
+				case ERROR_FILE_NOT_FOUND:
+				case ERROR_PATH_NOT_FOUND:
+					result = 0;
 
-			default:
+					break;
+
+				default:
+					libcerror_system_set_error(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_OPEN_FAILED,
+					 error_code,
+					 "%s: unable to open file: %ls.",
+					 function,
+					 filename );
+
+					return( -1 );
+			}
+		}
+		else
+		{
+#if ( WINVER <= 0x0500 )
+			result = libcfile_CloseHandle(
+			          handle );
+#else
+			result = CloseHandle(
+			          handle );
+#endif
+			if( result == 0 )
+			{
+				error_code = GetLastError();
+
 				libcerror_system_set_error(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_GENERIC,
+				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 				 error_code,
-				 "%s: unable to determine attributes of file: %ls.",
-				 function,
-				 filename );
+				 "%s: unable to close file.",
+				 function );
 
 				return( -1 );
+			}
+			result = 1;
+		}
+	}
+	else
+	{
+		/* Note that GetFileAttributesW does not support Windows device file names.
+		 */
+#if ( WINVER <= 0x0500 )
+		file_attributes = libcfile_GetFileAttributesW(
+		                   (LPCWSTR) filename );
+#else
+		file_attributes = GetFileAttributesW(
+		                   (LPCWSTR) filename );
+#endif
+		if( file_attributes == INVALID_FILE_ATTRIBUTES )
+		{
+			error_code = GetLastError();
+
+			switch( error_code )
+			{
+				case ERROR_ACCESS_DENIED:
+					result = 1;
+
+					break;
+
+				case ERROR_FILE_NOT_FOUND:
+				case ERROR_PATH_NOT_FOUND:
+					result = 0;
+
+					break;
+
+				default:
+					libcerror_system_set_error(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_GENERIC,
+					 error_code,
+					 "%s: unable to determine attributes of file: %ls.",
+					 function,
+					 filename );
+
+					return( -1 );
+			}
 		}
 	}
 	return( result );
@@ -617,51 +738,6 @@ int libcfile_file_exists_wide(
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Cross Windows safe version of DeleteFileA
- * Returns TRUE if successful or FALSE on error
- */
-BOOL libcfile_DeleteFileA(
-      LPCSTR filename )
-{
-	FARPROC function       = NULL;
-	HMODULE library_handle = NULL;
-	BOOL result            = FALSE;
-
-	if( filename == NULL )
-	{
-		return( FALSE );
-	}
-	library_handle = LoadLibrary(
-	                  _SYSTEM_STRING( "kernel32.dll" ) );
-
-	if( library_handle == NULL )
-	{
-		return( FALSE );
-	}
-	function = GetProcAddress(
-		    library_handle,
-		    (LPCSTR) "DeleteFileA" );
-
-	if( function != NULL )
-	{
-		result = function(
-			  filename );
-	}
-	/* This call should be after using the function
-	 * in most cases kernel32.dll will still be available after free
-	 */
-	if( FreeLibrary(
-	     library_handle ) != TRUE )
-	{
-		result = FALSE;
-	}
-	return( result );
-}
-
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
-
 /* Removes a file
  * Returns 1 if successful or -1 on error
  */
@@ -808,51 +884,6 @@ int libcfile_file_remove_with_error_code(
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-#if defined( WINAPI ) && ( WINVER <= 0x0500 )
-
-/* Cross Windows safe version of DeleteFileW
- * Returns TRUE if successful or FALSE on error
- */
-BOOL libcfile_DeleteFileW(
-      LPCWSTR filename )
-{
-	FARPROC function       = NULL;
-	HMODULE library_handle = NULL;
-	BOOL result            = FALSE;
-
-	if( filename == NULL )
-	{
-		return( FALSE );
-	}
-	library_handle = LoadLibrary(
-	                  _SYSTEM_STRING( "kernel32.dll" ) );
-
-	if( library_handle == NULL )
-	{
-		return( FALSE );
-	}
-	function = GetProcAddress(
-		    library_handle,
-		    (LPCSTR) "DeleteFileW" );
-
-	if( function != NULL )
-	{
-		result = function(
-			  filename );
-	}
-	/* This call should be after using the function
-	 * in most cases kernel32.dll will still be available after free
-	 */
-	if( FreeLibrary(
-	     library_handle ) != TRUE )
-	{
-		result = FALSE;
-	}
-	return( result );
-}
-
-#endif /* defined( WINAPI ) && ( WINVER <= 0x0500 ) */
 
 /* Removes a file
  * Returns 1 if successful or -1 on error

@@ -23,7 +23,8 @@ libcfile_la_SOURCES = \
 	libcfile_support.c libcfile_support.h \
 	libcfile_system_string.c libcfile_system_string.h \
 	libcfile_types.h \
-	libcfile_unused.h
+	libcfile_unused.h \
+	libcfile_winapi.c libcfile_winapi.h
 
 libcfile_la_LIBADD = \
 	@LIBCERROR_LIBADD@ \

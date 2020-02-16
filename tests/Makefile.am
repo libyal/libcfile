@@ -29,7 +29,8 @@ check_PROGRAMS = \
 	cfile_test_file \
 	cfile_test_notify \
 	cfile_test_support \
-	cfile_test_system_string
+	cfile_test_system_string \
+	cfile_test_winapi
 
 cfile_test_error_SOURCES = \
 	cfile_test_error.c \
@@ -94,6 +95,15 @@ cfile_test_system_string_SOURCES = \
 cfile_test_system_string_LDADD = \
 	../libcfile/libcfile.la \
 	@LIBCERROR_LIBADD@
+
+cfile_test_winapi_SOURCES = \
+	cfile_test_libcfile.h \
+	cfile_test_macros.h \
+	cfile_test_unused.h \
+	cfile_test_winapi.c
+
+cfile_test_winapi_LDADD = \
+	../libcfile/libcfile.la
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
