@@ -3384,7 +3384,10 @@ int libcfile_internal_file_get_size(
 	ssize_t read_count        = 0;
 	off64_t current_offset    = 0;
 	off64_t offset            = 0;
+
+#if defined( BLKGETSIZE64 ) || defined( DIOCGMEDIASIZE ) || defined( DIOCGDINFO ) || ( defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE ) )
 	uint32_t error_code       = 0;
+#endif
 
 #if !defined( DIOCGMEDIASIZE ) && defined( DIOCGDINFO )
 	struct disklabel disk_label;
@@ -3647,7 +3650,8 @@ int libcfile_internal_file_get_size(
 				safe_size = (size64_t) ( block_count * bytes_per_sector );
 			}
 		}
-#endif
+#endif /* defined( BLKGETSIZE64 ) || defined( DIOCGMEDIASIZE ) || defined( DIOCGDINFO ) || ( defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE ) ) */
+
 		if( read_count <= 0 )
 		{
 			/* Try to seek the end of the file and determine the size based on the offset
