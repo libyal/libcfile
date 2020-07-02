@@ -21,7 +21,9 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <narrow_string.h>
 #include <system_string.h>
+#include <wide_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -47,11 +49,9 @@ int cfile_test_system_string_size_to_narrow_string(
 	size_t narrow_string_size = 0;
 	int result                = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_size_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          &narrow_string_size,
 	          &error );
 
@@ -63,7 +63,7 @@ int cfile_test_system_string_size_to_narrow_string(
 	CFILE_TEST_ASSERT_EQUAL_SIZE(
 	 "narrow_string_size",
 	 narrow_string_size,
-	 (size_t) 9 );
+	 (size_t) 12 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -73,7 +73,7 @@ int cfile_test_system_string_size_to_narrow_string(
 	 */
 	result = libcfile_system_string_size_to_narrow_string(
 	          NULL,
-	          9,
+	          12,
 	          &narrow_string_size,
 	          &error );
 
@@ -90,8 +90,8 @@ int cfile_test_system_string_size_to_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_size_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          (size_t) SSIZE_MAX + 1,
+	          _SYSTEM_STRING( "test string" ),
+	          (size_t) -1,
 	          &narrow_string_size,
 	          &error );
 
@@ -108,8 +108,8 @@ int cfile_test_system_string_size_to_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_size_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          NULL,
 	          &error );
 
@@ -139,7 +139,7 @@ on_error:
 /* Tests the libcfile_system_string_copy_to_narrow_string function
  * Returns 1 if successful or 0 if not
  */
-int cfile_test_system_system_string_copy_to_narrow_string(
+int cfile_test_system_string_copy_to_narrow_string(
      void )
 {
 	char narrow_string[ 32 ];
@@ -147,11 +147,9 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_copy_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          narrow_string,
 	          32,
 	          &error );
@@ -161,8 +159,6 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 	 result,
 	 1 );
 
-/* TODO compare string */
-
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
@@ -171,7 +167,7 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 	 */
 	result = libcfile_system_string_copy_to_narrow_string(
 	          NULL,
-	          9,
+	          12,
 	          narrow_string,
 	          32,
 	          &error );
@@ -189,8 +185,8 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_copy_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          (size_t) SSIZE_MAX + 1,
+	          _SYSTEM_STRING( "test string" ),
+	          (size_t) -1,
 	          narrow_string,
 	          32,
 	          &error );
@@ -208,8 +204,8 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_copy_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          NULL,
 	          32,
 	          &error );
@@ -227,10 +223,10 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_copy_to_narrow_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          narrow_string,
-	          (size_t) SSIZE_MAX + 1,
+	          (size_t) -1,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -244,6 +240,27 @@ int cfile_test_system_system_string_copy_to_narrow_string(
 
 	libcerror_error_free(
 	 &error );
+
+	result = libcfile_system_string_copy_to_narrow_string(
+	          _SYSTEM_STRING( "test string" ),
+	          12,
+	          narrow_string,
+	          8,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO add test with failing system_string_copy */
 
 	return( 1 );
 
@@ -266,11 +283,9 @@ int cfile_test_system_string_size_from_narrow_string(
 	size_t system_string_size = 0;
 	int result                = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_size_from_narrow_string(
-	          "Test1234",
-	          9,
+	          "test string",
+	          12,
 	          &system_string_size,
 	          &error );
 
@@ -282,7 +297,7 @@ int cfile_test_system_string_size_from_narrow_string(
 	CFILE_TEST_ASSERT_EQUAL_SIZE(
 	 "system_string_size",
 	 system_string_size,
-	 (size_t) 9 );
+	 (size_t) 12 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -292,7 +307,7 @@ int cfile_test_system_string_size_from_narrow_string(
 	 */
 	result = libcfile_system_string_size_from_narrow_string(
 	          NULL,
-	          9,
+	          12,
 	          &system_string_size,
 	          &error );
 
@@ -309,8 +324,8 @@ int cfile_test_system_string_size_from_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_size_from_narrow_string(
-	          "Test1234",
-	          (size_t) SSIZE_MAX + 1,
+	          "test string",
+	          (size_t) -1,
 	          &system_string_size,
 	          &error );
 
@@ -327,8 +342,8 @@ int cfile_test_system_string_size_from_narrow_string(
 	 &error );
 
 	result = libcfile_system_string_size_from_narrow_string(
-	          "Test1234",
-	          9,
+	          "test string",
+	          12,
 	          NULL,
 	          &error );
 
@@ -358,7 +373,7 @@ on_error:
 /* Tests the libcfile_system_string_copy_from_narrow_string function
  * Returns 1 if successful or 0 if not
  */
-int cfile_test_system_system_string_copy_from_narrow_string(
+int cfile_test_system_string_copy_from_narrow_string(
      void )
 {
 	system_character_t system_string[ 32 ];
@@ -366,21 +381,17 @@ int cfile_test_system_system_string_copy_from_narrow_string(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_copy_from_narrow_string(
 	          system_string,
 	          32,
-	          "Test1234",
-	          9,
+	          "test string",
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 1 );
-
-/* TODO compare string */
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -391,8 +402,8 @@ int cfile_test_system_system_string_copy_from_narrow_string(
 	result = libcfile_system_string_copy_from_narrow_string(
 	          NULL,
 	          32,
-	          "Test1234",
-	          9,
+	          "test string",
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -409,9 +420,9 @@ int cfile_test_system_system_string_copy_from_narrow_string(
 
 	result = libcfile_system_string_copy_from_narrow_string(
 	          system_string,
-	          (size_t) SSIZE_MAX + 1,
-	          "Test1234",
-	          9,
+	          (size_t) -1,
+	          "test string",
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -430,7 +441,7 @@ int cfile_test_system_system_string_copy_from_narrow_string(
 	          system_string,
 	          32,
 	          NULL,
-	          9,
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -448,8 +459,8 @@ int cfile_test_system_system_string_copy_from_narrow_string(
 	result = libcfile_system_string_copy_from_narrow_string(
 	          system_string,
 	          32,
-	          "Test1234",
-	          (size_t) SSIZE_MAX + 1,
+	          "test string",
+	          (size_t) -1,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -463,6 +474,27 @@ int cfile_test_system_system_string_copy_from_narrow_string(
 
 	libcerror_error_free(
 	 &error );
+
+	result = libcfile_system_string_copy_from_narrow_string(
+	          system_string,
+	          8,
+	          "test string",
+	          12,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO add test with failing system_string_copy */
 
 	return( 1 );
 
@@ -487,11 +519,9 @@ int cfile_test_system_string_size_to_wide_string(
 	size_t wide_string_size  = 0;
 	int result               = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_size_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          &wide_string_size,
 	          &error );
 
@@ -503,7 +533,7 @@ int cfile_test_system_string_size_to_wide_string(
 	CFILE_TEST_ASSERT_EQUAL_SIZE(
 	 "wide_string_size",
 	 wide_string_size,
-	 (size_t) 9 );
+	 (size_t) 12 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -513,7 +543,7 @@ int cfile_test_system_string_size_to_wide_string(
 	 */
 	result = libcfile_system_string_size_to_wide_string(
 	          NULL,
-	          9,
+	          12,
 	          &wide_string_size,
 	          &error );
 
@@ -530,8 +560,8 @@ int cfile_test_system_string_size_to_wide_string(
 	 &error );
 
 	result = libcfile_system_string_size_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          (size_t) SSIZE_MAX + 1,
+	          _SYSTEM_STRING( "test string" ),
+	          (size_t) -1,
 	          &wide_string_size,
 	          &error );
 
@@ -548,8 +578,8 @@ int cfile_test_system_string_size_to_wide_string(
 	 &error );
 
 	result = libcfile_system_string_size_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          NULL,
 	          &error );
 
@@ -579,7 +609,7 @@ on_error:
 /* Tests the libcfile_system_string_copy_to_wide_string function
  * Returns 1 if successful or 0 if not
  */
-int cfile_test_system_system_string_copy_to_wide_string(
+int cfile_test_system_string_copy_to_wide_string(
      void )
 {
 	wchar_t wide_string[ 32 ];
@@ -587,11 +617,9 @@ int cfile_test_system_system_string_copy_to_wide_string(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_copy_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          wide_string,
 	          32,
 	          &error );
@@ -605,13 +633,11 @@ int cfile_test_system_system_string_copy_to_wide_string(
 	 "error",
 	 error );
 
-/* TODO compare string */
-
 	/* Test error cases
 	 */
 	result = libcfile_system_string_copy_to_wide_string(
 	          NULL,
-	          9,
+	          12,
 	          wide_string,
 	          32,
 	          &error );
@@ -629,8 +655,8 @@ int cfile_test_system_system_string_copy_to_wide_string(
 	 &error );
 
 	result = libcfile_system_string_copy_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          (size_t) SSIZE_MAX + 1,
+	          _SYSTEM_STRING( "test string" ),
+	          (size_t) -1,
 	          wide_string,
 	          32,
 	          &error );
@@ -648,8 +674,8 @@ int cfile_test_system_system_string_copy_to_wide_string(
 	 &error );
 
 	result = libcfile_system_string_copy_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          NULL,
 	          32,
 	          &error );
@@ -667,10 +693,10 @@ int cfile_test_system_system_string_copy_to_wide_string(
 	 &error );
 
 	result = libcfile_system_string_copy_to_wide_string(
-	          _SYSTEM_STRING( "Test1234" ),
-	          9,
+	          _SYSTEM_STRING( "test string" ),
+	          12,
 	          wide_string,
-	          (size_t) SSIZE_MAX + 1,
+	          (size_t) -1,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -684,6 +710,27 @@ int cfile_test_system_system_string_copy_to_wide_string(
 
 	libcerror_error_free(
 	 &error );
+
+	result = libcfile_system_string_copy_to_wide_string(
+	          _SYSTEM_STRING( "test string" ),
+	          12,
+	          wide_string,
+	          8,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO add test with failing system_string_copy */
 
 	return( 1 );
 
@@ -706,11 +753,9 @@ int cfile_test_system_string_size_from_wide_string(
 	size_t system_string_size = 0;
 	int result                = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_size_from_wide_string(
-	          L"Test1234",
-	          9,
+	          L"test string",
+	          12,
 	          &system_string_size,
 	          &error );
 
@@ -722,7 +767,7 @@ int cfile_test_system_string_size_from_wide_string(
 	CFILE_TEST_ASSERT_EQUAL_SIZE(
 	 "system_string_size",
 	 system_string_size,
-	 (size_t) 9 );
+	 (size_t) 12 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -732,7 +777,7 @@ int cfile_test_system_string_size_from_wide_string(
 	 */
 	result = libcfile_system_string_size_from_wide_string(
 	          NULL,
-	          9,
+	          12,
 	          &system_string_size,
 	          &error );
 
@@ -749,8 +794,8 @@ int cfile_test_system_string_size_from_wide_string(
 	 &error );
 
 	result = libcfile_system_string_size_from_wide_string(
-	          L"Test1234",
-	          (size_t) SSIZE_MAX + 1,
+	          L"test string",
+	          (size_t) -1,
 	          &system_string_size,
 	          &error );
 
@@ -767,8 +812,8 @@ int cfile_test_system_string_size_from_wide_string(
 	 &error );
 
 	result = libcfile_system_string_size_from_wide_string(
-	          L"Test1234",
-	          9,
+	          L"test string",
+	          12,
 	          NULL,
 	          &error );
 
@@ -798,7 +843,7 @@ on_error:
 /* Tests the libcfile_system_string_copy_from_wide_string function
  * Returns 1 if successful or 0 if not
  */
-int cfile_test_system_system_string_copy_from_wide_string(
+int cfile_test_system_string_copy_from_wide_string(
      void )
 {
 	system_character_t system_string[ 32 ];
@@ -806,21 +851,17 @@ int cfile_test_system_system_string_copy_from_wide_string(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
-	/* Test regular cases
-	 */
 	result = libcfile_system_string_copy_from_wide_string(
 	          system_string,
 	          32,
-	          L"Test1234",
-	          9,
+	          L"test string",
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 1 );
-
-/* TODO compare string */
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -831,8 +872,8 @@ int cfile_test_system_system_string_copy_from_wide_string(
 	result = libcfile_system_string_copy_from_wide_string(
 	          NULL,
 	          32,
-	          L"Test1234",
-	          9,
+	          L"test string",
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -849,9 +890,9 @@ int cfile_test_system_system_string_copy_from_wide_string(
 
 	result = libcfile_system_string_copy_from_wide_string(
 	          system_string,
-	          (size_t) SSIZE_MAX + 1,
-	          L"Test1234",
-	          9,
+	          (size_t) -1,
+	          L"test string",
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -870,7 +911,7 @@ int cfile_test_system_system_string_copy_from_wide_string(
 	          system_string,
 	          32,
 	          NULL,
-	          9,
+	          12,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -888,8 +929,8 @@ int cfile_test_system_system_string_copy_from_wide_string(
 	result = libcfile_system_string_copy_from_wide_string(
 	          system_string,
 	          32,
-	          L"Test1234",
-	          (size_t) SSIZE_MAX + 1,
+	          L"test string",
+	          (size_t) -1,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -903,6 +944,27 @@ int cfile_test_system_system_string_copy_from_wide_string(
 
 	libcerror_error_free(
 	 &error );
+
+	result = libcfile_system_string_copy_from_wide_string(
+	          system_string,
+	          8,
+	          L"test string",
+	          12,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO add test with failing system_string_copy */
 
 	return( 1 );
 
@@ -942,7 +1004,7 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_copy_to_narrow_string",
-	 cfile_test_system_system_string_copy_to_narrow_string );
+	 cfile_test_system_string_copy_to_narrow_string );
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_size_from_narrow_string",
@@ -950,7 +1012,7 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_copy_from_narrow_string",
-	 cfile_test_system_system_string_copy_from_narrow_string );
+	 cfile_test_system_string_copy_from_narrow_string );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
@@ -960,7 +1022,7 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_copy_to_wide_string",
-	 cfile_test_system_system_string_copy_to_wide_string );
+	 cfile_test_system_string_copy_to_wide_string );
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_size_from_wide_string",
@@ -968,7 +1030,7 @@ int main(
 
 	CFILE_TEST_RUN(
 	 "libcfile_system_string_copy_from_wide_string",
-	 cfile_test_system_system_string_copy_from_wide_string );
+	 cfile_test_system_string_copy_from_wide_string );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
@@ -976,7 +1038,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 }
 

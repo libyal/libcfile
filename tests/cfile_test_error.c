@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #endif
 
-#include "cfile_test_libcerror.h"
 #include "cfile_test_libcfile.h"
 #include "cfile_test_macros.h"
 #include "cfile_test_unused.h"
