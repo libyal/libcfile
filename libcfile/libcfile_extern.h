@@ -30,7 +30,11 @@
 
 #include <libcfile/extern.h>
 
+#if defined( __CYGWIN__ )
+#define LIBCFILE_EXTERN_VARIABLE	extern
+#else
 #define LIBCFILE_EXTERN_VARIABLE	LIBCFILE_EXTERN
+#endif
 
 #else
 #define LIBCFILE_EXTERN		/* extern */
