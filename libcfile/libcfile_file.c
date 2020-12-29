@@ -2469,6 +2469,10 @@ ssize_t libcfile_file_write_buffer_with_error_code(
 	}
 	internal_file->current_offset += write_count;
 
+	if( (size64_t) internal_file->current_offset > internal_file->size )
+	{
+		internal_file->size = (size64_t) internal_file->current_offset;
+	}
 	return( write_count );
 }
 
@@ -2567,6 +2571,10 @@ ssize_t libcfile_file_write_buffer_with_error_code(
 	}
 	internal_file->current_offset += write_count;
 
+	if( (size64_t) internal_file->current_offset > internal_file->size )
+	{
+		internal_file->size = (size64_t) internal_file->current_offset;
+	}
 	return( write_count );
 }
 
