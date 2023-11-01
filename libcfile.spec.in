@@ -3,10 +3,9 @@ Version: @VERSION@
 Release: 1
 Summary: Library to support cross-platform C file functions
 Group: System Environment/Libraries
-License: LGPLv3+
+License: LGPL-3.0-or-later
 Source: %{name}-%{version}.tar.gz
 URL: https://github.com/libyal/libcfile
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libcfile_spec_requires@ @ax_libcerror_spec_requires@ @ax_libclocale_spec_requires@ @ax_libcnotify_spec_requires@ @ax_libuna_spec_requires@
 BuildRequires: gcc @ax_libcerror_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libuna_spec_build_requires@
 
@@ -48,19 +47,16 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %files -n libcfile
-%defattr(644,root,root,755)
 %license COPYING COPYING.LESSER
 %doc AUTHORS README
-%attr(755,root,root) %{_libdir}/*.so.*
+%{_libdir}/*.so.*
 
 %files -n libcfile-static
-%defattr(644,root,root,755)
 %license COPYING COPYING.LESSER
 %doc AUTHORS README
-%attr(755,root,root) %{_libdir}/*.a
+%{_libdir}/*.a
 
 %files -n libcfile-devel
-%defattr(644,root,root,755)
 %license COPYING COPYING.LESSER
 %doc AUTHORS README
 %{_libdir}/*.so
