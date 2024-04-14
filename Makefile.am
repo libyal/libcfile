@@ -41,8 +41,15 @@ EXTRA_DIST = \
 	$(PKGCONFIG_FILES) \
 	$(SPEC_FILES)
 
-MAINTAINERCLEANFILES = \
-	Makefile.in
+DISTCLEANFILES = \
+	config.status \
+	config.cache \
+	config.log \
+	libcfile.pc \
+	libcfile.spec \
+	Makefile \
+	Makefile.in \
+	po/Makevars
 
 pkgconfigdir = $(libdir)/pkgconfig
 
@@ -62,16 +69,4 @@ library:
 	cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libcfile && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS)
-
-distclean: clean
-	-rm -f Makefile
-	-rm -f config.status
-	-rm -f config.cache
-	-rm -f config.log
-	-rm -f libcfile.pc
-	-rm -f libcfile.spec
-	@for dir in ${subdirs}; do \
-		(cd $$dir && $(MAKE) distclean) \
-		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
-	done && test -z "$$fail"
 

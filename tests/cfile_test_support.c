@@ -188,7 +188,7 @@ int cfile_test_file_exists(
 	/* Test regular cases
 	 */
 	result = libcfile_file_exists(
-	          "Makefile.am",
+	          "TestFile",
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -256,7 +256,7 @@ int cfile_test_file_exists_wide(
 	/* Test regular cases
 	 */
 	result = libcfile_file_exists_wide(
-	          L"Makefile.am",
+	          L"TestFile",
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
@@ -700,8 +700,29 @@ int main(
      char * const argv[] CFILE_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+	FILE *file_stream = NULL;
+	int result        = 0;
+
 	CFILE_TEST_UNREFERENCED_PARAMETER( argc )
 	CFILE_TEST_UNREFERENCED_PARAMETER( argv )
+
+	file_stream = file_stream_open(
+	               "TestFile",
+	               "a" );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "file_stream",
+	 file_stream );
+
+	result = file_stream_close(
+	          file_stream );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	file_stream = NULL;
 
 	CFILE_TEST_RUN(
 	 "libcfile_get_version",

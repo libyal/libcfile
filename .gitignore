@@ -135,6 +135,8 @@ stamp-h[1-9]
 /tests/cfile_test_system_string
 /tests/cfile_test_winapi
 /tests/input
+/tests/notify_stream.log
+/tests/TestFile
 /tests/tmp*
 
 # Local library dependencies specific files
