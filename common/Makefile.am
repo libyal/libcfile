@@ -1,5 +1,5 @@
 AM_CPPFLAGS = \
-	-I../include -I../include -I$(top_srcdir)/include
+	-I../include -I$(top_srcdir)/include
 
 EXTRA_DIST = \
 	byte_stream.h \
