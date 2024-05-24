@@ -80,9 +80,9 @@ run_test_with_input()
 
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then
-			IFS="" read -a INPUT_FILES <<< $(cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?");
+			readarray -t INPUT_FILES < <( cat ${TEST_SET_DIRECTORY}/files | sed -e "s?^?${TEST_SET_INPUT_DIRECTORY}/?" );
 		else
-			IFS="" read -a INPUT_FILES <<< $(ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB});
+   			readarray -t INPUT_FILES < <( ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB} ) ;
 		fi
 		for INPUT_FILE in "${INPUT_FILES[@]}";
 		do
