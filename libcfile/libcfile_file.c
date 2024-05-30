@@ -288,9 +288,13 @@ int libcfile_file_open_with_error_code(
 #if ( WINVER >= 0x0600 )
 	FILE_ALIGNMENT_INFO file_alignment_information;
 
-	BOOL result                             = 0;
+#else
+	DISK_GEOMETRY_EX disk_geom;
+	DWORD bytes_returned                    = 0;
 #endif
 
+	BOOL result                             = 0;
+	size_t sector_size                      = 0;
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_with_error_code";
 	DWORD file_io_access_flags              = 0;
@@ -542,12 +546,55 @@ int libcfile_file_open_with_error_code(
 #endif
 			libcerror_error_free(
 			 error );
+		} else if(file_alignment_information.AlignmentRequirement != 0) {
+			sector_size = 512;
 		}
-		else if( file_alignment_information.AlignmentRequirement != 0 )
+#else
+		result = DeviceIoControl(
+					 internal_file->handle,
+					 IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+					 NULL,
+					 0,
+					 &disk_geom,
+					 sizeof(disk_geom),
+					 &bytes_returned,
+					 NULL);
+
+		if( result == FALSE && GetLastError() != ERROR_MORE_DATA )
+		{
+			*error_code = (uint32_t) GetLastError();
+
+			libcerror_system_set_error(
+						error,
+						LIBCERROR_ERROR_DOMAIN_IO,
+						LIBCERROR_IO_ERROR_IOCTL_FAILED,
+						*error_code,
+						"%s: unable to retrieve file alignment information.",
+						function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		} else {
+			sector_size = disk_geom.Geometry.BytesPerSector;
+		}
+#endif /* ( WINVER >= 0x0600 ) */
+
+		if( sector_size != 0 )
 		{
 			if( libcfile_internal_file_set_block_size(
 			     internal_file,
-			     (size_t) 512,
+				 sector_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -560,7 +607,7 @@ int libcfile_file_open_with_error_code(
 				return( -1 );
 			}
 		}
-#endif /* ( WINVER >= 0x0600 ) */
+
 	}
 	if( libcfile_internal_file_get_size(
 	     internal_file,
@@ -806,10 +853,13 @@ int libcfile_file_open_wide_with_error_code(
 {
 #if ( WINVER >= 0x0600 )
 	FILE_ALIGNMENT_INFO file_alignment_information;
-
-	BOOL result                             = 0;
+#else
+	DISK_GEOMETRY_EX disk_geom;
+	DWORD bytes_returned                    = 0;
 #endif
 
+	BOOL result                             = 0;
+	size_t sector_size                      = 0;
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_wide_with_error_code";
 	DWORD file_io_access_flags              = 0;
@@ -1062,11 +1112,54 @@ int libcfile_file_open_wide_with_error_code(
 			libcerror_error_free(
 			 error );
 		}
-		else if( file_alignment_information.AlignmentRequirement != 0 )
+		else if(file_alignment_information.AlignmentRequirement != 0) {
+			sector_size = 512;
+		}
+#else
+		result = DeviceIoControl(
+					 internal_file->handle,
+					 IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+					 NULL,
+					 0,
+					 &disk_geom,
+					 sizeof(disk_geom),
+					 &bytes_returned,
+					 NULL);
+
+		if( result == FALSE && GetLastError() != ERROR_MORE_DATA )
+		{
+			*error_code = (uint32_t) GetLastError();
+
+			libcerror_system_set_error(
+						error,
+						LIBCERROR_ERROR_DOMAIN_IO,
+						LIBCERROR_IO_ERROR_IOCTL_FAILED,
+						*error_code,
+						"%s: unable to retrieve file alignment information.",
+						function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		} else {
+			sector_size = disk_geom.Geometry.BytesPerSector;
+		}
+#endif /* ( WINVER >= 0x0600 ) */
+		if( sector_size != 0 )
 		{
 			if( libcfile_internal_file_set_block_size(
 			     internal_file,
-			     (size_t) 512,
+				 sector_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1079,7 +1172,6 @@ int libcfile_file_open_wide_with_error_code(
 				return( -1 );
 			}
 		}
-#endif /* ( WINVER >= 0x0600 ) */
 	}
 	if( libcfile_internal_file_get_size(
 	     internal_file,
