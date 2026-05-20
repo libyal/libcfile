@@ -271,7 +271,7 @@ struct _FILE_ALIGNMENT_INFO {
 	ULONG AlignmentRequirement;
 };
 
-#endif
+#endif /* ( WINVER >= 0x0600 ) && ( WINVER < 0x0602 ) */
 
 /* Opens a file
  * This function uses the WINAPI function for Windows XP (0x0501) or later,
@@ -287,17 +287,21 @@ int libcfile_file_open_with_error_code(
 {
 #if ( WINVER >= 0x0600 )
 	FILE_ALIGNMENT_INFO file_alignment_information;
+#else
+	DISK_GEOMETRY_EX disk_geometry;
 
-	BOOL result                             = 0;
+	DWORD response_count                    = 0;
 #endif
 
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_with_error_code";
+	BOOL result                             = 0;
 	DWORD file_io_access_flags              = 0;
 	DWORD file_io_creation_flags            = 0;
 	DWORD file_io_shared_flags              = 0;
 	DWORD flags_and_attributes              = 0;
 	size_t filename_length                  = 0;
+	size_t sector_size                      = 0;
 	ssize_t read_count                      = 0;
 
 	if( file == NULL )
@@ -543,11 +547,112 @@ int libcfile_file_open_with_error_code(
 			libcerror_error_free(
 			 error );
 		}
-		else if( file_alignment_information.AlignmentRequirement != 0 )
+		else
+		{
+			if( (size_t) file_alignment_information.AlignmentRequirement >= (size_t) SSIZE_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid file alignment requirement value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+			sector_size = (size_t) file_alignment_information.AlignmentRequirement;
+		}
+#else
+		result = DeviceIoControl(
+		          internal_file->handle,
+		          IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+		          NULL,
+		          0,
+		          &disk_geometry,
+		          (DWORD) sizeof( DISK_GEOMETRY_EX ),
+		          &response_count,
+		          NULL );
+
+		if( result == FALSE )
+		{
+			*error_code = (uint32_t) GetLastError();
+
+			if( *error_code != ERROR_MORE_DATA )
+			{
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+				 *error_code,
+				 "%s: unable to retrieve disk geometry.",
+				 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+				}
+#endif
+				libcerror_error_free(
+				 error );
+			}
+			else if( response_count < sizeof( DISK_GEOMETRY_EX ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid response count value out of bounds.",
+				 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+				}
+#endif
+				libcerror_error_free(
+				 error );
+			}
+			else
+			{
+				result = TRUE;
+			}
+		}
+		if( result == TRUE )
+		{
+#if ( SSIZE_MAX < UINT32_MAX )
+			if( (size_t) disk_geometry.Geometry.BytesPerSector >= (size_t) SSIZE_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid geometry bytes per sector value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+#endif
+			sector_size = (size_t) disk_geometry.Geometry.BytesPerSector;
+		}
+#endif /* ( WINVER >= 0x0600 ) */
+
+		if( sector_size != 0 )
 		{
 			if( libcfile_internal_file_set_block_size(
 			     internal_file,
-			     (size_t) 512,
+			     (size_t) sector_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -560,7 +665,6 @@ int libcfile_file_open_with_error_code(
 				return( -1 );
 			}
 		}
-#endif /* ( WINVER >= 0x0600 ) */
 	}
 	if( libcfile_internal_file_get_size(
 	     internal_file,
@@ -806,17 +910,21 @@ int libcfile_file_open_wide_with_error_code(
 {
 #if ( WINVER >= 0x0600 )
 	FILE_ALIGNMENT_INFO file_alignment_information;
+#else
+	DISK_GEOMETRY_EX disk_geometry;
 
-	BOOL result                             = 0;
+	DWORD response_count                    = 0;
 #endif
 
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_wide_with_error_code";
+	BOOL result                             = 0;
 	DWORD file_io_access_flags              = 0;
 	DWORD file_io_creation_flags            = 0;
 	DWORD file_io_shared_flags              = 0;
 	DWORD flags_and_attributes              = 0;
 	size_t filename_length                  = 0;
+	size_t sector_size                      = 0;
 	ssize_t read_count                      = 0;
 
 	if( file == NULL )
@@ -1062,11 +1170,112 @@ int libcfile_file_open_wide_with_error_code(
 			libcerror_error_free(
 			 error );
 		}
-		else if( file_alignment_information.AlignmentRequirement != 0 )
+		else
+		{
+			if( (size_t) file_alignment_information.AlignmentRequirement >= (size_t) SSIZE_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid file alignment requirement value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+			sector_size = (size_t) file_alignment_information.AlignmentRequirement;
+		}
+#else
+		result = DeviceIoControl(
+		          internal_file->handle,
+		          IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+		          NULL,
+		          0,
+		          &disk_geometry,
+		          (DWORD) sizeof( DISK_GEOMETRY_EX ),
+		          &response_count,
+		          NULL );
+
+		if( result == FALSE )
+		{
+			*error_code = (uint32_t) GetLastError();
+
+			if( *error_code != ERROR_MORE_DATA )
+			{
+				libcerror_system_set_error(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+				 *error_code,
+				 "%s: unable to retrieve disk geometry.",
+				 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+				}
+#endif
+				libcerror_error_free(
+				 error );
+			}
+			else if( response_count < sizeof( DISK_GEOMETRY_EX ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid response count value out of bounds.",
+				 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+				}
+#endif
+				libcerror_error_free(
+				 error );
+			}
+			else
+			{
+				result = TRUE;
+			}
+		}
+		if( result == TRUE )
+		{
+#if ( SSIZE_MAX < UINT32_MAX )
+			if( (size_t) disk_geometry.Geometry.BytesPerSector >= (size_t) SSIZE_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid geometry bytes per sector value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+#endif
+			sector_size = (size_t) disk_geometry.Geometry.BytesPerSector;
+		}
+#endif /* ( WINVER >= 0x0600 ) */
+
+		if( sector_size != 0 )
 		{
 			if( libcfile_internal_file_set_block_size(
 			     internal_file,
-			     (size_t) 512,
+			     (size_t) sector_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1079,7 +1288,6 @@ int libcfile_file_open_wide_with_error_code(
 				return( -1 );
 			}
 		}
-#endif /* ( WINVER >= 0x0600 ) */
 	}
 	if( libcfile_internal_file_get_size(
 	     internal_file,
@@ -3951,6 +4159,7 @@ ssize_t libcfile_internal_file_io_control_read_with_error_code(
 	static char *function = "libcfile_internal_file_io_control_read_with_error_code";
 
 #if defined( WINAPI )
+	BOOL result           = 0;
 	DWORD response_count  = 0;
 #endif
 
@@ -4066,17 +4275,21 @@ ssize_t libcfile_internal_file_io_control_read_with_error_code(
 		return( -1 );
 	}
 #if defined( WINAPI )
-	if( DeviceIoControl(
-	     internal_file->handle,
-	     (DWORD) control_code,
-	     control_data,
-	     (DWORD) control_data_size,
-	     data,
-	     (DWORD) data_size,
-	     &response_count,
-	     NULL ) == 0 )
+	result = DeviceIoControl(
+	          internal_file->handle,
+	          (DWORD) control_code,
+	          control_data,
+	          (DWORD) control_data_size,
+	          data,
+	          (DWORD) data_size,
+	          &response_count,
+	          NULL );
+
+	if( result == FALSE )
 	{
 		*error_code = (uint32_t) GetLastError();
+
+		/* TODO: handle if( *error_code == ERROR_MORE_DATA ) */
 
 		libcerror_system_set_error(
 		 error,
