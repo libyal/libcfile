@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
   [libcfile],
-  [20260520],
+  [20260528],
   [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -79,6 +79,15 @@ AX_LIBCFILE_CHECK_LOCAL
 
 dnl Check if DLL support is needed
 AX_LIBCFILE_CHECK_DLL_SUPPORT
+
+dnl Check if asan support should be enabled
+AX_TESTS_CHECK_ENABLE_ASAN
+
+dnl Check if ubsan support should be enabled
+AX_TESTS_CHECK_ENABLE_UBSAN
+
+dnl Check if code coverage support should be enabled
+AX_TESTS_CHECK_ENABLE_CODE_COVERAGE
 
 dnl Check if tests required headers and functions are available
 AX_TESTS_CHECK_LOCAL
