@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Script that runs the tests
 #
-# Version: 20260528
+# Version: 20260529
 
 EXIT_SUCCESS=0
 EXIT_FAILURE=1
@@ -306,7 +306,7 @@ then
 
 	# Test "./configure && make && make check" with OpenSSL non-EVP implementation.
 
-	run_configure_make_check "--enable-openssl-evp-cipher=no --enable-openssl-evp-md=no"
+	run_configure_make_check "--disable-openssl-evp-cipher --disable-openssl-evp-md"
 	RESULT=$?
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS}
@@ -316,7 +316,7 @@ then
 
 	# Test "./configure && make && make check" with OpenSSL EVP implementation.
 
-	run_configure_make_check "--enable-openssl-evp-cipher=yes --enable-openssl-evp-md=yes"
+	run_configure_make_check "--enable-openssl-evp-cipher --enable-openssl-evp-md"
 	RESULT=$?
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS}
@@ -338,7 +338,7 @@ fi
 
 if test ${HAVE_ENABLE_STATIC_EXECUTABLES} -eq 0
 then
-	CONFIGURE_OPTIONS="--enable-static-executables --enable-multi-threading-support=no"
+	CONFIGURE_OPTIONS="--disable-multi-threading-support --enable-static-executables"
 
 	if test ${HAVE_WITH_BZIP2} -eq 0
 	then
@@ -444,7 +444,7 @@ then
 fi
 
 # Run tests with coverage.
-CONFIGURE_OPTIONS="--enable-shared=no"
+CONFIGURE_OPTIONS="--disable-shared"
 
 if test ${HAVE_ENABLE_WIDE_CHARACTER_TYPE} -eq 0
 then

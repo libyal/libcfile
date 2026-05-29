@@ -1,6 +1,6 @@
 dnl Functions for testing
 dnl
-dnl Version: 20260528
+dnl Version: 20260529
 
 dnl Function to check whether libasan is functional
 AC_DEFUN([AX_TESTS_CHECK_LIBASAN],
@@ -76,7 +76,7 @@ AC_DEFUN([AX_TESTS_CHECK_ENABLE_ASAN],
   [AX_COMMON_ARG_ENABLE(
     [asan],
     [asan],
-    [build with asan)],
+    [build with asan],
     [no])
 
   AS_IF(
@@ -100,7 +100,7 @@ AC_DEFUN([AX_TESTS_CHECK_ENABLE_UBSAN],
   [AX_COMMON_ARG_ENABLE(
     [ubsan],
     [ubsan],
-    [build with ubsan)],
+    [build with ubsan],
     [no])
 
   AS_IF(

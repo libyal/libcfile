@@ -95,6 +95,10 @@ typedef size_t u64;
 #include "libcfile_types.h"
 #include "libcfile_winapi.h"
 
+#if defined( HAVE_IOCTL ) || defined( WINAPI )
+#define LIBCFILE_HAVE_IO_CONTROL	1
+#endif
+
 /* Creates a file
  * Make sure the value file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -479,6 +483,7 @@ int libcfile_file_open_with_error_code(
 		}
 		return( -1 );
 	}
+#if defined( LIBCFILE_HAVE_IO_CONTROL )
 	if( internal_file->is_device_filename != 0 )
 	{
 		read_count = libcfile_internal_file_io_control_read_with_error_code(
@@ -666,6 +671,8 @@ int libcfile_file_open_with_error_code(
 			}
 		}
 	}
+#endif /* defined( LIBCFILE_HAVE_IO_CONTROL ) */
+
 	if( libcfile_internal_file_get_size(
 	     internal_file,
 	     &( internal_file->size ),
@@ -1102,6 +1109,7 @@ int libcfile_file_open_wide_with_error_code(
 		}
 		return( -1 );
 	}
+#if defined( LIBCFILE_HAVE_IO_CONTROL )
 	if( internal_file->is_device_filename != 0 )
 	{
 		read_count = libcfile_internal_file_io_control_read_with_error_code(
@@ -1289,6 +1297,8 @@ int libcfile_file_open_wide_with_error_code(
 			}
 		}
 	}
+#endif /* defined( LIBCFILE_HAVE_IO_CONTROL ) */
+
 	if( libcfile_internal_file_get_size(
 	     internal_file,
 	     &( internal_file->size ),
@@ -3466,6 +3476,7 @@ int libcfile_internal_file_get_size(
 	}
 	else if( result != 0 )
 	{
+#if defined( LIBCFILE_HAVE_IO_CONTROL )
 		read_count = libcfile_internal_file_io_control_read_with_error_code(
 		              internal_file,
 		              IOCTL_DISK_GET_LENGTH_INFO,
@@ -3550,6 +3561,17 @@ int libcfile_internal_file_get_size(
 			*size  = (size64_t) length_information.Length.HighPart << 32;
 			*size += (uint32_t) length_information.Length.LowPart;
 		}
+#else
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine size of device.",
+		 function );
+
+		return( -1 );
+
+#endif /* defined( LIBCFILE_HAVE_IO_CONTROL ) */
 	}
 	else
 	{
@@ -3676,6 +3698,7 @@ int libcfile_internal_file_get_size(
 	if( S_ISBLK( file_statistics.st_mode )
 	 || S_ISCHR( file_statistics.st_mode ) )
 	{
+#if defined( LIBCFILE_HAVE_IO_CONTROL )
 #if defined( BLKGETSIZE64 )
 		read_count = libcfile_internal_file_io_control_read_with_error_code(
 		              internal_file,
@@ -3866,7 +3889,8 @@ int libcfile_internal_file_get_size(
 				safe_size = (size64_t) ( block_count * bytes_per_sector );
 			}
 		}
-#endif /* defined( BLKGETSIZE64 ) || defined( DIOCGMEDIASIZE ) || defined( DIOCGDINFO ) || ( defined( DKIOCGETBLOCKCOUNT ) && defined( DKIOCGETBLOCKSIZE ) ) */
+#endif
+#endif /* defined( LIBCFILE_HAVE_IO_CONTROL ) */
 
 		if( read_count <= 0 )
 		{
@@ -4140,8 +4164,6 @@ int libcfile_file_is_device(
 #error Missing file is device function
 #endif
 
-#if defined( HAVE_IOCTL ) || defined( WINAPI )
-
 /* Read data from a device file using IO control
  * This function uses the POSIX ioctl function or WINAPI DeviceIoControl
  * Returns the number of bytes read if successful or -1 on error
@@ -4346,12 +4368,18 @@ ssize_t libcfile_internal_file_io_control_read_with_error_code(
 		return( -1 );
 	}
 	return( (size_t) data_size );
-#endif
-}
-
 #else
-#error Missing file IO control with data function
-#endif
+	libcerror_error_set(
+	 error,
+	 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+	 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+	 "%s: missing IO control support.",
+	 function );
+
+	return( -1 );
+
+#endif /* defined( HAVE_IOCTL ) || defined( WINAPI ) */
+}
 
 /* Read data from a device file using IO control
  * Returns the number of bytes read if successful or -1 on error

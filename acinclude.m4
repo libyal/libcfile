@@ -76,16 +76,6 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
     ])
 
   AS_IF(
-    [test x"$ac_cv_enable_winapi" = xno],
-    [AS_IF(
-      [test "x$ac_cv_func_ioctl" != xyes],
-      [AC_MSG_FAILURE(
-        [Missing function: ioctl],
-        [1])
-      ])
-    ])
-
-  AS_IF(
     [test "x$ac_cv_func_lseek" != xyes],
     [AC_MSG_FAILURE(
       [Missing function: lseek],
