@@ -13,7 +13,7 @@ jobs:
         - configure_options: '--enable-code-coverage --enable-wide-character-type --enable-winapi'
           codecov_name: 'cygwin64-gcc-no-optimization'
     steps:
-    - name: Configure git 
+    - name: Configure git
       run: git config --global core.autocrlf false
     - uses: actions/checkout@v6
     - name: Install Cygwin and build dependencies
@@ -22,6 +22,13 @@ jobs:
         packages: autoconf, automake, curl, gettext-devel, git, libtool, make, mingw-w64-x86_64-gcc, pkg-config
         platform: x86_64
         add-to-path: true
+    - name: Download test data
+      shell: bash --login -e -o pipefail -o igncr {0}
+      working-directory: ${{ github.workspace }}
+      env:
+        CHERE_INVOKING: 1
+      run: |
+        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
     - name: Build from source
       shell: bash --login -e -o pipefail -o igncr {0}
       working-directory: ${{ github.workspace }}
@@ -30,8 +37,10 @@ jobs:
         CONFIGURE_OPTIONS: ${{ matrix.configure_options }}
         LD: ld
       run: |
-        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
-        tests/build.sh ${CONFIGURE_OPTIONS}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${CONFIGURE_OPTIONS}
+        make > /dev/null
     - name: Run tests
       shell: bash --login -e -o pipefail -o igncr {0}
       working-directory: ${{ github.workspace }}
@@ -64,7 +73,7 @@ jobs:
         include:
         - os: ubuntu-24.04
           compiler: 'gcc'
-          configure_options: 'CPPFLAGS=-DHAVE_MEMORY_TESTS=1 --enable-code-coverage --enable-wide-character-type'
+          configure_options: '--enable-code-coverage --enable-wide-character-type CPPFLAGS=-DHAVE_MEMORY_TESTS=1'
           codecov_name: 'ubuntu-24.04-gcc-no-optimization'
     steps:
     - uses: actions/checkout@v6
@@ -78,7 +87,10 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       run: |
-        tests/build.sh ${{ matrix.configure_options }}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${{ matrix.configure_options }}
+        make > /dev/null
     - name: Run tests
       run: |
         make check CHECK_WITH_STDERR=1 SKIP_TOOLS_END_TO_END_TESTS=1
@@ -93,7 +105,7 @@ jobs:
         name: ${{ matrix.codecov_name }}
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true
-  coverage_mingw:
+  coverage_msys2_mingw:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -108,13 +120,19 @@ jobs:
         msystem: MINGW64
         update: true
         install: autoconf automake gettext gettext-devel git libtool make mingw-w64-x86_64-gcc pkg-config
+    - name: Download test data
+      shell: msys2 {0}
+      run: |
+        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
     - name: Build from source
       shell: msys2 {0}
       env:
         CONFIGURE_OPTIONS: ${{ matrix.configure_options }}
       run: |
-        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
-        tests/build.sh ${CONFIGURE_OPTIONS}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${CONFIGURE_OPTIONS}
+        make > /dev/null
     - name: Run tests
       shell: msys2 {0}
       run: |

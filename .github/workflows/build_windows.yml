@@ -36,8 +36,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - configure_options: '--disable-winapi'
-        - configure_options: '--enable-winapi'
+        - configure_options: ''
     steps:
     - name: Configure git
       run: git config --global core.autocrlf false
@@ -45,9 +44,16 @@ jobs:
     - name: Install Cygwin and build dependencies
       uses: cygwin/cygwin-install-action@v6
       with:
-        packages: autoconf, automake, gettext-devel, git, libtool, make, mingw-w64-x86_64-gcc, pkg-config
+        packages: autoconf, automake, binutils, gcc-core, gettext-devel, git, libtool, make, pkg-config
         platform: x86_64
         add-to-path: true
+    - name: Download test data
+      shell: bash --login -e -o pipefail -o igncr {0}
+      working-directory: ${{ github.workspace }}
+      env:
+        CHERE_INVOKING: 1
+      run: |
+        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
     - name: Build from source
       shell: bash --login -e -o pipefail -o igncr {0}
       working-directory: ${{ github.workspace }}
@@ -56,8 +62,10 @@ jobs:
         CONFIGURE_OPTIONS: ${{ matrix.configure_options }}
         LD: ld
       run: |
-        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
-        tests/build.sh ${CONFIGURE_OPTIONS}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${CONFIGURE_OPTIONS}
+        make > /dev/null
     - name: Run tests
       shell: bash --login -e -o pipefail -o igncr {0}
       working-directory: ${{ github.workspace }}
@@ -65,12 +73,13 @@ jobs:
         CHERE_INVOKING: 1
       run: |
         tests/runtests.sh
-  build_mingw:
+  build_msys2_mingw:
     runs-on: windows-latest
     strategy:
       matrix:
         include:
-        - configure_options: ''
+        - configure_options: '--disable-winapi --enable-wide-character-type'
+        - configure_options: '--enable-winapi --enable-wide-character-type'
     steps:
     - uses: actions/checkout@v6
     - name: Set up MSYS2 with MinGW-w64
@@ -79,13 +88,19 @@ jobs:
         msystem: MINGW64
         update: true
         install: autoconf automake gettext gettext-devel git libtool make mingw-w64-x86_64-gcc pkg-config
+    - name: Download test data
+      shell: msys2 {0}
+      run: |
+        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
     - name: Build from source
       shell: msys2 {0}
       env:
         CONFIGURE_OPTIONS: ${{ matrix.configure_options }}
       run: |
-        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
-        tests/build.sh ${CONFIGURE_OPTIONS}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${CONFIGURE_OPTIONS}
+        make > /dev/null
     - name: Run tests
       shell: msys2 {0}
       run: |

@@ -791,6 +791,11 @@ int libcfile_file_open_with_error_code(
 	 */
 	file_io_flags |= O_CLOEXEC;
 #endif
+#if defined( __MINGW32__ )
+	/* Ensure the file descriptor is opened in binary mode
+	 */
+	file_io_flags |= O_BINARY;
+#endif
 #if defined( HAVE_GLIB_H )
 	internal_file->descriptor = g_open(
 	                             filename,
@@ -2076,11 +2081,12 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 
 			if( read_count != (ssize_t) internal_file->block_size )
 			{
-				libcerror_error_set(
+				libcerror_system_set_error(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: invalid read count: %" PRIzd " returned.",
+				 *error_code,
+				 "%s: unable to read from file (pre-aligned, count: %" PRIzd ").",
 				 function,
 				 read_count );
 
@@ -2197,11 +2203,12 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 
 		if( read_count != (ssize_t) internal_file->block_size )
 		{
-			libcerror_error_set(
+			libcerror_system_set_error(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: invalid read count: %" PRIzd " returned.",
+			 *error_code,
+			 "%s: unable to read from file (post-aligned, count: %" PRIzd ").",
 			 function,
 			 read_count );
 
@@ -2364,6 +2371,8 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 
 				return( -1 );
 			}
+			errno = 0;
+
 			read_count = read(
 			              internal_file->descriptor,
 			              internal_file->block_data,
@@ -2378,8 +2387,9 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 *error_code,
-				 "%s: unable to read from file.",
-				 function );
+				 "%s: unable to read from file (pre-aligned, count: %" PRIzd ").",
+				 function,
+				 read_count );
 
 				return( -1 );
 			}
@@ -2429,6 +2439,8 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 	}
 	if( read_size > 0 )
 	{
+		errno = 0;
+
 		read_count = read(
 		              internal_file->descriptor,
 		              (void *) &( buffer[ buffer_offset ] ),
@@ -2483,6 +2495,8 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 
 			return( -1 );
 		}
+		errno = 0;
+
 		read_count = read(
 		              internal_file->descriptor,
 		              internal_file->block_data,
@@ -2497,8 +2511,9 @@ ssize_t libcfile_file_read_buffer_with_error_code(
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 *error_code,
-			 "%s: unable to read from file.",
-			 function );
+			 "%s: unable to read from file (post-aligned, count: %" PRIzd ").",
+			 function,
+			 read_count );
 
 			return( -1 );
 		}

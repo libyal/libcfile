@@ -13,11 +13,11 @@ jobs:
         - os: ubuntu-24.04
           compiler: 'clang'
           configure_options: ''
-        - os: ubuntu-24.04-arm
-          compiler: 'clang'
-          configure_options: ''
         - os: ubuntu-24.04
           compiler: 'gcc'
+          configure_options: ''
+        - os: ubuntu-24.04-arm
+          compiler: 'clang'
           configure_options: ''
         - os: ubuntu-24.04-arm
           compiler: 'gcc'
@@ -37,7 +37,10 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       run: |
-        tests/build.sh ${{ matrix.configure_options }}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${{ matrix.configure_options }}
+        make > /dev/null
     - name: Run tests
       run: |
         tests/runtests.sh
@@ -61,7 +64,10 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       run: |
-        tests/build.sh ${{ matrix.configure_options }}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${{ matrix.configure_options }}
+        make > /dev/null
     - name: Run tests
       run: |
         make distcheck
@@ -91,7 +97,10 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       run: |
-        tests/build.sh ${{ matrix.configure_options }}
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${{ matrix.configure_options }}
+        make > /dev/null
     - name: Run tests
       run: |
         tests/runtests.sh

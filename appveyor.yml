@@ -70,33 +70,10 @@ environment:
     platform: x64
     configuration: Release
     PYTHON_PATH: "C:\\Python311"
-  - TARGET: macos-x64-clang
-    BUILD_ENVIRONMENT: xcode
-    APPVEYOR_BUILD_WORKER_IMAGE: macos-sonoma
-    HOMEBREW_NO_INSTALL_CLEANUP: 1
-    CC: clang
-    CFLAGS: "-I/usr/local/include"
-    LDFLAGS: "-L/usr/local/lib"
-    CONFIGURE_OPTIONS: ""
-  - TARGET: macos-x64-gcc
-    BUILD_ENVIRONMENT: xcode
-    APPVEYOR_BUILD_WORKER_IMAGE: macos-sonoma
-    HOMEBREW_NO_INSTALL_CLEANUP: 1
-    CC: gcc
-    CFLAGS: "-I/usr/local/include"
-    LDFLAGS: "-L/usr/local/lib"
-    CONFIGURE_OPTIONS: ""
-  - TARGET: macos-pkgbuild
-    BUILD_ENVIRONMENT: xcode
-    APPVEYOR_BUILD_WORKER_IMAGE: macos-sonoma
-    HOMEBREW_NO_INSTALL_CLEANUP: 1
-    CONFIGURE_OPTIONS: "--disable-dependency-tracking --prefix=/usr/local --with-pyprefix"
 
 install:
 - cmd: if [%BUILD_ENVIRONMENT%]==[msbuild] (
     git clone https://github.com/libyal/vstools.git ..\vstools )
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode"; then brew untap homebrew/homebrew-cask-versions && brew update -q; fi
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode"; then brew install -q autoconf automake gettext gnu-sed libtool pkg-config || true; fi
 
 build_script:
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
@@ -108,7 +85,6 @@ build_script:
     .\build.ps1 -VisualStudioVersion $env:TARGET.Substring(2, 4) -Configuration $env:CONFIGURATION -Platform $env:PLATFORM -PythonPath $env:PYTHON_PATH -VSToolsOptions "--extend-with-x64 --no-python-dll" }
 - ps: If (("vs2017", "vs2019", "vs2022", "vs2022-vsdebug", "vs2022-x64").Contains($env:TARGET)) {
     .\build.ps1 -VisualStudioVersion $env:TARGET.Substring(2, 4) -Configuration $env:CONFIGURATION -Platform $env:PLATFORM -PythonPath $env:PYTHON_PATH -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany" }
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode"; then export PATH="/usr/local/opt/gettext/bin:$PATH"; export SED="/usr/local/bin/gsed"; tests/build.sh ${CONFIGURE_OPTIONS}; fi
 
 test_script:
 - cmd: rem Run tests
