@@ -86,7 +86,7 @@ enum LIBCFILE_ACCESS_BEHAVIOR
 #elif defined( __CYGWIN__ )
 #define  LIBCFILE_LARGE_INTEGER_ZERO			{ { 0, 0 } }
 
-#elif defined( __MINGW32_VERSION ) || defined( __MINGW64_VERSION_MAJOR )
+#elif defined( __MINGW32__ )
 #define  LIBCFILE_LARGE_INTEGER_ZERO			{ { 0, 0 } }
 
 #endif

@@ -44,7 +44,7 @@ jobs:
     - name: Install Cygwin and build dependencies
       uses: cygwin/cygwin-install-action@v6
       with:
-        packages: autoconf, automake, binutils, gcc-core, gettext-devel, git, libtool, make, pkg-config
+        packages: autoconf, automake, binutils, curl, gcc-core, gettext-devel, git, libtool, make, pkg-config
         platform: x86_64
         add-to-path: true
     - name: Download test data
@@ -72,7 +72,7 @@ jobs:
       env:
         CHERE_INVOKING: 1
       run: |
-        tests/runtests.sh
+        tests/runtests.sh CHECK_WITH_STDERR=1
   build_msys2_mingw:
     runs-on: windows-latest
     strategy:
@@ -87,7 +87,7 @@ jobs:
       with:
         msystem: MINGW64
         update: true
-        install: autoconf automake gettext gettext-devel git libtool make mingw-w64-x86_64-gcc pkg-config
+        install: autoconf automake curl git libtool make mingw-w64-x86_64-gcc mingw-w64-x86_64-gettext-runtime mingw-w64-x86_64-gettext-tools pkg-config
     - name: Download test data
       shell: msys2 {0}
       run: |
@@ -104,4 +104,4 @@ jobs:
     - name: Run tests
       shell: msys2 {0}
       run: |
-        tests/runtests.sh
+        tests/runtests.sh CHECK_WITH_STDERR=1
