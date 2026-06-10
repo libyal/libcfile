@@ -41,10 +41,10 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1
   build_dist:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -69,10 +69,10 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        make distcheck
+        make distcheck AM_MAKEFLAGS="-j4" VERBOSE=1
   build_shared:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -103,7 +103,7 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1
