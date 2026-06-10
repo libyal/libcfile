@@ -866,6 +866,22 @@ int libcfile_file_open_with_error_code(
 	internal_file->access_flags   = access_flags;
 	internal_file->current_offset = 0;
 
+#ifdef __FreeBSD__
+	if( libcfile_internal_file_set_block_size(
+	     internal_file,
+	     (size_t) 512,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set block size.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
