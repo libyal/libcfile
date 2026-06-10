@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20251129
+# Version: 20260604
 
 # Generic auto-generated build files
 *~
@@ -127,7 +127,12 @@ stamp-h[1-9]
 /libcfile.spec
 /libcfile/libcfile.rc
 /libcfile/libcfile_definitions.h
+/tests/*.dir
 /tests/*.exe
+/tests/*.log
+/tests/*.tmp
+/tests/atconfig
+/tests/atlocal
 /tests/cfile_test_error
 /tests/cfile_test_file
 /tests/cfile_test_notify
@@ -136,6 +141,10 @@ stamp-h[1-9]
 /tests/cfile_test_winapi
 /tests/input
 /tests/notify_stream.log
+/tests/package.m4
+/tests/test_inputs_*.at
+/tests/test_library
+/tests/test_manpages
 /tests/TestFile
 /tests/tmp*
 
