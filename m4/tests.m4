@@ -1,6 +1,6 @@
 dnl Functions for testing
 dnl
-dnl Version: 20260610
+dnl Version: 20260612
 
 dnl Function to check if pthread_rwlock_unlock can be hooked for testing
 AC_DEFUN([AX_TESTS_CHECK_CAN_HOOK_PTHREAD_RWLOCK_UNLOCK],
@@ -265,16 +265,41 @@ AC_DEFUN([AX_TESTS_CHECK_LOCAL],
       [Define to 1 if dlsym function is available in GNU dl.])
     ])
 
+  AX_TESTS_CHECK_CAN_HOOK_PTHREAD_RWLOCK_UNLOCK
+  AX_TESTS_CHECK_FILE_SYSTEM_IS_CASE_INSENSITIVE
+
+  dnl Check for programs used in test_macros.at
   AC_PATH_PROG([CYGPATH], [cygpath])
   AC_PATH_PROG([WINEPATH], [winepath])
 
-  AX_TESTS_CHECK_CAN_HOOK_PTHREAD_RWLOCK_UNLOCK
-  AX_TESTS_CHECK_FILE_SYSTEM_IS_CASE_INSENSITIVE
+  dnl Check for programs used in test_manpages.at
   AX_TESTS_CHECK_HAVE_MANPAGE_LINTER
+
+  dnl Check for programs used in test_tools.at
+  AC_PROG_SED
+
+  dnl Note cannot use GZIP given it has a special purpose within gzip
+  AC_PATH_PROG(GZIP_COMMAND, [gzip])
+  AC_PATH_PROG(ZCAT, [zcat])
 
   AC_SUBST(
     [TESTS_MANPAGE_LINTER],
     [$ac_cv_have_manpage_linter])
+
+  ac_tests_target_string="$target"
+
+  AS_IF(
+    [test "x$ac_tests_target_string" = x],
+    [ac_tests_target_string="$host"])
+
+  AS_CASE(
+    [$ac_tests_target_string],
+    [*mingw*],[ac_cv_tests_use_mingw=yes],
+    [*],[ac_cv_tests_use_mingw=no])
+
+  AC_SUBST(
+    [TESTS_USE_MINGW],
+    [$ac_cv_tests_use_mingw])
   AC_SUBST(
     [TESTS_USE_WINAPI],
     [$ac_cv_enable_winapi])

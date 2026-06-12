@@ -82,11 +82,6 @@ typedef size_t u64;
 #include <unistd.h>
 #endif
 
-#if defined( HAVE_GLIB_H )
-#include <glib.h>
-#include <glib/gstdio.h>
-#endif
-
 #include "libcfile_definitions.h"
 #include "libcfile_file.h"
 #include "libcfile_libcerror.h"
@@ -796,17 +791,11 @@ int libcfile_file_open_with_error_code(
 	 */
 	file_io_flags |= O_BINARY;
 #endif
-#if defined( HAVE_GLIB_H )
-	internal_file->descriptor = g_open(
-	                             filename,
-	                             file_io_flags,
-	                             0644 );
-#else
 	internal_file->descriptor = open(
 	                             filename,
 	                             file_io_flags,
 	                             0644 );
-#endif
+
 	if( internal_file->descriptor == -1 )
 	{
 		*error_code = (uint32_t) errno;
@@ -1473,17 +1462,10 @@ int libcfile_file_open_wide_with_error_code(
 	 */
 	file_io_flags |= O_CLOEXEC;
 #endif
-#if defined( HAVE_GLIB_H )
-	internal_file->descriptor = g_open(
-	                             narrow_filename,
-	                             file_io_flags,
-	                             0644 );
-#else
 	internal_file->descriptor = open(
 	                             narrow_filename,
 	                             file_io_flags,
 	                             0644 );
-#endif
 
 	memory_free(
 	 narrow_filename );

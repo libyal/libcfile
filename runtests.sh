@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Script that runs tests.
 #
-# Version: 20260610
+# Version: 20260611
 
 initialize_configure_options()
 {
@@ -183,7 +183,7 @@ run_configure_make_check_python()
 	./tests/runtests.sh ${MAKE_CHECK_OPTIONS} SKIP_LIBRARY_TESTS=1 SKIP_TOOLS_TESTS=1 | sed -E '/Making check in / d'
 }
 
-run_configure_make_check_static_executable()
+run_configure_make_check_static_executables()
 {
 	CONFIGURE_OPTIONS="--disable-multi-threading-support --enable-static-executables"
 
