@@ -2812,6 +2812,7 @@ off64_t libcfile_file_seek_offset(
 {
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_seek_offset";
+	off64_t calculated_offset               = 0;
 	off64_t offset_remainder                = 0;
 	LARGE_INTEGER large_integer_offset      = LIBCFILE_LARGE_INTEGER_ZERO;
 	DWORD error_code                        = 0;
@@ -2852,9 +2853,17 @@ off64_t libcfile_file_seek_offset(
 
 		return( -1 );
 	}
-	if( ( whence != SEEK_CUR )
-	 && ( whence != SEEK_END )
-	 && ( whence != SEEK_SET ) )
+	calculated_offset = offset;
+
+	if( whence == SEEK_CUR )
+	{
+		calculated_offset += internal_file->current_offset;
+	}
+	else if( whence == SEEK_END )
+	{
+		calculated_offset += internal_file->size;
+	}
+	else if( whence != SEEK_SET )
 	{
 		libcerror_error_set(
 		 error,
@@ -2865,19 +2874,22 @@ off64_t libcfile_file_seek_offset(
 
 		return( -1 );
 	}
+	if( calculated_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_file->block_size != 0 )
 	{
-		if( whence == SEEK_CUR )
-		{
-			offset += internal_file->current_offset;
-		}
-		else if( whence == SEEK_END )
-		{
-			offset += internal_file->size;
-		}
 		whence           = SEEK_SET;
-		offset_remainder = offset % internal_file->block_size;
-		offset          -= offset_remainder;
+		offset_remainder = calculated_offset % internal_file->block_size;
+		offset           = calculated_offset - offset_remainder;
 	}
 	if( whence == SEEK_SET )
 	{
@@ -2933,7 +2945,6 @@ off64_t libcfile_file_seek_offset(
 #else
 		offset = ( (off64_t) large_integer_offset.HighPart << 32 ) + large_integer_offset.LowPart;
 #endif
-
 		if( offset < 0 )
 		{
 			libcerror_error_set(
@@ -2972,6 +2983,7 @@ off64_t libcfile_file_seek_offset(
 {
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_seek_offset";
+	off64_t calculated_offset               = 0;
 	off64_t offset_remainder                = 0;
 
 	if( file == NULL )
@@ -3009,9 +3021,17 @@ off64_t libcfile_file_seek_offset(
 
 		return( -1 );
 	}
-	if( ( whence != SEEK_CUR )
-	 && ( whence != SEEK_END )
-	 && ( whence != SEEK_SET ) )
+	calculated_offset = offset;
+
+	if( whence == SEEK_CUR )
+	{
+		calculated_offset += internal_file->current_offset;
+	}
+	else if( whence == SEEK_END )
+	{
+		calculated_offset += internal_file->size;
+	}
+	else if( whence != SEEK_SET )
 	{
 		libcerror_error_set(
 		 error,
@@ -3022,19 +3042,22 @@ off64_t libcfile_file_seek_offset(
 
 		return( -1 );
 	}
+	if( calculated_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_file->block_size != 0 )
 	{
-		if( whence == SEEK_CUR )
-		{
-			offset += internal_file->current_offset;
-		}
-		else if( whence == SEEK_END )
-		{
-			offset += internal_file->size;
-		}
 		whence           = SEEK_SET;
-		offset_remainder = offset % internal_file->block_size;
-		offset          -= offset_remainder;
+		offset_remainder = calculated_offset % internal_file->block_size;
+		offset           = calculated_offset - offset_remainder;
 	}
 	offset = lseek(
 	          internal_file->descriptor,
