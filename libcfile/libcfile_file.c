@@ -553,6 +553,9 @@ int libcfile_file_open_with_error_code(
      uint32_t *error_code,
      libcerror_error_t **error )
 {
+#if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ )
+	struct stat file_statistics;
+#endif
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_with_error_code";
 	int file_io_flags                       = 0;
@@ -690,6 +693,38 @@ int libcfile_file_open_with_error_code(
 		}
 		return( -1 );
 	}
+#if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ )
+	if( fstat(
+	     internal_file->descriptor,
+	     &file_statistics ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file statistics.",
+		 function );
+
+		return( -1 );
+	}
+	if( S_ISBLK( file_statistics.st_mode ) )
+	{
+		if( libcfile_internal_file_determine_block_size(
+		     internal_file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine block size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif /* defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) */
+
 	if( libcfile_internal_file_get_size(
 	     internal_file,
 	     &( internal_file->size ),
@@ -1030,6 +1065,9 @@ int libcfile_file_open_wide_with_error_code(
      uint32_t *error_code,
      libcerror_error_t **error )
 {
+#if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ )
+	struct stat file_statistics;
+#endif
 	libcfile_internal_file_t *internal_file = NULL;
 	static char *function                   = "libcfile_file_open_wide_with_error_code";
 	char *narrow_filename                   = NULL;
@@ -1166,6 +1204,11 @@ int libcfile_file_open_wide_with_error_code(
 	 */
 	file_io_flags |= O_CLOEXEC;
 #endif
+#if defined( __MINGW32__ )
+	/* Ensure the file descriptor is opened in binary mode
+	 */
+	file_io_flags |= O_BINARY;
+#endif
 	internal_file->descriptor = open(
 	                             narrow_filename,
 	                             file_io_flags,
@@ -1218,6 +1261,38 @@ int libcfile_file_open_wide_with_error_code(
 		}
 		goto on_error;
 	}
+#if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ )
+	if( fstat(
+	     internal_file->descriptor,
+	     &file_statistics ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file statistics.",
+		 function );
+
+		return( -1 );
+	}
+	if( S_ISBLK( file_statistics.st_mode ) )
+	{
+		if( libcfile_internal_file_determine_block_size(
+		     internal_file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine block size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif /* defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) */
+
 	if( libcfile_internal_file_get_size(
 	     internal_file,
 	     &( internal_file->size ),
@@ -4790,10 +4865,17 @@ int libcfile_internal_file_set_block_size(
 	{
 		if( block_size > 0 )
 		{
+#if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ )
+			if( posix_memalign(
+			     (void **) &( internal_file->block_data ),
+			     block_size,
+			     block_size ) != 0 )
+#else
 			internal_file->block_data = (uint8_t *) memory_allocate(
-			                                         sizeof( uint8_t ) * block_size );
+			                                         block_size );
 
 			if( internal_file->block_data == NULL )
+#endif
 			{
 				libcerror_error_set(
 				 error,

@@ -2,7 +2,7 @@ man_MANS = \
 	libcfile.3
 
 EXTRA_DIST = \
-	libcfile.3
+	$(man_MANS)
 
 DISTCLEANFILES = \
 	Makefile \
