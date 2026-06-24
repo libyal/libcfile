@@ -3335,10 +3335,10 @@ int cfile_test_file_is_device(
 	          file,
 	          &error );
 
-	CFILE_TEST_ASSERT_EQUAL_INT(
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 0 );
+	 -1 );
 
 	CFILE_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -4259,7 +4259,80 @@ int main(
 	 stderr,
 	 NULL );
 #endif
+	if( source != NULL )
+	{
+		/* Make sure the file can be read, on some operating systems
+		 * "test -r source" will pass, but open fail.
+		 */
+		result = libcfile_file_initialize(
+		          &file,
+		          &error );
 
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NOT_NULL(
+		 "file",
+		 file );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libcfile_file_open_wide(
+		          file,
+		          source,
+		          LIBCFILE_OPEN_READ,
+		          NULL );
+#else
+		result = libcfile_file_open(
+		          file,
+		          source,
+		          LIBCFILE_OPEN_READ,
+		          NULL );
+#endif
+		if( result != 1 )
+		{
+			source = NULL;
+		}
+		result = libcfile_file_close(
+		          file,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 0 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		result = libcfile_file_free(
+		          &file,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "file",
+		 file );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		if( source == NULL )
+		{
+			return( 77 );
+		}
+	}
 	CFILE_TEST_RUN(
 	 "libcfile_file_initialize",
 	 cfile_test_file_initialize );
@@ -4281,65 +4354,81 @@ int main(
 	 cfile_test_file_resize );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
-	if( source != NULL )
-	{
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_open",
-		 cfile_test_file_open,
-		 source );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_open",
+	 cfile_test_file_open,
+	 source );
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_open_with_error_code",
-		 cfile_test_file_open_with_error_code,
-		 source );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_open_with_error_code",
+	 cfile_test_file_open_with_error_code,
+	 source );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_open_wide",
-		 cfile_test_file_open_wide,
-		 source );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_open_wide",
+	 cfile_test_file_open_wide,
+	 source );
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_open_wide_with_error_code",
-		 cfile_test_file_open_wide_with_error_code,
-		 source );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_open_wide_with_error_code",
+	 cfile_test_file_open_wide_with_error_code,
+	 source );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-		CFILE_TEST_RUN(
-		 "libcfile_file_close",
-		 cfile_test_file_close );
+	CFILE_TEST_RUN(
+	 "libcfile_file_close",
+	 cfile_test_file_close );
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_open_close",
-		 cfile_test_file_open_close,
-		 source );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_open_close",
+	 cfile_test_file_open_close,
+	 source );
 
-		/* Initialize test
+	/* Initialize test
+	 */
+	result = cfile_test_file_open_source(
+		  &file,
+		  source,
+		  &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcfile_file_get_size(
+		  file,
+		  &file_size,
+		  &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( ( file_size % 512 ) == 0 )
+	{
+		/* Test with block size if possible
 		 */
-		result = cfile_test_file_open_source(
-		          &file,
-		          source,
-		          &error );
-
-		CFILE_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 1 );
-
-	        CFILE_TEST_ASSERT_IS_NOT_NULL(
-	         "file",
-	         file );
-
-	        CFILE_TEST_ASSERT_IS_NULL(
-	         "error",
-	         error );
-
-		result = libcfile_file_get_size(
-		          file,
-		          &file_size,
-		          &error );
+		result = libcfile_file_set_block_size(
+			  file,
+			  512,
+			  &error );
 
 		CFILE_TEST_ASSERT_EQUAL_INT(
 		 "result",
@@ -4349,135 +4438,117 @@ int main(
 		CFILE_TEST_ASSERT_IS_NULL(
 		 "error",
 		 error );
+	}
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_seek_offset",
+	 cfile_test_file_seek_offset,
+	 file );
 
-		if( ( file_size % 512 ) == 0 )
-		{
-			/* Test with block size if possible
-			 */
-			result = libcfile_file_set_block_size(
-			          file,
-			          512,
-			          &error );
-
-			CFILE_TEST_ASSERT_EQUAL_INT(
-			 "result",
-			 result,
-			 1 );
-
-		        CFILE_TEST_ASSERT_IS_NULL(
-		         "error",
-		         error );
-		}
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_seek_offset",
-		 cfile_test_file_seek_offset,
-		 file );
-
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_read_buffer",
-		 cfile_test_file_read_buffer,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_read_buffer",
+	 cfile_test_file_read_buffer,
+	 file );
 
 #if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI )
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_internal_file_read_buffer_at_offset_with_error_code",
-		 cfile_test_internal_file_read_buffer_at_offset_with_error_code,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_internal_file_read_buffer_at_offset_with_error_code",
+	 cfile_test_internal_file_read_buffer_at_offset_with_error_code,
+	 file );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) && defined( WINAPI ) */
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_read_buffer_with_error_code",
-		 cfile_test_file_read_buffer_with_error_code,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_read_buffer_with_error_code",
+	 cfile_test_file_read_buffer_with_error_code,
+	 file );
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_is_open",
-		 cfile_test_file_is_open,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_is_open",
+	 cfile_test_file_is_open,
+	 file );
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_get_offset",
-		 cfile_test_file_get_offset,
-		 file );
-
-#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
-
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_internal_file_get_size",
-		 cfile_test_internal_file_get_size,
-		 file );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
-
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_get_size",
-		 cfile_test_file_get_size,
-		 file );
-
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_is_device",
-		 cfile_test_file_is_device,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_get_offset",
+	 cfile_test_file_get_offset,
+	 file );
 
 #if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_internal_file_io_control_read_with_error_code",
-		 cfile_test_internal_file_io_control_read_with_error_code,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_internal_file_get_size",
+	 cfile_test_internal_file_get_size,
+	 file );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_io_control_read",
-		 cfile_test_file_io_control_read,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_get_size",
+	 cfile_test_file_get_size,
+	 file );
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_io_control_read_with_error_code",
-		 cfile_test_file_io_control_read_with_error_code,
-		 file );
-
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_set_access_behavior",
-		 cfile_test_file_set_access_behavior,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_is_device",
+	 cfile_test_file_is_device,
+	 file );
 
 #if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_internal_file_set_block_size",
-		 cfile_test_internal_file_set_block_size,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_internal_file_io_control_read_with_error_code",
+	 cfile_test_internal_file_io_control_read_with_error_code,
+	 file );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
 
-		CFILE_TEST_RUN_WITH_ARGS(
-		 "libcfile_file_set_block_size",
-		 cfile_test_file_set_block_size,
-		 file );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_io_control_read",
+	 cfile_test_file_io_control_read,
+	 file );
 
-		/* Clean up
-		 */
-		result = cfile_test_file_close_source(
-		          &file,
-		          &error );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_io_control_read_with_error_code",
+	 cfile_test_file_io_control_read_with_error_code,
+	 file );
 
-		CFILE_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 0 );
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_set_access_behavior",
+	 cfile_test_file_set_access_behavior,
+	 file );
 
-		CFILE_TEST_ASSERT_IS_NULL(
-	         "file",
-	         file );
+#if defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT )
 
-	        CFILE_TEST_ASSERT_IS_NULL(
-	         "error",
-	         error );
-	}
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_internal_file_set_block_size",
+	 cfile_test_internal_file_set_block_size,
+	 file );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBCFILE_DLL_IMPORT ) */
+
+	CFILE_TEST_RUN_WITH_ARGS(
+	 "libcfile_file_set_block_size",
+	 cfile_test_file_set_block_size,
+	 file );
+
+	/* Clean up
+	 */
+	result = cfile_test_file_close_source(
+		  &file,
+		  &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "file",
+	 file );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 	return( EXIT_SUCCESS );

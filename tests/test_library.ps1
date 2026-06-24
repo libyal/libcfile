@@ -6,6 +6,31 @@ $OptionSets = "" -split " "
 
 . .\test_functions.ps1
 
+Function RunTestBinaryWithDevice
+{
+	param( [string]$TestExecutablesDirectory, [string]$TestName, [string]$TestFile )
+
+	$TestExecutable = "${TestExecutablesDirectory}\${TestName}.exe"
+
+	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
+	{
+		$TestDescription = "Missing binary: ${TestName}"
+		WriteTestResult ${TestDescription} ${ExitCommandNotFound}
+
+		Return ${ExitCommandNotFound}
+	}
+	$Output = Invoke-Expression "${TestExecutable} ${TestFile}"
+	$Result = $global:LastExitCode
+
+	If (${Result} -ne ${ExitSuccess})
+	{
+		Write-Host ${Output} -foreground Red
+	}
+	$TestDescription = "${TestName} with input: '${TestFile}"
+	WriteTestResult ${TestDescription} ${Result}
+
+	Return ${Result}
+}
 $TestExecutablesDirectory = GetTestExecutablesDirectory
 
 If (-Not (Test-Path ${TestExecutablesDirectory}))
@@ -15,7 +40,7 @@ If (-Not (Test-Path ${TestExecutablesDirectory}))
 	Exit ${ExitFailure}
 }
 
-$Result = ${ExitIgnore}
+$Result = ${ExitSuccess}
 
 Foreach (${TestName} in ${LibraryTests} -split " ")
 {
@@ -24,11 +49,11 @@ Foreach (${TestName} in ${LibraryTests} -split " ")
 	{
 		Continue
 	}
-	$Result = RunTestBinary ${TestExecutablesDirectory} "cfile_test_${TestName}"
+	$ResultRun = RunTestBinary ${TestExecutablesDirectory} "cfile_test_${TestName}"
 
-	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
+	If ((${ResultRun} -ne ${ExitSuccess}) -And (${ResultRun} -ne ${ExitIgnore}))
 	{
-		Break
+		$Result = ${ResultRun}
 	}
 }
 
@@ -43,17 +68,25 @@ Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 	}
 	ForEach ($TestInput in ${TestInputs})
 	{
-		$Result = RunTestBinaryWithInput ${TestExecutablesDirectory} "cfile_test_${TestName}" ${TestInput}
+		$ResultRun = RunTestBinaryWithInput ${TestExecutablesDirectory} "cfile_test_${TestName}" ${TestInput}
 
-		If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
+		If ((${ResultRun} -ne ${ExitSuccess}) -And (${ResultRun} -ne ${ExitIgnore}))
 		{
-			Break
+			$Result = ${ResultRun}
 		}
-	}
-	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
-	{
-		Break
 	}
 }
 
+$ResultRun = RunTestBinaryWithDevice ${TestExecutablesDirectory} "cfile_test_file" '\\.\PhysicalDrive0'
+
+If ((${ResultRun} -ne ${ExitSuccess}) -And (${ResultRun} -ne ${ExitIgnore}))
+{
+	$Result = ${ResultRun}
+}
+$ResultRun = RunTestBinaryWithDevice ${TestExecutablesDirectory} "cfile_test_file" '\\.\C:'
+
+If ((${ResultRun} -ne ${ExitSuccess}) -And (${ResultRun} -ne ${ExitIgnore}))
+{
+	$Result = ${ResultRun}
+}
 Exit ${Result}

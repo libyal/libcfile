@@ -3,6 +3,45 @@ m4_include([test_macros.at])
 
 include_test_inputs([libcfile])
 
+dnl Runs test file on a device
+m4_define([RUN_TEST_FILE_WITH_DEVICE],
+  [m4_foreach_w(
+    [test_file],
+    [/dev/ada0 /dev/da0 /dev/sda /dev/vda /dev/vtbd0],
+    [m4_syscmd([test -r ]test_file)
+
+    m4_if(
+      m4_sysval,
+      [0],
+      [m4_define(
+        [test_binary],
+        [m4_expand(test_prefix[]_test_file)])dnl
+
+      m4_define([sanitized_test_file],
+        [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+      AT_SETUP(test_binary with input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_LIBRARY_TESTS}"])
+
+      AT_CHECK(
+        [OSTYPE_LOWER=`echo "$OSTYPE" | tr '[A-Z]' '[a-z]'`
+        case "${OSTYPE_LOWER}" in
+          cygwin*|msys*)
+            exit 77
+            ;;
+
+          *)
+            ath_fn_run_test_binary test_binary test_input
+            ;;
+        esac
+        ])
+
+      AT_CLEANUP])
+    ])
+  ])
+
 dnl Wrap m4_define to overwrite AT_TESTSUITE_NAME
 m4_define([_M4_DEFINE_HOOK], m4_defn([m4_define]))
 m4_define([m4_define],
@@ -39,3 +78,5 @@ RUN_TEST_BINARIES_WITH_INPUT(
   [SKIP_LIBRARY_TESTS],
   [file],
   test_inputs_libcfile)
+
+RUN_TEST_FILE_WITH_DEVICE

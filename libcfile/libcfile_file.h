@@ -254,6 +254,10 @@ int libcfile_file_set_access_behavior(
      int access_behavior,
      libcerror_error_t **error );
 
+int libcfile_internal_file_determine_block_size(
+     libcfile_internal_file_t *internal_file,
+     libcerror_error_t **error );
+
 int libcfile_internal_file_set_block_size(
      libcfile_internal_file_t *internal_file,
      size_t block_size,
