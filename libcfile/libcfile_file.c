@@ -4432,14 +4432,21 @@ int libcfile_internal_file_determine_block_size(
 #endif /* defined( WINAPI ) */
 
 	static char *function     = "libcfile_internal_file_get_bytes_per_sector";
-	uint32_t error_code       = 0;
 
 #if defined( WINAPI )
 	uint32_t bytes_per_sector = 0;
+	uint32_t error_code       = 0;
 	BOOL result               = 0;
-#else
-	ssize_t read_count        = 0;
 
+#if ( WINVER < 0x0600 )
+	DWORD response_count      = 0;
+#endif
+
+#else
+#if defined( BLKSSZGET ) || defined( DIOCGSECTORSIZE ) || defined( DKIOCGETBLOCKSIZE )
+	ssize_t read_count        = 0;
+	uint32_t error_code       = 0;
+#endif
 #if !defined( BLKSSZGET ) && defined( DIOCGSECTORSIZE )
 	u_int bytes_per_sector    = 0;
 #else
@@ -4593,7 +4600,7 @@ int libcfile_internal_file_determine_block_size(
 			  &disk_geometry,
 			  sizeof( DISK_GEOMETRY ),
 			  &response_count,
-			  error );
+			  NULL );
 
 		if( result == FALSE )
 		{
@@ -4657,6 +4664,7 @@ int libcfile_internal_file_determine_block_size(
 		}
 	}
 #endif /* ( WINVER >= 0x0600 ) */
+
 #elif defined( BLKSSZGET )
 	read_count = libcfile_internal_file_io_control_read_with_error_code(
 		      internal_file,
