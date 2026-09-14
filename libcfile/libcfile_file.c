@@ -4431,7 +4431,7 @@ int libcfile_internal_file_determine_block_size(
 #endif
 #endif /* defined( WINAPI ) */
 
-	static char *function     = "libcfile_internal_file_get_bytes_per_sector";
+	static char *function     = "libcfile_internal_file_determine_block_size";
 
 #if defined( WINAPI )
 	uint32_t bytes_per_sector = 0;
