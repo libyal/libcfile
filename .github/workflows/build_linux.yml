@@ -10,19 +10,19 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: ubuntu-24.04
+        - os: ubuntu-26.04
           compiler: 'clang'
           configure_options: ''
-        - os: ubuntu-24.04
+        - os: ubuntu-26.04
           compiler: 'gcc'
           configure_options: ''
-        - os: ubuntu-24.04-arm
+        - os: ubuntu-26.04-arm
           compiler: 'clang'
           configure_options: ''
-        - os: ubuntu-24.04-arm
+        - os: ubuntu-26.04-arm
           compiler: 'gcc'
           configure_options: ''
-        - os: ubuntu-24.04
+        - os: ubuntu-26.04
           compiler: 'gcc'
           configure_options: '--enable-wide-character-type'
     steps:
@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: ubuntu-24.04
+        - os: ubuntu-26.04
           compiler: 'gcc'
           configure_options: ''
     steps:
@@ -78,10 +78,10 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: ubuntu-24.04
+        - os: ubuntu-26.04
           compiler: 'gcc'
           configure_options: ''
-        - os: ubuntu-24.04
+        - os: ubuntu-26.04
           compiler: 'gcc'
           configure_options: '--enable-wide-character-type'
     steps:
