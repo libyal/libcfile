@@ -221,6 +221,11 @@ int libcfile_file_free(
 		}
 		*file = NULL;
 
+		if( internal_file->block_data != NULL )
+		{
+			memory_free(
+			 internal_file->block_data );
+		}
 		memory_free(
 		 internal_file );
 	}
@@ -4858,9 +4863,9 @@ int libcfile_internal_file_set_block_size(
 
 		return( -1 );
 	}
-	if( internal_file->block_data != NULL )
+	if( block_size != internal_file->block_size )
 	{
-		if( block_size != internal_file->block_size )
+		if( internal_file->block_data != NULL )
 		{
 			memory_free(
 			 internal_file->block_data );
@@ -4868,10 +4873,11 @@ int libcfile_internal_file_set_block_size(
 			internal_file->block_data      = NULL;
 			internal_file->block_data_size = 0;
 		}
+		internal_file->block_size = 0;
 	}
-	if( internal_file->block_data == NULL )
+	if( block_size > 0 )
 	{
-		if( block_size > 0 )
+		if( internal_file->block_data == NULL )
 		{
 #if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ )
 			if( posix_memalign(
@@ -4906,10 +4912,15 @@ int libcfile_internal_file_set_block_size(
 				 "%s: unable to clear block data.",
 				 function );
 
+				memory_free(
+				 internal_file->block_data );
+
+				internal_file->block_data = NULL;
+
 				return( -1 );
 			}
+			internal_file->block_size = block_size;
 		}
-		internal_file->block_size = block_size;
 	}
 	return( 1 );
 }

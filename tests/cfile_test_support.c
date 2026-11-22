@@ -21,11 +21,24 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <memory.h>
 #include <narrow_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
+#endif
+
+#if defined( HAVE_SYS_STAT_H )
+#include <sys/stat.h>
+#endif
+
+#if defined( HAVE_SYS_TYPES_H )
+#include <sys/types.h>
+#endif
+
+#if defined( HAVE_FCNTL_H )
+#include <fcntl.h>
 #endif
 
 #if defined( HAVE_UNISTD_H )
@@ -182,8 +195,20 @@ on_error:
 int cfile_test_file_exists(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+#if !defined( WINAPI ) && !defined( __MINGW32__ )
+	char inaccessible_directory[ 18 ] = {
+		'c', 'f', 'i', 'l', 'e', '_', 't', 'e', 's', 't', '_', 'X', 'X', 'X', 'X', 'X', 'X', 0 };
+
+	char inaccessible_file[ 32 ]      = { 0 };
+#endif
+	libcerror_error_t *error          = NULL;
+	int result                        = 0;
+
+#if !defined( WINAPI ) && !defined( __MINGW32__ )
+	size_t directory_length           = 0;
+	int file_descriptor               = -1;
+	int with_directory                = 0;
+#endif
 
 	/* Test regular cases
 	 */
@@ -213,6 +238,119 @@ int cfile_test_file_exists(
 	 "error",
 	 error );
 
+#if !defined( WINAPI ) && !defined( __MINGW32__ )
+	/* Test a file in a directory without access permission
+	 * On POSIX stat() fails with EACCES in this case
+	 * the file is expected to be reported as existing
+	 */
+	result = cfile_test_get_temporary_filename(
+	          inaccessible_directory,
+	          18,
+	          &error );
+
+	CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	with_directory = result;
+
+	if( with_directory != 0 )
+	{
+		/* Convert the temporary file into a directory
+		 */
+		result = libcfile_file_remove(
+		          inaccessible_directory,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		result = mkdir(
+		          inaccessible_directory,
+		          0700 );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 0 );
+
+		directory_length = narrow_string_length(
+		                    inaccessible_directory );
+
+		memory_copy(
+		 inaccessible_file,
+		 inaccessible_directory,
+		 directory_length );
+
+		inaccessible_file[ directory_length ]     = '/';
+		inaccessible_file[ directory_length + 1 ] = 'f';
+		inaccessible_file[ directory_length + 2 ] = 0;
+
+		file_descriptor = open(
+		                   inaccessible_file,
+		                   O_WRONLY | O_CREAT,
+		                   0600 );
+
+		CFILE_TEST_ASSERT_NOT_EQUAL_INT(
+		 "file_descriptor",
+		 file_descriptor,
+		 -1 );
+
+		close(
+		 file_descriptor );
+
+		chmod(
+		 inaccessible_directory,
+		 0 );
+
+		result = libcfile_file_exists(
+		          inaccessible_file,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		chmod(
+		 inaccessible_directory,
+		 0700 );
+
+		result = libcfile_file_remove(
+		          inaccessible_file,
+		          &error );
+
+		CFILE_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CFILE_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		rmdir(
+		 inaccessible_directory );
+
+		with_directory = 0;
+	}
+#endif /* !defined( WINAPI ) && !defined( __MINGW32__ ) */
+
 	/* Test error cases
 	 */
 	result = libcfile_file_exists(
@@ -231,6 +369,27 @@ int cfile_test_file_exists(
 	libcerror_error_free(
 	 &error );
 
+#if !defined( WINAPI ) && !defined( __MINGW32__ )
+	/* Test a file with an invalid path such as within a non-directory
+	 */
+	result = libcfile_file_exists(
+	          "TestFile/x",
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#endif /* !defined( WINAPI ) && !defined( __MINGW32__ ) */
+
 	return( 1 );
 
 on_error:
@@ -239,6 +398,23 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+#if !defined( WINAPI ) && !defined( __MINGW32__ )
+	if( with_directory != 0 )
+	{
+		chmod(
+		 inaccessible_directory,
+		 0700 );
+
+		if( inaccessible_file[ 0 ] != 0 )
+		{
+			libcfile_file_remove(
+			 inaccessible_file,
+			 NULL );
+		}
+		rmdir(
+		 inaccessible_directory );
+	}
+#endif /* !defined( WINAPI ) && !defined( __MINGW32__ ) */
 	return( 0 );
 }
 
@@ -378,6 +554,24 @@ int cfile_test_file_remove(
 	libcerror_error_free(
 	 &error );
 
+	/* Test removing a non-existent file
+	 */
+	result = libcfile_file_remove(
+	          "bogus",
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -467,6 +661,25 @@ int cfile_test_file_remove_with_error_code(
 	result = libcfile_file_remove_with_error_code(
 	          temporary_filename,
 	          NULL,
+	          &error );
+
+	CFILE_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CFILE_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test removing a non-existent file
+	 */
+	result = libcfile_file_remove_with_error_code(
+	          "bogus",
+	          &error_code,
 	          &error );
 
 	CFILE_TEST_ASSERT_EQUAL_INT(
